@@ -81,6 +81,16 @@ export default function Home() {
           const loc: [number, number] = [position.coords.latitude, position.coords.longitude];
           setGpsLocation(loc);
           setFocusLocation(loc);
+          
+          // Re-fetch default route with actual GPS so distance is correct
+          const defaultDest: [number, number] = [10.8783, 106.8063];
+          fetch(`/api/routes?originLat=${loc[0]}&originLng=${loc[1]}&destLat=${defaultDest[0]}&destLng=${defaultDest[1]}`)
+            .then(r => r.json())
+            .then(resRoutes => {
+                setRoutes(resRoutes);
+                const balancedRoute = resRoutes.find((r: Route) => r.id === 'route-balanced');
+                if (balancedRoute) updateFocusBounds(balancedRoute.coordinates);
+            }).catch(e => console.error("Error updating GPS route", e));
         },
         (error) => {
           console.warn("GPS Error:", error.message);

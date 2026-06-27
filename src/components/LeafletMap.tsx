@@ -88,20 +88,20 @@ export default function LeafletMap({
   // --- THIẾT KẾ CÁC ICON TÙY BIẾN ĐẸP MẮT ---
   
   // 1. Icon định vị tài xế (màu xanh dương nhấp nháy)
-  const driverIcon = L.divIcon({
-    html: `
-      <div class="relative flex h-6 w-6">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-6 w-6 bg-blue-600 border-2 border-white shadow-md"></span>
-      </div>
-    `,
-    className: 'custom-driver-icon',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
+  // 1. Icon định vị tài xế (màu xanh dương nhấp nháy)
+  const createCustomIcon = (color: string, icon: string) => L.divIcon({
+    html: `<div class="flex items-center justify-center w-8 h-8 rounded-full bg-${color}-600 border-2 border-white text-white shadow-lg">${icon}</div>`,
+    className: 'custom-icon',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16]
   });
 
-  // 1.5 Icon định vị GPS thật (màu xanh lá)
-  const gpsIcon = L.divIcon({
+  const driverIcon = createCustomIcon('blue', '🚘');
+  const gpsIcon = createCustomIcon('indigo', '📍');
+  const destIcon = createCustomIcon('red', '🏁');
+
+  // 1.5 Icon định vị GPS thật nhấp nháy (như cũ)
+  const gpsPulseIcon = L.divIcon({
     html: `
       <div class="relative flex h-6 w-6">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -203,6 +203,21 @@ export default function LeafletMap({
             </div>
           </Popup>
         </Marker>
+
+        {/* 1.5 Marker Điểm Đến (Destination) - Từ tuyến đường đang chọn */}
+        {routes.map(route => {
+          if (route.id !== selectedRouteId || !route.coordinates || route.coordinates.length === 0) return null;
+          const destLatLng = route.coordinates[route.coordinates.length - 1];
+          return (
+            <Marker key={`dest-${route.id}`} position={destLatLng} icon={destIcon}>
+              <Popup>
+                <div className="p-1">
+                  <p className="font-bold text-red-600">Điểm đến</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
 
         {/* 2. Vẽ các vùng rủi ro nắng nóng (Heat Zones) */}
         {(activeLayer === 'all' || activeLayer === 'heat') && heatZones.map((zone) => (
