@@ -1,7 +1,7 @@
 'use client';
 
 import { Route } from '@/types';
-import { Route as RouteIcon, Clock, Milestone, Thermometer, Droplets, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Route as RouteIcon, Clock, Milestone, Thermometer, Droplets, CheckCircle2, AlertTriangle, ShieldCheck, Car } from 'lucide-react';
 
 interface RouteCompareProps {
   routes: Route[];
@@ -82,6 +82,13 @@ export default function RouteCompare({ routes, selectedRouteId, onSelectRoute }:
                     <Droplets className="w-3.5 h-3.5 text-blue-500" />
                     <span className="text-[10px] text-gray-400">
                       Ngập: <b className={`font-semibold ${route.floodRisk === 'High' ? 'text-red-400' : 'text-emerald-400'}`}>{route.floodRisk}</b>
+                    </span>
+                  </div>
+                  {/* Traffic Congestion */}
+                  <div className="flex items-center gap-1">
+                    <Car className="w-3.5 h-3.5 text-amber-500" />
+                    <span className="text-[10px] text-gray-400">
+                      Kẹt xe: <b className={`font-semibold ${route.trafficCongestion === 'Heavy' ? 'text-red-400' : route.trafficCongestion === 'Moderate' ? 'text-amber-400' : 'text-emerald-400'}`}>{route.trafficCongestion === 'Heavy' ? 'Nặng' : route.trafficCongestion === 'Moderate' ? 'Vừa' : route.trafficCongestion === 'Light' ? 'Nhẹ' : 'Thông thoáng'}</b>
                     </span>
                   </div>
                 </div>

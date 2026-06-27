@@ -133,6 +133,7 @@ export default function LeafletMap({
     let color = 'bg-amber-500';
     if (type === 'Flooded') color = 'bg-blue-500';
     if (type === 'Too hot') color = 'bg-orange-600';
+    if (type === 'Traffic jam') color = 'bg-rose-700';
     
     return L.divIcon({
       html: `
@@ -301,6 +302,7 @@ export default function LeafletMap({
                   {report.type === 'Flooded' && '🌊 Đường bị ngập'}
                   {report.type === 'Hard to stop' && '⛔ Khó dừng đỗ'}
                   {report.type === 'Unsafe pickup/drop-off' && '❌ Điểm đón không an toàn'}
+                  {report.type === 'Traffic jam' && '🚗 Kẹt xe / Tắc đường'}
                 </p>
                 {report.note && <p className="text-xs text-gray-700 mt-1">Ghi chú: {report.note}</p>}
                 <p className="text-[10px] text-gray-500 mt-1">Gửi lúc: {new Date(report.timestamp).toLocaleTimeString()}</p>

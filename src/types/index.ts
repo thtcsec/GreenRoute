@@ -41,6 +41,7 @@ export interface Route {
   distance: number; // in km
   heatRisk: 'High' | 'Medium' | 'Low' | 'Very Low';
   floodRisk: 'High' | 'Medium' | 'Low';
+  trafficCongestion: 'Heavy' | 'Moderate' | 'Light' | 'Clear';
   climateScore: number; // Scale 1-100
   isRecommended: boolean;
   recommendationStatus: string;
@@ -67,7 +68,7 @@ export interface PickupPoints {
 
 export interface ClimateReport {
   id: string;
-  type: 'Too hot' | 'No shade' | 'Flooded' | 'Hard to stop' | 'Unsafe pickup/drop-off';
+  type: 'Too hot' | 'No shade' | 'Flooded' | 'Hard to stop' | 'Unsafe pickup/drop-off' | 'Traffic jam';
   lat: number;
   lng: number;
   note?: string;

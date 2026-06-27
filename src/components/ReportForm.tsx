@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ClimateReport } from '@/types';
-import { Send, Thermometer, CloudSun, Droplets, Ban, ShieldAlert, Sparkles } from 'lucide-react';
+import { Send, Thermometer, CloudSun, Droplets, Ban, ShieldAlert, Sparkles, Car } from 'lucide-react';
 
 interface ReportFormProps {
   onSubmitReport: (type: ClimateReport['type'], note: string) => void;
@@ -67,6 +67,13 @@ export default function ReportForm({ onSubmitReport }: ReportFormProps) {
       icon: ShieldAlert,
       color: 'border-rose-500 text-rose-400 bg-rose-950/20',
       desc: 'Điểm đón nguy hiểm'
+    },
+    {
+      type: 'Traffic jam',
+      label: 'Kẹt xe / Tắc đường',
+      icon: Car,
+      color: 'border-red-500 text-red-400 bg-red-950/20',
+      desc: 'Đoạn đường ùn tắc kéo dài'
     }
   ];
 
