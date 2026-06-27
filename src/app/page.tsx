@@ -82,6 +82,12 @@ export default function Home() {
   };
 
   const handleLocateMe = () => {
+    // Nếu đã có gpsLocation cập nhật từ watchPosition, bay về ngay lập tức không delay
+    if (gpsLocation) {
+      centerMapOnLocation(gpsLocation);
+      return;
+    }
+
     if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -89,12 +95,12 @@ export default function Home() {
           setGpsLocation(loc);
           centerMapOnLocation(loc);
         },
-        () => centerMapOnLocation(gpsLocation || driverLocation),
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        () => centerMapOnLocation(driverLocation),
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
       return;
     }
-    centerMapOnLocation(gpsLocation || driverLocation);
+    centerMapOnLocation(driverLocation);
   };
 
   // --- REAL-TIME GPS TRACKING ---
