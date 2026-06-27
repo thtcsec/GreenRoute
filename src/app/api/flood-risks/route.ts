@@ -3,7 +3,7 @@ import floodRisksData from '@/data/flood_risks.json';
 import { FloodRisk } from '@/types';
 
 // In-memory store (chỉ dùng cho hackathon/MVP)
-let floodRisks = [...floodRisksData] as FloodRisk[];
+const floodRisks = [...floodRisksData] as FloodRisk[];
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

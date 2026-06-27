@@ -3,7 +3,7 @@ import heatZonesData from '@/data/heat_zones.json';
 import { HeatZone } from '@/types';
 
 // In-memory store (chỉ dùng cho hackathon/MVP)
-let heatZones = [...heatZonesData] as HeatZone[];
+const heatZones = [...heatZonesData] as HeatZone[];
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

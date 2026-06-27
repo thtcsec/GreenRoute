@@ -36,8 +36,8 @@ export default function Home() {
   const [userReports, setUserReports] = useState<ClimateReport[]>([]);
   const [weather, setWeather] = useState<WeatherData | null>(null);
 
-  // Tọa độ người dùng (Mặc định ở KTX Khu A Đại học Quốc gia - điểm xuất phát của các tuyến)
-  const [driverLocation] = useState<[number, number]>([10.8720, 106.7920]);
+  // Tọa độ người dùng (Mặc định ở Đại học Quốc tế HCMIU)
+  const [driverLocation] = useState<[number, number]>([10.8795, 106.8045]);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>('route-balanced');
   const [activeCoolStop, setActiveCoolStop] = useState<CoolStop | null>(null);
   const [focusLocation, setFocusLocation] = useState<[number, number] | null>(null);
@@ -348,28 +348,31 @@ export default function Home() {
     <div className="flex items-center justify-center min-h-screen bg-black font-sans text-gray-200 sm:py-6 overflow-hidden">
       
       {/* Container Mobile Shape */}
-      <div className="w-full max-w-[480px] h-[100dvh] sm:h-[90vh] sm:max-h-[850px] flex flex-col bg-gray-950 sm:border border-gray-800 sm:rounded-[2.5rem] sm:shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
+      <div className="w-full max-w-[480px] h-[100dvh] sm:h-[90vh] sm:max-h-[850px] flex flex-col bg-gradient-to-b from-gray-900 to-black sm:border border-white/10 sm:rounded-[2.5rem] sm:shadow-[0_0_80px_rgba(16,185,129,0.15)] relative overflow-hidden">
         
         {/* Header */}
-        <header className="shrink-0 px-4 py-3 bg-gray-950 border-b border-gray-900 flex items-center justify-between z-30">
+        <header className="shrink-0 px-5 py-3.5 bg-black/40 backdrop-blur-xl border-b border-white/5 flex items-center justify-between z-30">
           <div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-              <h1 className="text-md font-extrabold tracking-tight text-white flex items-center gap-1">
+            <div className="flex items-center gap-2">
+              <div className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
+              </div>
+              <h1 className="text-lg font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
                 GreenRoute
               </h1>
             </div>
-            <p className="text-[10px] text-gray-500 font-medium">Team I - iMPACT</p>
+            <p className="text-[11px] text-gray-400 font-medium tracking-wide mt-0.5">Team I - iMPACT</p>
           </div>
           <div className="text-right">
-            <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-900/50 px-2 py-0.5 rounded-md font-bold">
-              MVP PROTOTYPE
+            <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-bold shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+              PROTOTYPE
             </span>
           </div>
         </header>
 
         {/* Input */}
-        <div className="shrink-0 relative z-30 pt-3 px-3 pb-2 bg-gray-950 border-b border-gray-900">
+        <div className="shrink-0 relative z-30 pt-4 px-4 pb-3 bg-black/40 backdrop-blur-xl border-b border-white/5">
           <TripInputBar 
             driverLocation={gpsLocation || driverLocation}
             onSearchRoutes={handleSearchRoutes}
@@ -377,7 +380,7 @@ export default function Home() {
         </div>
 
         {/* Bản đồ */}
-        <div className="shrink-0 w-full h-[32vh] min-h-[200px] relative z-10 border-b border-gray-900 bg-gray-900">
+        <div className="shrink-0 w-full h-[32vh] min-h-[220px] relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)]">
           <MapContainer
             driverLocation={driverLocation}
             coolstops={coolstops}
@@ -397,34 +400,36 @@ export default function Home() {
           />
           
           {/* Cụm nút công cụ nổi trên bản đồ */}
-          <div className="absolute bottom-3 right-3 flex flex-col gap-3 z-20">
+          <div className="absolute bottom-4 right-4 flex flex-col gap-4 z-20">
             {/* Nút FAB Báo cáo Khẩn cấp */}
             <button
               onClick={() => setIsReportModalOpen(true)}
-              className="p-3 rounded-full bg-red-600 border border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-bounce hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center relative"
+              className="p-3.5 rounded-full bg-gradient-to-br from-red-500 to-rose-700 border border-red-400/50 text-white shadow-[0_0_25px_rgba(225,29,72,0.6)] animate-bounce hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center relative"
               title="Báo cáo nhanh"
             >
-              <AlertTriangle className="w-5 h-5" />
-              {/* Chấm đỏ ping thông báo nếu có report chưa xem (ví dụ) */}
+              <AlertTriangle className="w-5 h-5 drop-shadow-md" />
               {userReports.length > 0 && (
-                <span className="absolute top-0 right-0 flex h-3 w-3">
+                <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-500 border-2 border-rose-700"></span>
                 </span>
               )}
             </button>
           </div>
 
           {/* Feature 3: Map Layer Toggle UI */}
-          <div className="absolute top-3 left-3 z-[1000] flex gap-1 bg-gray-950/80 p-1 rounded-xl border border-gray-800 backdrop-blur-sm shadow-lg">
+          <div className="absolute top-4 left-4 z-[1000] flex gap-1.5 bg-black/60 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl">
             {(['all', 'heat', 'flood', 'none'] as const).map(mode => (
               <button 
                 key={mode} 
                 onClick={() => setActiveLayer(mode)} 
-                className={`px-2 py-1 text-[10px] rounded-lg font-bold transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 text-[11px] rounded-xl font-bold transition-all duration-300 cursor-pointer ${
                   activeLayer === mode 
-                    ? (mode === 'heat' ? 'bg-orange-600 text-white' : mode === 'flood' ? 'bg-blue-600 text-white' : mode === 'all' ? 'bg-emerald-600 text-white' : 'bg-gray-700 text-white') 
-                    : 'text-gray-400 hover:text-gray-200'
+                    ? (mode === 'heat' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-[0_0_10px_rgba(249,115,22,0.4)]' 
+                      : mode === 'flood' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-[0_0_10px_rgba(59,130,246,0.4)]' 
+                      : mode === 'all' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)]' 
+                      : 'bg-white/20 text-white') 
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {mode === 'heat' ? 'Nắng' : mode === 'flood' ? 'Ngập' : mode === 'all' ? 'Tất cả' : 'Ẩn'}
@@ -434,12 +439,14 @@ export default function Home() {
 
           {/* Feature 2: OSRM Info Overlay & Cancel Button */}
           {osrmInfo && (
-            <div className="absolute top-14 left-3 z-[1000] flex items-center gap-3 bg-gray-900/90 border border-emerald-900/50 px-3 py-1.5 rounded-xl backdrop-blur-sm shadow-lg text-xs font-bold text-emerald-400">
-              <div>
-                <Navigation className="w-3.5 h-3.5 inline mr-1" />
-                {osrmInfo.distance} km • {osrmInfo.duration} phút
+            <div className="absolute top-16 left-4 z-[1000] flex items-center gap-3 bg-black/70 border border-emerald-500/30 px-4 py-2 rounded-2xl backdrop-blur-md shadow-[0_0_20px_rgba(16,185,129,0.2)] text-xs font-bold text-emerald-400">
+              <div className="flex items-center gap-1.5">
+                <Navigation className="w-4 h-4 text-emerald-500" />
+                <span>{osrmInfo.distance} km</span>
+                <span className="text-gray-500 mx-1">•</span>
+                <span>{osrmInfo.duration} phút</span>
               </div>
-              <div className="w-px h-3 bg-gray-700"></div>
+              <div className="w-px h-4 bg-white/10"></div>
               <button
                 onClick={() => {
                   setOsrmRoute(null);
@@ -448,19 +455,11 @@ export default function Home() {
                   setFocusBounds(null);
                   if (abortControllerRef.current) abortControllerRef.current.abort();
                 }}
-                className="text-gray-400 hover:text-red-400 transition-colors cursor-pointer flex items-center justify-center"
+                className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 p-1 rounded-full transition-colors cursor-pointer flex items-center justify-center"
                 title="Hủy tuyến đường"
               >
                 <X className="w-4 h-4" />
               </button>
-            </div>
-          )}
-
-          {/* Feature 2: OSRM Error Snackbar */}
-          {osrmError && (
-            <div className="absolute bottom-16 left-4 right-4 z-[1000] bg-red-950/90 border border-red-900/50 p-2 rounded-xl backdrop-blur-sm text-red-200 text-xs text-center shadow-lg">
-              <AlertCircle className="w-3.5 h-3.5 inline mr-1" />
-              {osrmError}
             </div>
           )}
 
@@ -470,7 +469,7 @@ export default function Home() {
               setFocusLocation(gpsLocation || driverLocation);
               setFocusBounds(null);
             }}
-            className="absolute bottom-4 right-4 z-[1000] p-2.5 rounded-xl bg-gray-900 border border-gray-800 text-emerald-400 shadow-lg active:scale-95 transition-transform cursor-pointer"
+            className="absolute bottom-5 right-20 z-[1000] p-3 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-emerald-400 shadow-xl hover:bg-black/80 hover:scale-105 active:scale-95 transition-all cursor-pointer"
             title="Định vị tài xế"
           >
             <Compass className="w-5 h-5" />
@@ -479,25 +478,26 @@ export default function Home() {
 
         {/* Cảnh báo khí hậu khẩn cấp trên đầu nội dung — dùng dữ liệu Weather live */}
         {weather && weather.alertLevel !== 'low' && (
-        <div className="px-4 pt-4 relative z-20">
-          <div className={`flex items-start gap-3 p-3 rounded-xl border ${
-            weather.alertLevel === 'extreme' ? 'bg-red-950/40 border-red-900/50 text-red-200' 
-            : weather.alertLevel === 'high' ? 'bg-orange-950/40 border-orange-900/50 text-orange-200'
-            : 'bg-yellow-950/40 border-yellow-900/50 text-yellow-200'
+        <div className="px-4 pt-5 relative z-20">
+          <div className={`relative overflow-hidden flex items-start gap-3 p-4 rounded-2xl border backdrop-blur-xl ${
+            weather.alertLevel === 'extreme' ? 'bg-red-950/50 border-red-500/30 text-red-200 shadow-[0_0_30px_rgba(220,38,38,0.15)]' 
+            : weather.alertLevel === 'high' ? 'bg-orange-950/50 border-orange-500/30 text-orange-200 shadow-[0_0_30px_rgba(249,115,22,0.15)]'
+            : 'bg-yellow-950/50 border-yellow-500/30 text-yellow-200 shadow-[0_0_30px_rgba(234,179,8,0.15)]'
           }`}>
-            <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 animate-pulse ${
+            <div className="absolute top-0 left-0 w-1 h-full bg-current opacity-50"></div>
+            <AlertTriangle className={`w-6 h-6 shrink-0 mt-0.5 animate-pulse ${
               weather.alertLevel === 'extreme' ? 'text-red-500' : weather.alertLevel === 'high' ? 'text-orange-500' : 'text-yellow-500'
             }`} />
             <div>
-              <p className="text-xs font-bold text-white uppercase tracking-wider">
-                {weather.weatherCondition} — Cảm nhận {weather.feelsLike}°C
+              <p className="text-sm font-extrabold text-white tracking-wide">
+                {weather.weatherCondition} — Cảm nhận <span className="text-[1.1em]">{weather.feelsLike}°C</span>
               </p>
-              <p className={`text-[11px] mt-0.5 ${
+              <p className={`text-xs mt-1.5 leading-relaxed font-medium ${
                 weather.alertLevel === 'extreme' ? 'text-red-300' : weather.alertLevel === 'high' ? 'text-orange-300' : 'text-yellow-300'
               }`}>
                 {weather.rainVolume > 0 
-                  ? `Lượng mưa ${weather.rainVolume}mm. Cẩn thận ngập tại các điểm trũng, hãy dùng tuyến đường GreenRoute đề xuất.`
-                  : `UV ${weather.uvIndex}. Hãy chủ động tránh đỗ tại ngã tư và sử dụng trạm CoolStop được đề xuất phía dưới.`
+                  ? `Lượng mưa ${weather.rainVolume}mm. Cẩn thận ngập sâu, hãy dùng tuyến đường GreenRoute đề xuất.`
+                  : `Tia UV ở mức ${weather.uvIndex}. Hãy chủ động tránh đỗ tại ngã tư và sử dụng trạm CoolStop phía dưới.`
                 }
               </p>
             </div>
@@ -505,10 +505,8 @@ export default function Home() {
         </div>
         )}
 
-
-
         {/* Cảnh báo khí hậu */}
-        <div className="shrink-0 relative z-20 pt-3 px-3 bg-gray-950">
+        <div className="shrink-0 relative z-20 pt-4 px-4 bg-transparent">
           <ClimateAlertBanner 
             driverLocation={driverLocation}
             heatZones={heatZones}
@@ -519,37 +517,38 @@ export default function Home() {
         </div>
 
         {/* Nội dung Tab */}
-        <main className="flex-1 overflow-y-auto px-4 py-4 pb-20 bg-gray-950 z-20 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto px-4 py-5 pb-24 z-20 custom-scrollbar">
           {loading ? (
             <div className="h-full flex items-center justify-center py-10">
-              <div className="flex flex-col items-center gap-3">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-emerald-500"></div>
-                <span className="text-xs text-gray-500">Đang khởi tạo dữ liệu...</span>
+              <div className="flex flex-col items-center gap-4">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-emerald-500"></div>
+                <span className="text-sm font-medium text-emerald-500/80 animate-pulse">Đang đồng bộ dữ liệu...</span>
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
               {activeTab === 'map' && (
-                <div className="space-y-4">
-                  <div className="bg-gray-900/60 border border-gray-850 p-4 rounded-2xl">
-                    <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-                      {weather && <img src={weather.icon} alt={weather.weatherCondition} className="w-6 h-6 object-contain drop-shadow" />}
+                <div className="space-y-5">
+                  <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 opacity-50"></div>
+                    <h3 className="text-sm font-extrabold text-white mb-3 flex items-center gap-2">
+                      {weather && <img src={weather.icon} alt={weather.weatherCondition} className="w-7 h-7 object-contain drop-shadow-md" />}
                       Trạng thái hành trình {weather ? `(${weather.temperature}°C)` : ''}
                     </h3>
-                    <ul className="text-xs space-y-2 text-gray-400">
-                      <li className="flex justify-between">
-                        <span>Thời tiết:</span>
-                        <span className="text-gray-200 font-semibold">{weather?.weatherCondition || 'Đang tải...'}</span>
+                    <ul className="text-xs space-y-3 text-gray-400">
+                      <li className="flex justify-between items-center bg-white/5 p-2 rounded-lg">
+                        <span>Thời tiết</span>
+                        <span className="text-gray-200 font-bold">{weather?.weatherCondition || 'Đang tải...'}</span>
                       </li>
-                      <li className="flex justify-between">
-                        <span>Chỉ số tia cực tím UV:</span>
-                        <span className={`${(weather?.uvIndex ?? 0) >= 8 ? 'text-red-400' : 'text-amber-400'} font-semibold`}>
-                          {weather?.uvIndex ?? '--'} {(weather?.uvIndex ?? 0) >= 8 ? '(Rất cao)' : ''}
+                      <li className="flex justify-between items-center bg-white/5 p-2 rounded-lg">
+                        <span>Chỉ số tia cực tím UV</span>
+                        <span className={`${(weather?.uvIndex ?? 0) >= 8 ? 'text-red-400' : 'text-amber-400'} font-bold flex items-center gap-1`}>
+                          {weather?.uvIndex ?? '--'} {(weather?.uvIndex ?? 0) >= 8 ? <span className="text-[9px] bg-red-500/20 px-1.5 py-0.5 rounded-full">Rất cao</span> : ''}
                         </span>
                       </li>
-                      <li className="flex justify-between">
-                        <span>Điểm dừng mát gần nhất:</span>
-                        <span className="text-emerald-400 font-semibold">
+                      <li className="flex justify-between items-center bg-white/5 p-2 rounded-lg">
+                        <span>Điểm dừng mát gần nhất</span>
+                        <span className="text-emerald-400 font-bold">
                           {coolstops.length > 0 ? `${coolstops[0].name} (${coolstops[0].distance}m)` : 'Đang tải...'}
                         </span>
                       </li>
@@ -583,11 +582,11 @@ export default function Home() {
                     onStartRoute={(id) => alert('Hành trình bắt đầu! 🚗 Vui lòng đi theo hướng dẫn.')}
                   />
                   
-                  <div className="w-full h-px bg-gray-900"></div>
+                  <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
                   
                   {/* Điểm đón trả an toàn */}
                   <div>
-                    <h3 className="text-base font-bold text-white mb-3 px-1">Điểm đón an toàn quanh đây</h3>
+                    <h3 className="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-4 px-1">Điểm đón an toàn quanh đây</h3>
                     <PickupSafety
                       pickupPoints={pickupPoints}
                       onNavigateToPoint={handleNavigateToPickup}
@@ -599,8 +598,8 @@ export default function Home() {
           )}
         </main>
 
-        {/* Thanh Điều Hướng Dưới Cùng (Tối ưu còn 3 tabs) */}
-        <nav className="absolute bottom-0 left-0 right-0 h-[68px] bg-gray-950/95 backdrop-blur-md border-t border-gray-900 grid grid-cols-3 z-30">
+        {/* Thanh Điều Hướng Dưới Cùng */}
+        <nav className="absolute bottom-0 left-0 right-0 h-[72px] bg-black/80 backdrop-blur-2xl border-t border-white/10 grid grid-cols-3 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.3)] pb-safe">
           {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -613,13 +612,16 @@ export default function Home() {
                     setActiveCoolStop(coolstops[0]);
                   }
                 }}
-                className={`relative flex flex-col items-center justify-center gap-1.5 select-none transition-colors cursor-pointer ${
-                  isActive ? 'text-emerald-400' : 'text-gray-500 hover:text-gray-300'
+                className={`relative flex flex-col items-center justify-center gap-1 select-none transition-all duration-300 cursor-pointer ${
+                  isActive ? 'text-emerald-400 scale-105' : 'text-gray-500 hover:text-gray-300'
                 }`}
               >
-                {isActive && <span className="absolute top-1 w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_#10b981]" />}
-                <Icon className={`w-6 h-6 mt-1 transition-transform ${isActive ? 'scale-110' : ''}`} />
-                <span className={`text-[11px] font-bold ${isActive ? 'text-emerald-400' : 'text-gray-400'}`}>{tab.label}</span>
+                {isActive && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/10 to-transparent pointer-events-none" />
+                )}
+                {isActive && <span className="absolute top-1.5 w-1 h-1 bg-emerald-400 rounded-full shadow-[0_0_10px_#10b981]" />}
+                <Icon className={`w-6 h-6 transition-transform mt-2 ${isActive ? 'drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`text-[10px] font-bold tracking-wide mt-1 ${isActive ? 'text-emerald-400' : 'text-gray-400'}`}>{tab.label}</span>
               </button>
             )
           })}

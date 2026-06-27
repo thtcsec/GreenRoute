@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ClimateReport } from '@/types';
-import { Send, Thermometer, CloudSun, Droplets, Ban, ShieldAlert, Sparkles, Car, Trash2, ClipboardList, ChevronDown } from 'lucide-react';
+import { Send, Thermometer, CloudSun, Droplets, Ban, ShieldAlert, Sparkles, Car, Trash2, ClipboardList, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 function timeAgo(timestamp: string): string {
   const diff = Date.now() - new Date(timestamp).getTime();
@@ -45,52 +45,64 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
     }, 600);
   };
 
-  const typesList: { type: ClimateReport['type']; label: string; icon: React.ElementType; color: string; desc: string }[] = [
+  const typesList: { type: ClimateReport['type']; label: string; icon: React.ElementType; activeColor: string; activeBg: string; activeBorder: string; desc: string }[] = [
     {
       type: 'Too hot',
       label: 'Trời quá nóng',
       icon: Thermometer,
-      color: 'border-orange-500 text-orange-400 bg-orange-950/20',
+      activeColor: 'text-orange-300',
+      activeBg: 'bg-orange-950/40',
+      activeBorder: 'border-orange-500/50',
       desc: 'Nắng gắt nhiệt độ cao'
     },
     {
       type: 'No shade',
       label: 'Thiếu bóng râm',
       icon: CloudSun,
-      color: 'border-amber-500 text-amber-400 bg-amber-950/20',
+      activeColor: 'text-amber-300',
+      activeBg: 'bg-amber-950/40',
+      activeBorder: 'border-amber-500/50',
       desc: 'Không có cây/mái che'
     },
     {
       type: 'Flooded',
       label: 'Đường ngập nước',
       icon: Droplets,
-      color: 'border-blue-500 text-blue-400 bg-blue-950/20',
+      activeColor: 'text-blue-300',
+      activeBg: 'bg-blue-950/40',
+      activeBorder: 'border-blue-500/50',
       desc: 'Ngập sâu khó di chuyển'
     },
     {
       type: 'Hard to stop',
       label: 'Khó dừng đỗ',
       icon: Ban,
-      color: 'border-red-500 text-red-400 bg-red-950/20',
+      activeColor: 'text-red-300',
+      activeBg: 'bg-red-950/40',
+      activeBorder: 'border-red-500/50',
       desc: 'Đường hẹp/cấm đỗ xe'
     },
     {
       type: 'Unsafe pickup/drop-off',
       label: 'Đón trả không an toàn',
       icon: ShieldAlert,
-      color: 'border-rose-500 text-rose-400 bg-rose-950/20',
+      activeColor: 'text-rose-300',
+      activeBg: 'bg-rose-950/40',
+      activeBorder: 'border-rose-500/50',
       desc: 'Điểm đón nguy hiểm'
     },
     {
       type: 'Traffic jam',
       label: 'Kẹt xe / Tắc đường',
       icon: Car,
-      color: 'border-red-500 text-red-400 bg-red-950/20',
+      activeColor: 'text-red-300',
+      activeBg: 'bg-red-950/40',
+      activeBorder: 'border-red-500/50',
       desc: 'Đoạn đường ùn tắc kéo dài'
     }
   ];
 
-  const reportTypeMap: Record<ClimateReport['type'], { label: string; icon: any }> = {
+  const reportTypeMap: Record<ClimateReport['type'], { label: string; icon: React.ElementType }> = {
     'Too hot': { label: 'Trời quá nóng', icon: Thermometer },
     'No shade': { label: 'Thiếu bóng râm', icon: CloudSun },
     'Flooded': { label: 'Đường ngập nước', icon: Droplets },
@@ -107,53 +119,63 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
   const hasMoreReports = sortedReports.length > 5;
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl">
-      <div className="flex items-center justify-between mb-4">
+    <div className="relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+      {/* Top accent bar */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-500/70 to-transparent"></div>
+
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="p-2.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+          <ShieldAlert className="w-5 h-5 text-amber-400" />
+        </div>
         <div>
-          <h3 className="text-md font-bold text-white flex items-center gap-1.5">
-            <ShieldAlert className="w-5 h-5 text-amber-400" /> Báo cáo thời tiết thời gian thực
-          </h3>
-          <p className="text-[11px] text-gray-500">Giúp đỡ cộng đồng tài xế khác bằng cách chia sẻ thông tin thực tế</p>
+          <h3 className="text-sm font-black text-white flex items-center gap-1.5">Báo cáo thời tiết thực tế</h3>
+          <p className="text-[11px] text-gray-400 mt-0.5">Giúp cộng đồng tài xế khác bằng cách chia sẻ thông tin</p>
         </div>
       </div>
 
+      {/* Success toast */}
       {success && (
-        <div className="mb-4 p-3 bg-emerald-950/80 border border-emerald-900 text-emerald-300 rounded-xl text-xs font-semibold flex items-center gap-2 animate-bounce">
-          <Sparkles className="w-4 h-4 text-emerald-400" /> Báo cáo thành công! Vị trí đã được đánh dấu trên bản đồ.
+        <div className="mb-4 p-3.5 bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 rounded-2xl text-xs font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.2)] animate-in slide-in-from-top-2 duration-300">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <span>Báo cáo thành công! Vị trí đã được đánh dấu trên bản đồ.</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Lựa chọn loại báo cáo */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+          <label className="text-[10px] font-extrabold text-gray-500 uppercase tracking-widest block">
             Chọn tình huống gặp phải:
           </label>
           <div className="grid grid-cols-1 gap-2">
             {typesList.map((item) => {
               const Icon = item.icon;
               const isSelected = reportType === item.type;
-              
+
               return (
                 <button
                   type="button"
                   key={item.type}
                   onClick={() => setReportType(item.type)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                  className={`flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer ${
                     isSelected
-                      ? `${item.color} border-2 scale-[1.01]`
-                      : 'bg-gray-950/50 border-gray-800/80 text-gray-400 hover:border-gray-700'
+                      ? `${item.activeBg} ${item.activeBorder} scale-[1.01] shadow-lg`
+                      : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/15'
                   }`}
                 >
-                  <div className={`p-2 rounded-lg ${isSelected ? 'bg-gray-900/60' : 'bg-gray-900/40'}`}>
-                    <Icon className="w-4 h-4" />
+                  <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-black/40 border border-white/10' : 'bg-black/30'}`}>
+                    <Icon className={`w-4 h-4 ${isSelected ? item.activeColor : 'text-gray-500'}`} />
                   </div>
-                  <div>
-                    <p className={`text-xs font-bold ${isSelected ? 'text-white' : 'text-gray-300'}`}>
+                  <div className="flex-1">
+                    <p className={`text-xs font-extrabold ${isSelected ? 'text-white' : 'text-gray-400'}`}>
                       {item.label}
                     </p>
-                    <p className="text-[10px] text-gray-500">{item.desc}</p>
+                    <p className={`text-[10px] mt-0.5 ${isSelected ? 'text-gray-300' : 'text-gray-600'}`}>{item.desc}</p>
                   </div>
+                  {isSelected && (
+                    <CheckCircle2 className={`w-5 h-5 shrink-0 ${item.activeColor}`} />
+                  )}
                 </button>
               );
             })}
@@ -162,14 +184,14 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
 
         {/* Ghi chú thêm */}
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
+          <label className="text-[10px] font-extrabold text-gray-500 uppercase tracking-widest block">
             Ghi chú chi tiết (Tùy chọn):
           </label>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Ví dụ: Đoạn đường ngập khoảng nửa bánh xe máy, xe ga nên tránh..."
-            className="w-full bg-gray-950 border border-gray-850 rounded-xl p-3 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-all resize-none h-20"
+            className="w-full bg-black/50 border border-white/10 rounded-2xl p-3.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-amber-500/50 focus:bg-amber-950/10 focus:shadow-[0_0_15px_rgba(245,158,11,0.1)] transition-all resize-none h-20 leading-relaxed"
           />
         </div>
 
@@ -177,10 +199,13 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-amber-500 hover:bg-amber-600 text-gray-950 flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-amber-500/10"
+          className="w-full py-3.5 px-4 rounded-2xl font-extrabold text-sm bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)]"
         >
           {isSubmitting ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-gray-950"></div>
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>
+              <span>Đang gửi...</span>
+            </>
           ) : (
             <>
               <Send className="w-4 h-4" /> Gửi báo cáo ngay
@@ -190,15 +215,15 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
       </form>
 
       {/* Lịch sử báo cáo */}
-      <div className="mt-5 pt-5 border-t border-gray-800">
-        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+      <div className="mt-6 pt-5 border-t border-white/10">
+        <h4 className="text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
           <ClipboardList className="w-3.5 h-3.5" /> Lịch sử báo cáo
         </h4>
 
         {sortedReports.length === 0 ? (
-          <div className="bg-gray-950/50 border border-gray-800 rounded-xl p-6 text-center">
+          <div className="bg-white/5 border border-white/5 rounded-2xl p-6 text-center">
             <ClipboardList className="w-8 h-8 text-gray-700 mx-auto mb-2" />
-            <p className="text-xs text-gray-500">Chưa có báo cáo nào</p>
+            <p className="text-xs text-gray-600 font-medium">Chưa có báo cáo nào</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -209,16 +234,16 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
               return (
                 <div
                   key={report.id}
-                  className="bg-gray-950/50 border border-gray-800 rounded-xl p-3 flex items-center gap-3 group transition-all hover:border-gray-700"
+                  className="bg-white/5 border border-white/5 rounded-2xl p-3.5 flex items-center gap-3 group transition-all hover:bg-white/10 hover:border-white/10"
                 >
-                  <div className="p-1.5 rounded-lg bg-gray-900 shrink-0">
+                  <div className="p-2 rounded-xl bg-black/40 border border-white/5 shrink-0">
                     <Icon className="w-3.5 h-3.5 text-gray-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-gray-200">{typeInfo?.label || report.type}</span>
-                      <span className="text-[10px] text-gray-600">·</span>
-                      <span className="text-[10px] text-gray-500">{timeAgo(report.timestamp)}</span>
+                      <span className="text-xs font-extrabold text-gray-200 truncate">{typeInfo?.label || report.type}</span>
+                      <span className="text-[10px] text-gray-600 shrink-0">·</span>
+                      <span className="text-[10px] text-gray-500 shrink-0">{timeAgo(report.timestamp)}</span>
                     </div>
                     {report.note && (
                       <p className="text-[11px] text-gray-500 mt-0.5 truncate">{report.note}</p>
@@ -227,7 +252,7 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
                   {onDeleteReport && (
                     <button
                       onClick={() => onDeleteReport(report.id)}
-                      className="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-950/30 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shrink-0"
+                      className="p-1.5 rounded-xl text-gray-600 hover:text-red-400 hover:bg-red-950/30 border border-transparent hover:border-red-500/20 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shrink-0"
                       title="Xoá báo cáo"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -240,9 +265,9 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
             {hasMoreReports && !showAllReports && (
               <button
                 onClick={() => setShowAllReports(true)}
-                className="w-full py-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                className="w-full py-2.5 text-xs font-extrabold text-emerald-400 hover:text-emerald-300 flex items-center justify-center gap-1.5 transition-colors cursor-pointer bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5"
               >
-                <ChevronDown className="w-3.5 h-3.5" /> Xem tất cả ({sortedReports.length} báo cáo)
+                <ChevronDown className="w-4 h-4" /> Xem tất cả ({sortedReports.length} báo cáo)
               </button>
             )}
           </div>

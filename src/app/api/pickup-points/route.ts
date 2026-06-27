@@ -4,7 +4,7 @@ import { PickupPoints } from '@/types';
 
 // In-memory store cho pickup points
 // (Do pickup points hiện tại lưu object thay vì array)
-let pickupPoints: PickupPoints = { ...pickupPointsData } as PickupPoints;
+const pickupPoints: PickupPoints = { ...pickupPointsData } as PickupPoints;
 
 export async function GET() {
   return NextResponse.json(pickupPoints);

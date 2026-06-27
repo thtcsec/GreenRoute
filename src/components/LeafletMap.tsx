@@ -1,10 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMap, LayerGroup } from 'react-leaflet';
+import React, { useEffect, useState, memo } from 'react';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints } from '@/types';
+
+import HeatZoneLayer from './map/HeatZoneLayer';
+import FloodZoneLayer from './map/FloodZoneLayer';
+import CoolStopLayer from './map/CoolStopLayer';
+import PickupPointsLayer from './map/PickupPointsLayer';
+import UserReportsLayer from './map/UserReportsLayer';
+import RouteLayer from './map/RouteLayer';
+import UserMarkerLayer from './map/UserMarkerLayer';
+import MapLegend from './map/MapLegend';
 
 // Sửa lỗi Leaflet icon mặc định trong Next.js/Webpack
 const setupDefaultIcon = () => {
@@ -19,14 +28,14 @@ const setupDefaultIcon = () => {
 
 setupDefaultIcon();
 
-// Component phụ để cập nhật góc nhìn bản đồ động
+// Component phụ để cập nhật góc nhìn bản đồ động mượt mà
 function ChangeView({ center, zoom, bounds }: { center: [number, number]; zoom: number; bounds?: L.LatLngBoundsExpression }) {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
-      map.fitBounds(bounds, { padding: [40, 40] });
+      map.fitBounds(bounds, { padding: [40, 40], animate: true, duration: 1 });
     } else {
-      map.setView(center, zoom, { animate: true });
+      map.setView(center, zoom, { animate: true, duration: 1 });
     }
   }, [center, zoom, bounds, map]);
   return null;
@@ -50,7 +59,7 @@ interface LeafletMapProps {
   activeLayer: 'heat' | 'flood' | 'all' | 'none';
 }
 
-export default function LeafletMap({
+function LeafletMapComponent({
   driverLocation,
   coolstops,
   heatZones,
@@ -67,112 +76,27 @@ export default function LeafletMap({
   osrmRoute,
   activeLayer
 }: LeafletMapProps) {
-  const [mapReady, setMapReady] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMapReady(true);
-  }, []);
+  const [mapReady] = useState(true);
 
   if (!mapReady) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-950 text-emerald-400">
         <div className="flex flex-col items-center gap-3">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-emerald-500"></div>
-          <span className="text-sm font-medium">Đang tải bản đồ...</span>
+          <span className="text-sm font-medium text-gray-300">Đang khởi tạo GIS Map Engine...</span>
         </div>
       </div>
     );
   }
 
-  // --- THIẾT KẾ CÁC ICON TÙY BIẾN ĐẸP MẮT ---
-  
-  // 1. Icon định vị tài xế (màu xanh dương nhấp nháy)
-  const driverIcon = L.divIcon({
-    html: `
-      <div class="relative flex h-6 w-6">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-6 w-6 bg-blue-600 border-2 border-white shadow-md"></span>
-      </div>
-    `,
-    className: 'custom-driver-icon',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
-  });
-
-  // 1.5 Icon định vị GPS thật (màu xanh lá)
-  const gpsIcon = L.divIcon({
-    html: `
-      <div class="relative flex h-6 w-6">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-6 w-6 bg-emerald-600 border-2 border-white shadow-md"></span>
-      </div>
-    `,
-    className: 'custom-gps-icon',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
-  });
-
-  // 2. Icon điểm dừng mát mẻ (Màu xanh lá có biểu tượng lá cây)
-  const coolStopIcon = (_name: string) => L.divIcon({
-    html: `
-      <div class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-600 border-2 border-white text-white shadow-lg transform hover:scale-110 transition-transform duration-200">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 10H6M12 2a4 4 0 0 1 4 4v4H8V6a4 4 0 0 1 4-4Z"/></svg>
-      </div>
-    `,
-    className: 'custom-coolstop-icon',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
-
-  // 3. Icon điểm đón mặc định bị nắng nóng/nguy hiểm (Màu đỏ cảnh báo)
-  const defaultPickupIcon = L.divIcon({
-    html: `
-      <div class="flex items-center justify-center w-8 h-8 rounded-full bg-rose-600 border-2 border-white text-white shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      </div>
-    `,
-    className: 'custom-pickup-default-icon',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
-
-  // 4. Icon điểm đón thay thế an toàn gợi ý (Màu xanh dương nhạt hình dấu check)
-  const suggestedPickupIcon = L.divIcon({
-    html: `
-      <div class="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-600 border-2 border-white text-white shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      </div>
-    `,
-    className: 'custom-pickup-suggested-icon',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
-
-  // 5. Icon báo cáo khí hậu của người dùng (Màu vàng cam cảnh báo)
-  const reportIcon = (type: string) => {
-    let color = 'bg-amber-500';
-    if (type === 'Flooded') color = 'bg-blue-500';
-    if (type === 'Too hot') color = 'bg-orange-600';
-    if (type === 'Traffic jam') color = 'bg-rose-700';
-    
-    return L.divIcon({
-      html: `
-        <div class="flex items-center justify-center w-7 h-7 rounded-full ${color} border border-white text-white shadow-md animate-pulse">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-      `,
-      className: 'custom-report-icon',
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
-    });
-  };
-
   // Map center setup
   const centerLatLong: [number, number] = focusLocation || gpsLocation || driverLocation;
 
+  const showHeat = activeLayer === 'all' || activeLayer === 'heat';
+  const showFlood = activeLayer === 'all' || activeLayer === 'flood';
+
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative overflow-hidden">
       <MapContainer
         center={centerLatLong}
         zoom={15}
@@ -187,222 +111,37 @@ export default function LeafletMap({
         {/* Cập nhật view động */}
         <ChangeView center={centerLatLong} zoom={focusLocation ? 16 : 15} bounds={focusBounds || undefined} />
 
-        {/* 1. Marker vị trí người dùng (Ưu tiên GPS thật, nếu không có thì dùng giả lập) */}
-        <Marker 
-          position={gpsLocation || driverLocation} 
-          icon={gpsLocation ? gpsIcon : driverIcon}
-        >
-          <Popup>
-            <div className="p-1">
-              <p className="font-bold text-emerald-700">
-                {gpsLocation ? "Vị trí GPS thật" : "Vị trí giả lập"}
-              </p>
-              <p className="text-xs text-gray-600">
-                {gpsLocation ? "Từ thiết bị của bạn" : "Dùng để demo tính năng"}
-              </p>
-            </div>
-          </Popup>
-        </Marker>
+        {/* 1. Marker vị trí người dùng */}
+        <UserMarkerLayer driverLocation={driverLocation} gpsLocation={gpsLocation} />
 
         {/* 2. Vẽ các vùng rủi ro nắng nóng (Heat Zones) */}
-        {(activeLayer === 'all' || activeLayer === 'heat') && heatZones.map((zone) => (
-          <Circle
-            key={zone.id}
-            center={[zone.lat, zone.lng]}
-            radius={zone.radius}
-            pathOptions={{
-              color: '#f97316',
-              fillColor: '#ea580c',
-              fillOpacity: 0.25,
-              weight: 1.5,
-              dashArray: '4, 4'
-            }}
-          >
-            <Popup>
-              <div className="p-1">
-                <p className="font-bold text-orange-600">{zone.name}</p>
-                <p className="text-xs text-gray-700 mt-1">💡 Rủi ro: <b>{zone.riskLevel}</b></p>
-                <p className="text-xs text-gray-700">🌡️ Chỉ số nhiệt: <b>{zone.heatIndex}°C</b></p>
-                <p className="text-xs text-gray-600 mt-1">{zone.description}</p>
-              </div>
-            </Popup>
-          </Circle>
-        ))}
+        <HeatZoneLayer heatZones={heatZones} visible={showHeat} />
 
         {/* 3. Vẽ các vùng rủi ro ngập lụt (Flood Zones) */}
-        {(activeLayer === 'all' || activeLayer === 'flood') && floodRisks.map((zone) => (
-          <Circle
-            key={zone.id}
-            center={[zone.lat, zone.lng]}
-            radius={zone.radius}
-            pathOptions={{
-              color: '#3b82f6',
-              fillColor: '#2563eb',
-              fillOpacity: 0.25,
-              weight: 1.5,
-              dashArray: '3, 3'
-            }}
-          >
-            <Popup>
-              <div className="p-1">
-                <p className="font-bold text-blue-600">{zone.name}</p>
-                <p className="text-xs text-gray-700 mt-1">🌊 Rủi ro ngập: <b>{zone.riskLevel}</b></p>
-                <p className="text-xs text-gray-700">📏 Mức nước ngập: <b>{zone.waterDepth} cm</b></p>
-                <p className="text-xs text-gray-600 mt-1">{zone.description}</p>
-              </div>
-            </Popup>
-          </Circle>
-        ))}
+        <FloodZoneLayer floodRisks={floodRisks} visible={showFlood} />
 
         {/* 4. Marker các điểm dừng chân mát mẻ (CoolStops) */}
-        {coolstops.map((stop) => (
-          <Marker
-            key={stop.id}
-            position={[stop.lat, stop.lng]}
-            icon={coolStopIcon(stop.name)}
-            eventHandlers={{
-              click: () => onSelectCoolStop(stop)
-            }}
-          >
-            <Popup>
-              <div className="p-1 font-sans">
-                <p className="font-bold text-emerald-700 text-sm">{stop.name}</p>
-                <p className="text-xs text-gray-700 mt-1">🌳 Shade Score: <b>{stop.shadeScore}/10</b></p>
-                <p className="text-xs text-gray-700">☂️ Mái che mưa: <b>{stop.rainCover ? 'Có' : 'Không'}</b></p>
-                <p className="text-xs text-gray-700">🛡️ An toàn lề đường: <b>{stop.curbSafety}</b></p>
-                <p className="text-xs text-gray-600 mt-1">{stop.description}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <CoolStopLayer coolstops={coolstops} onSelectCoolStop={onSelectCoolStop} />
 
         {/* 5. Marker điểm đón mặc định & gợi ý điểm an toàn */}
-        {pickupPoints && (
-          <>
-            <Marker position={[pickupPoints.defaultPoint.lat, pickupPoints.defaultPoint.lng]} icon={defaultPickupIcon}>
-              <Popup>
-                <div className="p-1">
-                  <p className="font-bold text-red-600 text-xs">⚠️ ĐIỂM ĐÓN GỐC (RỦI RO)</p>
-                  <p className="font-semibold text-gray-900 text-sm">{pickupPoints.defaultPoint.name}</p>
-                  <p className="text-xs text-gray-700 mt-1">Lý do: {pickupPoints.defaultPoint.reason}</p>
-                </div>
-              </Popup>
-            </Marker>
-
-            <Marker position={[pickupPoints.suggestedPoint.lat, pickupPoints.suggestedPoint.lng]} icon={suggestedPickupIcon}>
-              <Popup>
-                <div className="p-1">
-                  <p className="font-bold text-emerald-600 text-xs">✅ ĐIỂM ĐÓN KHUYÊN DÙNG</p>
-                  <p className="font-semibold text-gray-900 text-sm">{pickupPoints.suggestedPoint.name}</p>
-                  <p className="text-xs text-gray-700 mt-1">Lý do: {pickupPoints.suggestedPoint.reason}</p>
-                </div>
-              </Popup>
-            </Marker>
-
-            {/* Nối 2 điểm đón bằng đường nét đứt để thể hiện sự dịch chuyển an toàn */}
-            <Polyline
-              positions={[
-                [pickupPoints.defaultPoint.lat, pickupPoints.defaultPoint.lng],
-                [pickupPoints.suggestedPoint.lat, pickupPoints.suggestedPoint.lng]
-              ]}
-              pathOptions={{
-                color: '#06b6d4',
-                weight: 2,
-                dashArray: '5, 5'
-              }}
-            />
-          </>
-        )}
+        <PickupPointsLayer pickupPoints={pickupPoints} />
 
         {/* 6. Hiển thị báo cáo thời tiết tức thời của người dùng */}
-        {userReports.map((report) => (
-          <Marker
-            key={report.id}
-            position={[report.lat, report.lng]}
-            icon={reportIcon(report.type)}
-          >
-            <Popup>
-              <div className="p-1">
-                <p className="font-bold text-amber-600 text-xs">⚠️ BÁO CÁO TỪ TÀI XẾ</p>
-                <p className="font-semibold text-gray-900 text-sm">
-                  {report.type === 'Too hot' && '🔥 Trời quá nóng'}
-                  {report.type === 'No shade' && '☀️ Thiếu bóng mát'}
-                  {report.type === 'Flooded' && '🌊 Đường bị ngập'}
-                  {report.type === 'Hard to stop' && '⛔ Khó dừng đỗ'}
-                  {report.type === 'Unsafe pickup/drop-off' && '❌ Điểm đón không an toàn'}
-                  {report.type === 'Traffic jam' && '🚗 Kẹt xe / Tắc đường'}
-                </p>
-                {report.note && <p className="text-xs text-gray-700 mt-1">Ghi chú: {report.note}</p>}
-                <p className="text-[10px] text-gray-500 mt-1">Gửi lúc: {new Date(report.timestamp).toLocaleTimeString()}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <UserReportsLayer userReports={userReports} />
 
-        {/* 7. Vẽ các tuyến đường so sánh (Chỉ hiện khi chưa có tuyến OSRM)
-            Render tuyến đã chọn sau cùng để đảm bảo nó luôn hiển thị nổi bật trên top. */}
-        {!osrmRoute && (
-          <>
-            {routes.filter(r => r.id !== selectedRouteId).map(route => (
-              <Polyline
-                key={route.id}
-                positions={route.coordinates}
-                pathOptions={{
-                  color: '#64748b',
-                  weight: 3,
-                  opacity: 0.4
-                }}
-                eventHandlers={{ click: () => onSelectRoute(route.id) }}
-              />
-            ))}
-
-            {/* Render tuyến được chọn ở trên cùng */}
-            {routes.find(r => r.id === selectedRouteId) && (() => {
-              const route = routes.find(r => r.id === selectedRouteId)!;
-              return (
-                <Polyline
-                  key={route.id}
-                  positions={route.coordinates}
-                  pathOptions={{
-                    color: route.color,
-                    weight: 6,
-                    opacity: 0.9
-                  }}
-                  eventHandlers={{ click: () => onSelectRoute(route.id) }}
-                />
-              );
-            })()}
-          </>
-        )}
-
-        {/* 8. Vẽ tuyến đường OSRM thật (Thay thế toàn bộ Polyline giả) */}
-        {osrmRoute && (
-          <LayerGroup>
-            {/* Đường viền (Outline) để nổi bật tuyến đường trên nền bản đồ phức tạp */}
-            <Polyline
-              positions={osrmRoute}
-              pathOptions={{
-                color: '#022c22', // emerald-950
-                weight: 8,
-                opacity: 0.6,
-                lineCap: 'round',
-                lineJoin: 'round'
-              }}
-            />
-            {/* Lõi tuyến đường */}
-            <Polyline
-              positions={osrmRoute}
-              pathOptions={{
-                color: '#10b981', // emerald-500
-                weight: 5,
-                opacity: 1,
-                lineCap: 'round',
-                lineJoin: 'round'
-              }}
-            />
-          </LayerGroup>
-        )}
+        {/* 7 & 8. Vẽ các tuyến đường so sánh & tuyến OSRM */}
+        <RouteLayer
+          routes={routes}
+          selectedRouteId={selectedRouteId}
+          osrmRoute={osrmRoute}
+          onSelectRoute={onSelectRoute}
+        />
       </MapContainer>
+
+      {/* 9. Hiển thị chú giải bản đồ (Map Legend) */}
+      <MapLegend activeLayer={activeLayer} />
     </div>
   );
 }
+
+export default memo(LeafletMapComponent);

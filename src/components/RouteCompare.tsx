@@ -12,15 +12,15 @@ interface RouteCompareProps {
 
 export default function RouteCompare({ routes, selectedRouteId, onSelectRoute, onStartRoute }: RouteCompareProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-md font-bold text-white flex items-center gap-1.5">
-          <RouteIcon className="w-5 h-5 text-emerald-400" /> So sánh tuyến đường khí hậu
+        <h3 className="text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 flex items-center gap-2">
+          <RouteIcon className="w-5 h-5 text-emerald-400" /> Lựa chọn tuyến đường
         </h3>
-        <span className="text-[10px] text-gray-500 font-medium">Ấn để chọn tuyến</span>
+        <span className="text-[10px] text-gray-400 font-bold tracking-wider uppercase bg-white/5 px-2 py-1 rounded-md">Ấn để chọn</span>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {routes.map((route) => {
           const isSelected = selectedRouteId === route.id;
           
@@ -28,112 +28,125 @@ export default function RouteCompare({ routes, selectedRouteId, onSelectRoute, o
             <div
               key={route.id}
               onClick={() => onSelectRoute(route.id)}
-              className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer ${
+              className={`relative overflow-hidden p-4 rounded-3xl transition-all duration-300 cursor-pointer ${
                 isSelected
-                  ? 'bg-gray-900 border-emerald-500 shadow-lg shadow-emerald-500/5'
-                  : 'bg-gray-950/80 border-gray-800 hover:border-gray-700'
+                  ? 'bg-gradient-to-br from-emerald-900/40 to-black border border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.15)] scale-[1.02]'
+                  : 'bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10'
               }`}
             >
+              {isSelected && (
+                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-400 to-cyan-500"></div>
+              )}
+              
               {/* Tiêu đề & Trạng thái khuyến nghị */}
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h4 className={`text-sm font-bold transition-colors ${isSelected ? 'text-emerald-400' : 'text-white'}`}>
+                  <h4 className={`text-sm font-extrabold transition-colors ${isSelected ? 'text-emerald-400 drop-shadow-md' : 'text-white'}`}>
                     {route.name}
                   </h4>
-                  <p className="text-[11px] text-gray-400 mt-1 italic">
+                  <p className="text-[11px] text-gray-400 mt-1 font-medium italic">
                     {route.recommendationStatus}
                   </p>
                 </div>
                 {route.isRecommended && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-950 text-emerald-400 border border-emerald-900/60 shrink-0">
-                    <ShieldCheck className="w-3 h-3" /> Tối ưu nhất
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)] shrink-0">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Tối ưu nhất
                   </span>
                 )}
                 {!route.isRecommended && route.id === 'route-coolest' && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-red-950 text-red-400 border border-red-900/60 shrink-0">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-red-500/20 text-red-300 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)] shrink-0">
                     Chậm (+9p)
                   </span>
                 )}
               </div>
 
               {/* Thông số chuyến đi */}
-              <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                <div className="flex items-center gap-1.5 text-gray-400">
-                  <Clock className="w-3.5 h-3.5 text-gray-500" />
-                  Thời gian: <span className="font-bold text-white">{route.time} phút</span>
+              <div className="grid grid-cols-2 gap-3 text-xs mb-4">
+                <div className="flex items-center gap-2 bg-black/40 p-2 rounded-xl border border-white/5">
+                  <Clock className="w-4 h-4 text-emerald-400" />
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Thời gian</span>
+                    <span className="font-extrabold text-white">{route.time} phút</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-gray-400">
-                  <Milestone className="w-3.5 h-3.5 text-gray-500" />
-                  Khoảng cách: <span className="font-bold text-white">{route.distance} km</span>
+                <div className="flex items-center gap-2 bg-black/40 p-2 rounded-xl border border-white/5">
+                  <Milestone className="w-4 h-4 text-cyan-400" />
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Khoảng cách</span>
+                    <span className="font-extrabold text-white">{route.distance} km</span>
+                  </div>
                 </div>
               </div>
 
               {/* Thu nhập & Chi phí xăng */}
               {(route.estimatedEarning != null || route.fuelCost != null) && (
-                <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                <div className="grid grid-cols-2 gap-3 text-xs mb-4">
                   {route.estimatedEarning != null && (
-                    <div className="flex items-center gap-1.5 text-gray-400">
-                      <span className="text-sm">💰</span>
-                      Thu nhập: <span className="font-bold text-emerald-400">{route.estimatedEarning.toLocaleString('vi-VN')}đ</span>
+                    <div className="flex items-center gap-2 text-gray-400 bg-black/20 p-2 rounded-xl border border-white/5">
+                      <span className="text-base drop-shadow-md">💰</span>
+                      <div className="flex flex-col">
+                        <span className="text-[9px] uppercase font-bold text-gray-500">Dự kiến Thu</span>
+                        <span className="font-extrabold text-emerald-400">{route.estimatedEarning.toLocaleString('vi-VN')}đ</span>
+                      </div>
                     </div>
                   )}
                   {route.fuelCost != null && (
-                    <div className="flex items-center gap-1.5 text-gray-400">
-                      <span className="text-sm">⛽</span>
-                      Xăng: <span className="font-bold text-amber-400">{route.fuelCost.toLocaleString('vi-VN')}đ</span>
+                    <div className="flex items-center gap-2 text-gray-400 bg-black/20 p-2 rounded-xl border border-white/5">
+                      <span className="text-base drop-shadow-md">⛽</span>
+                      <div className="flex flex-col">
+                        <span className="text-[9px] uppercase font-bold text-gray-500">Chi phí xăng</span>
+                        <span className="font-extrabold text-amber-400">{route.fuelCost.toLocaleString('vi-VN')}đ</span>
+                      </div>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Chỉ số rủi ro & Điểm khí hậu */}
-              <div className="flex items-center justify-between border-t border-gray-850 pt-3">
+              <div className="flex items-center justify-between border-t border-white/10 pt-4">
                 <div className="flex items-center gap-3">
                   {/* Heat Risk */}
-                  <div className="flex items-center gap-1">
-                    <Thermometer className="w-3.5 h-3.5 text-orange-500" />
-                    <span className="text-[10px] text-gray-400">
-                      Nắng: <b className={`font-semibold ${route.heatRisk === 'High' ? 'text-red-400' : 'text-emerald-400'}`}>{route.heatRisk}</b>
+                  <div className="flex items-center gap-1.5 bg-black/30 px-2 py-1 rounded-lg">
+                    <Thermometer className={`w-3.5 h-3.5 ${route.heatRisk === 'High' ? 'text-red-500 animate-pulse' : 'text-orange-400'}`} />
+                    <span className="text-[9px] text-gray-400 font-bold uppercase">
+                      <b className={`font-extrabold ${route.heatRisk === 'High' ? 'text-red-400' : 'text-emerald-400'}`}>{route.heatRisk}</b>
                     </span>
                   </div>
                   {/* Flood Risk */}
-                  <div className="flex items-center gap-1">
-                    <Droplets className="w-3.5 h-3.5 text-blue-500" />
-                    <span className="text-[10px] text-gray-400">
-                      Ngập: <b className={`font-semibold ${route.floodRisk === 'High' ? 'text-red-400' : 'text-emerald-400'}`}>{route.floodRisk}</b>
+                  <div className="flex items-center gap-1.5 bg-black/30 px-2 py-1 rounded-lg">
+                    <Droplets className={`w-3.5 h-3.5 ${route.floodRisk === 'Medium' ? 'text-blue-500 animate-bounce' : 'text-blue-400'}`} />
+                    <span className="text-[9px] text-gray-400 font-bold uppercase">
+                      <b className={`font-extrabold ${route.floodRisk !== 'Low' ? 'text-amber-400' : 'text-emerald-400'}`}>{route.floodRisk}</b>
                     </span>
                   </div>
-                  {/* Traffic Congestion */}
-                  <div className="flex items-center gap-1">
-                    <Car className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="text-[10px] text-gray-400">
-                      Kẹt xe: <b className={`font-semibold ${route.trafficCongestion === 'Heavy' ? 'text-red-400' : route.trafficCongestion === 'Moderate' ? 'text-amber-400' : 'text-emerald-400'}`}>{route.trafficCongestion === 'Heavy' ? 'Nặng' : route.trafficCongestion === 'Moderate' ? 'Vừa' : route.trafficCongestion === 'Light' ? 'Nhẹ' : 'Thông thoáng'}</b>
+                  {/* Traffic */}
+                  <div className="flex items-center gap-1.5 bg-black/30 px-2 py-1 rounded-lg">
+                    <Car className="w-3.5 h-3.5 text-gray-400" />
+                    <span className="text-[9px] text-gray-400 font-bold uppercase">
+                      <b className={`font-extrabold ${route.trafficCongestion === 'Heavy' ? 'text-red-400' : 'text-emerald-400'}`}>{route.trafficCongestion === 'Heavy' ? 'Nặng' : 'Ổn'}</b>
                     </span>
                   </div>
                 </div>
 
                 {/* Điểm khí hậu */}
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-gray-500">Chỉ số khí hậu:</span>
-                    <div className="flex items-center gap-1 bg-gray-950 px-2 py-0.5 rounded-md border border-gray-850">
-                      <span className={`text-xs font-bold ${
+                <div className="flex flex-col items-end gap-1.5">
+                  <div className="flex items-center gap-1">
+                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Khí hậu</span>
+                    <span className={`text-base font-black leading-none drop-shadow-md ${
                         route.climateScore >= 80 ? 'text-emerald-400' : route.climateScore >= 60 ? 'text-amber-400' : 'text-red-400'
                       }`}>
                         {route.climateScore}
-                      </span>
-                      <span className="text-[9px] text-gray-600">/100</span>
-                    </div>
+                    </span>
                   </div>
                   {/* Visual progress bar for Climate Score */}
-                  <div className="w-24 h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                  <div className="w-20 h-1.5 rounded-full bg-black border border-white/5 overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${
+                      className={`h-full rounded-full transition-all duration-1000 ease-out ${
                         route.climateScore >= 80
-                          ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
                           : route.climateScore >= 60
-                            ? 'bg-gradient-to-r from-amber-500 to-amber-400'
-                            : 'bg-gradient-to-r from-red-500 to-red-400'
+                            ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
+                            : 'bg-gradient-to-r from-red-500 to-rose-400'
                       }`}
                       style={{ width: `${route.climateScore}%` }}
                     />
@@ -142,17 +155,17 @@ export default function RouteCompare({ routes, selectedRouteId, onSelectRoute, o
               </div>
 
               {/* CTA Button for selected route */}
-              {isSelected && (
-                <button
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isSelected ? 'max-h-20 mt-4 opacity-100' : 'max-h-0 mt-0 opacity-0'}`}>
+                <button 
                   onClick={(e) => {
                     e.stopPropagation();
-                    onStartRoute?.(route.id);
+                    if(onStartRoute) onStartRoute(route.id);
                   }}
-                  className="w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm bg-emerald-500 hover:bg-emerald-600 text-gray-950 flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-emerald-500/10"
+                  className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all active:scale-[0.98]"
                 >
-                  <Navigation className="w-4 h-4" /> Chọn tuyến này
+                  <Navigation className="w-5 h-5" /> Bắt đầu hành trình
                 </button>
-              )}
+              </div>
             </div>
           );
         })}
