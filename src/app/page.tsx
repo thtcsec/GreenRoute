@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints } from '@/types';
 import CoolStopCard from '@/components/CoolStopCard';
@@ -11,7 +11,7 @@ import TripInputBar from '@/components/TripInputBar';
 import ClimateAlertBanner from '@/components/ClimateAlertBanner';
 
 // Import icons
-import { Map, Snowflake, Route as RouteIcon, AlertTriangle, Flame, Compass, X } from 'lucide-react';
+import { Map, Snowflake, Route as RouteIcon, ShieldCheck, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X } from 'lucide-react';
 
 // Load MapContainer dynamically to prevent SSR issues
 const MapContainer = dynamic(() => import('@/components/MapContainer'), {
@@ -35,12 +35,20 @@ export default function Home() {
   const [pickupPoints, setPickupPoints] = useState<PickupPoints | null>(null);
   const [userReports, setUserReports] = useState<ClimateReport[]>([]);
 
-  // Tương tác bản đồ
-  const [driverLocation] = useState<[number, number]>([10.8795, 106.8045]);
+  // Tọa độ người dùng (Mặc định ở KTX Khu A Đại học Quốc gia - điểm xuất phát của các tuyến)
+  const [driverLocation] = useState<[number, number]>([10.8720, 106.7920]);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>('route-balanced');
   const [activeCoolStop, setActiveCoolStop] = useState<CoolStop | null>(null);
   const [focusLocation, setFocusLocation] = useState<[number, number] | null>(null);
-  const [focusBounds, setFocusBounds] = useState<any>(null);
+  const [focusBounds, setFocusBounds] = useState<[[number, number], [number, number]] | null>(null);
+
+  // --- NEW STATES cho Feature 1, 2, 3 ---
+  const [gpsLocation, setGpsLocation] = useState<[number, number] | null>(null);
+  const [activeLayer, setActiveLayer] = useState<'heat' | 'flood' | 'all' | 'none'>('all');
+  const [osrmRoute, setOsrmRoute] = useState<[number, number][] | null>(null);
+  const [osrmInfo, setOsrmInfo] = useState<{ distance: number; duration: number } | null>(null);
+  const [osrmError, setOsrmError] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Tab di động chủ đạo (Đã tối ưu lại còn 3 tabs)
   const [activeTab, setActiveTab] = useState<'map' | 'coolstop' | 'journey'>('map');
@@ -51,8 +59,35 @@ export default function Home() {
   // Trạng thái tải dữ liệu
   const [loading, setLoading] = useState(true);
 
+  // Tính toán góc nhìn bản đồ chứa trọn tuyến đường
+  const updateFocusBounds = (coords: [number, number][]) => {
+    if (!coords || coords.length === 0) return;
+    const lats = coords.map(c => c[0]);
+    const lngs = coords.map(c => c[1]);
+    setFocusBounds([
+      [Math.min(...lats), Math.min(...lngs)],
+      [Math.max(...lats), Math.max(...lngs)]
+    ]);
+    setFocusLocation(null);
+  };
+
   // --- FETCHING DATA FROM API ---
   useEffect(() => {
+    // Feature 1: Real GPS Location
+    if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const loc: [number, number] = [position.coords.latitude, position.coords.longitude];
+          setGpsLocation(loc);
+          setFocusLocation(loc);
+        },
+        (error) => {
+          console.warn("GPS Error:", error.message);
+        },
+        { timeout: 10000, maximumAge: 30000 }
+      );
+    }
+
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -67,7 +102,6 @@ export default function Home() {
         setCoolstops(resCoolStops);
         setHeatZones(resHeatZones);
         setFloodRisks(resFloodRisks);
-        setRoutes(resRoutes);
         setPickupPoints(resPickup);
 
         const storedReports = localStorage.getItem('greenroute_reports');
@@ -75,7 +109,35 @@ export default function Home() {
           setUserReports(JSON.parse(storedReports));
         }
 
-        const balancedRoute = resRoutes.find((r: Route) => r.id === 'route-balanced');
+        const dataRoutes = resRoutes;
+
+        // Thay vì dùng đường chim bay giả lập, gọi OSRM để bám sát đường đi thực tế cho các tuyến so sánh
+        const currentOrigin = gpsLocation || driverLocation;
+
+        const realRoutes = await Promise.all(dataRoutes.map(async (route: Route) => {
+          try {
+            // Chỉ lấy điểm hiện tại và điểm CUỐI CÙNG của tuyến đường để vẽ đường đi thực tế
+            const destination = route.coordinates[route.coordinates.length - 1];
+            const waypointsArr = [currentOrigin, destination]; 
+            
+            const waypoints = waypointsArr.map(c => `${c[1]},${c[0]}`).join(';');
+            const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson`);
+            const osrmData = await osrmRes.json();
+            
+            if (osrmData.routes && osrmData.routes.length > 0) {
+              const realCoords = osrmData.routes[0].geometry.coordinates.map((c: number[]) => [c[1], c[0]] as [number, number]);
+              return { ...route, coordinates: realCoords };
+            }
+          } catch (err) {
+            console.error('Lỗi khi fetch OSRM cho tuyến so sánh:', err);
+          }
+          return route;
+        }));
+
+        setRoutes(realRoutes);
+
+        // Lấy route balanced làm mặc định
+        const balancedRoute = realRoutes.find((r: Route) => r.id === 'route-balanced');
         if (balancedRoute) {
           updateFocusBounds(balancedRoute.coordinates);
         }
@@ -89,47 +151,124 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const updateFocusBounds = (coords: [number, number][]) => {
-    if (!coords || coords.length === 0) return;
-    const lats = coords.map(c => c[0]);
-    const lngs = coords.map(c => c[1]);
-    setFocusBounds([
-      [Math.min(...lats), Math.min(...lngs)],
-      [Math.max(...lats), Math.max(...lngs)]
-    ]);
-    setFocusLocation(null);
-  };
+  // --- ACTIONS ---
   
-  const handleNavigateToCoolStop = (stop: CoolStop) => {
+  // Helper: Haversine distance (meters)
+  const haversineDist = (a: [number, number], b: [number, number]) => {
+    const toRad = (v: number) => (v * Math.PI) / 180;
+    const R = 6371000; // Earth radius meters
+    const dLat = toRad(b[0] - a[0]);
+    const dLon = toRad(b[1] - a[1]);
+    const lat1 = toRad(a[0]);
+    const lat2 = toRad(b[0]);
+    const sinDLat = Math.sin(dLat / 2);
+    const sinDLon = Math.sin(dLon / 2);
+    const c = 2 * Math.asin(Math.sqrt(sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon));
+    return R * c;
+  };
+
+  // 1. Khi nhấn dẫn đường tới CoolStop
+  const handleNavigateToCoolStop = async (stop: CoolStop) => {
     setActiveCoolStop(stop);
-    setFocusLocation([stop.lat, stop.lng]);
-    setFocusBounds(null);
-    setActiveTab('map');
+    setActiveTab('map'); // Chuyển về màn hình bản đồ để tài xế quan sát đường đi
+    
+    // Feature 2: OSRM Routing
+    const origin = gpsLocation || driverLocation;
+    const dest: [number, number] = [stop.lat, stop.lng];
+    
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    
+    try {
+      setOsrmError(null);
+      const res = await fetch(
+        `https://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${dest[1]},${dest[0]}?overview=full&geometries=geojson`,
+        { signal: abortControllerRef.current.signal }
+      );
+      if (!res.ok) throw new Error('OSRM network error');
+      const data = await res.json();
+      
+      if (data.routes && data.routes.length > 0) {
+        const route = data.routes[0];
+        const coords = route.geometry.coordinates.map((c: number[]) => [c[1], c[0]] as [number, number]);
+        setOsrmRoute(coords);
+        setOsrmInfo({
+          distance: +(route.distance / 1000).toFixed(1),
+          duration: +(route.duration / 60).toFixed(0)
+        });
+        updateFocusBounds(coords);
+
+        // Try to match this OSRM polyline to one of the predefined routes so the UI highlights it
+        try {
+          if (routes && routes.length > 0) {
+            const scores = routes.map(r => {
+              // for each OSRM point find nearest point in route r
+              const dists = coords.map((p: [number, number]) => {
+                const nearest = r.coordinates.reduce((min, q) => Math.min(min, haversineDist(p, q)), Infinity);
+                return nearest;
+              });
+              const avg = dists.reduce((s: number, v: number) => s + v, 0) / dists.length;
+              return { id: r.id, avg };
+            });
+            scores.sort((a, b) => a.avg - b.avg);
+            const best = scores[0];
+            // If average distance < 200m consider it a match
+            if (best && best.avg < 200) {
+              setSelectedRouteId(best.id);
+            }
+          }
+        } catch (matchErr) {
+          console.warn('Error matching OSRM to predefined routes', matchErr);
+        }
+        
+      } else {
+        throw new Error('No route found');
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name !== 'AbortError') {
+        setOsrmRoute(null);
+        setOsrmInfo(null);
+        setOsrmError('Không thể lấy chỉ đường thật, giữ nguyên bản đồ.');
+        setFocusLocation(dest);
+        setFocusBounds(null);
+        setTimeout(() => setOsrmError(null), 3000);
+      }
+    }
   };
 
   const handleSelectRoute = (routeId: string) => {
     setSelectedRouteId(routeId);
+    // Hủy tuyến OSRM hiện tại để hiện lại các tuyến so sánh
+    setOsrmRoute(null);
+    setOsrmInfo(null);
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+
     const route = routes.find(r => r.id === routeId);
     if (route) {
       updateFocusBounds(route.coordinates);
     }
   };
 
-  const handleNavigateToPickup = (lat: number, lng: number, name: string) => {
+  // 3. Khi chỉ đường tới điểm đón thay thế
+  const handleNavigateToPickup = (lat: number, lng: number, _name: string) => {
     setFocusLocation([lat, lng]);
     setFocusBounds(null);
     setActiveTab('map');
   };
 
   const handleSubmitReport = (type: ClimateReport['type'], note: string) => {
+    // Tài xế báo cáo ngay tại tọa độ xung quanh vị trí của mình (lệch một tí để demo sinh động)
+    const baseLoc = gpsLocation || driverLocation;
     const offsetLat = (Math.random() - 0.5) * 0.003;
     const offsetLng = (Math.random() - 0.5) * 0.003;
     
     const newReport: ClimateReport = {
       id: `report-${Date.now()}`,
       type,
-      lat: driverLocation[0] + offsetLat,
-      lng: driverLocation[1] + offsetLng,
+      lat: baseLoc[0] + offsetLat,
+      lng: baseLoc[1] + offsetLng,
       note,
       timestamp: new Date().toISOString()
     };
@@ -210,6 +349,9 @@ export default function Home() {
             focusBounds={focusBounds}
             onSelectCoolStop={handleMapSelectCoolStop}
             onSelectRoute={handleSelectRoute}
+            gpsLocation={gpsLocation}
+            osrmRoute={osrmRoute}
+            activeLayer={activeLayer}
           />
           
           {/* Cụm nút công cụ nổi trên bản đồ */}
@@ -229,18 +371,78 @@ export default function Home() {
                 </span>
               )}
             </button>
+          </div>
 
-            {/* Nút định vị */}
-            <button
-              onClick={() => {
-                setFocusLocation(driverLocation);
-                setFocusBounds(null);
-              }}
-              className="p-3 rounded-full bg-gray-900 border border-gray-800 text-emerald-400 shadow-lg active:scale-95 transition-transform cursor-pointer"
-              title="Định vị tài xế"
-            >
-              <Compass className="w-5 h-5" />
-            </button>
+          {/* Feature 3: Map Layer Toggle UI */}
+          <div className="absolute top-3 left-3 z-[1000] flex gap-1 bg-gray-950/80 p-1 rounded-xl border border-gray-800 backdrop-blur-sm shadow-lg">
+            {(['all', 'heat', 'flood', 'none'] as const).map(mode => (
+              <button 
+                key={mode} 
+                onClick={() => setActiveLayer(mode)} 
+                className={`px-2 py-1 text-[10px] rounded-lg font-bold transition-colors cursor-pointer ${
+                  activeLayer === mode 
+                    ? (mode === 'heat' ? 'bg-orange-600 text-white' : mode === 'flood' ? 'bg-blue-600 text-white' : mode === 'all' ? 'bg-emerald-600 text-white' : 'bg-gray-700 text-white') 
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                {mode === 'heat' ? 'Nắng' : mode === 'flood' ? 'Ngập' : mode === 'all' ? 'Tất cả' : 'Ẩn'}
+              </button>
+            ))}
+          </div>
+
+          {/* Feature 2: OSRM Info Overlay & Cancel Button */}
+          {osrmInfo && (
+            <div className="absolute top-14 left-3 z-[1000] flex items-center gap-3 bg-gray-900/90 border border-emerald-900/50 px-3 py-1.5 rounded-xl backdrop-blur-sm shadow-lg text-xs font-bold text-emerald-400">
+              <div>
+                <Navigation className="w-3.5 h-3.5 inline mr-1" />
+                {osrmInfo.distance} km • {osrmInfo.duration} phút
+              </div>
+              <div className="w-px h-3 bg-gray-700"></div>
+              <button
+                onClick={() => {
+                  setOsrmRoute(null);
+                  setOsrmInfo(null);
+                  setFocusLocation(gpsLocation || driverLocation);
+                  setFocusBounds(null);
+                  if (abortControllerRef.current) abortControllerRef.current.abort();
+                }}
+                className="text-gray-400 hover:text-red-400 transition-colors cursor-pointer flex items-center justify-center"
+                title="Hủy tuyến đường"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Feature 2: OSRM Error Snackbar */}
+          {osrmError && (
+            <div className="absolute bottom-16 left-4 right-4 z-[1000] bg-red-950/90 border border-red-900/50 p-2 rounded-xl backdrop-blur-sm text-red-200 text-xs text-center shadow-lg">
+              <AlertCircle className="w-3.5 h-3.5 inline mr-1" />
+              {osrmError}
+            </div>
+          )}
+
+          {/* Nút reset góc nhìn bản đồ về vị trí tài xế */}
+          <button
+            onClick={() => {
+              setFocusLocation(gpsLocation || driverLocation);
+              setFocusBounds(null);
+            }}
+            className="absolute bottom-4 right-4 z-[1000] p-2.5 rounded-xl bg-gray-900 border border-gray-800 text-emerald-400 shadow-lg active:scale-95 transition-transform cursor-pointer"
+            title="Định vị tài xế"
+          >
+            <Compass className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Cảnh báo khí hậu khẩn cấp trên đầu nội dung */}
+        <div className="px-4 pt-4 relative z-20">
+          <div className="flex items-start gap-3 p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-red-200">
+            <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5 animate-pulse" />
+            <div>
+              <p className="text-xs font-bold text-white uppercase tracking-wider">Cảnh báo nắng nóng cực đoan (VNU Vùng Cam)</p>
+              <p className="text-[11px] text-red-300 mt-0.5">Nhiệt độ cảm nhận thực tế đạt 41°C. Hãy chủ động tránh đỗ tại ngã tư và sử dụng trạm **CoolStop** được đề xuất phía dưới.</p>
+            </div>
           </div>
         </div>
 
