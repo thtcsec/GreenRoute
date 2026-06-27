@@ -45,3 +45,30 @@ body {
   color: #ffffff !important;
 }
 
+/* Tùy biến thanh cuộn (Custom Scrollbar) siêu mỏng và đẹp */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(17, 24, 39, 0.3); /* bg-gray-900 30% opacity */
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.4); /* bg-emerald-500 40% opacity */
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.7); /* bg-emerald-500 70% opacity */
+}
+
+/* Thêm hỗ trợ cho Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.4) rgba(17, 24, 39, 0.3);
+}
+

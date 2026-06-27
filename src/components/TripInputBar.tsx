@@ -215,7 +215,7 @@ export default function TripInputBar({
 
                 {/* Origin Dropdown */}
                 {activeField === 'origin' && currentSuggestions.length > 0 && (
-                  <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-gray-800 bg-gray-900 shadow-2xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-gray-800 bg-gray-900 shadow-2xl max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-1 duration-150">
                     {currentSuggestions.map((loc) => (
                       <button
                         key={`origin-${loc.lat}-${loc.lng}`}
@@ -274,7 +274,7 @@ export default function TripInputBar({
 
                 {/* Destination Dropdown */}
                 {activeField === 'dest' && currentSuggestions.length > 0 && (
-                  <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-gray-800 bg-gray-900 shadow-2xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-gray-800 bg-gray-900 shadow-2xl max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-1 duration-150">
                     {currentSuggestions.map((loc) => (
                       <button
                         key={`dest-${loc.lat}-${loc.lng}`}
