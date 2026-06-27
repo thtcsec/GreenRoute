@@ -2,8 +2,8 @@
   {
     "id": "fr-1",
     "name": "Đường song hành ngập sâu (gần Đại học TDTT)",
-    "lat": 10.8720,
-    "lng": 106.7960,
+    "lat": 10.872,
+    "lng": 106.796,
     "radius": 120,
     "riskLevel": "Extreme",
     "waterDepth": 40,
@@ -12,11 +12,111 @@
   {
     "id": "fr-2",
     "name": "Đoạn dốc thoát nước chậm - KTX Khu B (Cổng sau)",
-    "lat": 10.8820,
-    "lng": 106.8090,
+    "lat": 10.882,
+    "lng": 106.809,
     "radius": 90,
     "riskLevel": "High",
     "waterDepth": 25,
     "description": "Khu vực giao lộ ngập nước cục bộ tạm thời khi mưa lớn dồn dập, đường trơn trượt nguy hiểm."
+  },
+  {
+    "id": "fr-gen-1",
+    "name": "Điểm ngập tự động 1",
+    "lat": 10.871985063650328,
+    "lng": 106.77921695895907,
+    "radius": 133,
+    "riskLevel": "High",
+    "waterDepth": 43,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-2",
+    "name": "Điểm ngập tự động 2",
+    "lat": 10.890734274746219,
+    "lng": 106.79414125058848,
+    "radius": 65,
+    "riskLevel": "High",
+    "waterDepth": 23,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-3",
+    "name": "Điểm ngập tự động 3",
+    "lat": 10.902357375401232,
+    "lng": 106.81411304943967,
+    "radius": 112,
+    "riskLevel": "Extreme",
+    "waterDepth": 32,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-4",
+    "name": "Điểm ngập tự động 4",
+    "lat": 10.87810993777402,
+    "lng": 106.76732988091052,
+    "radius": 84,
+    "riskLevel": "High",
+    "waterDepth": 32,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-5",
+    "name": "Điểm ngập tự động 5",
+    "lat": 10.907626310949066,
+    "lng": 106.8200998994565,
+    "radius": 128,
+    "riskLevel": "High",
+    "waterDepth": 39,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-6",
+    "name": "Điểm ngập tự động 6",
+    "lat": 10.845757281591231,
+    "lng": 106.80236465215502,
+    "radius": 137,
+    "riskLevel": "Extreme",
+    "waterDepth": 23,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-7",
+    "name": "Điểm ngập tự động 7",
+    "lat": 10.861742926783188,
+    "lng": 106.82148264157544,
+    "radius": 92,
+    "riskLevel": "High",
+    "waterDepth": 41,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-8",
+    "name": "Điểm ngập tự động 8",
+    "lat": 10.858232497946878,
+    "lng": 106.79255830748124,
+    "radius": 80,
+    "riskLevel": "Extreme",
+    "waterDepth": 28,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-9",
+    "name": "Điểm ngập tự động 9",
+    "lat": 10.862640010325432,
+    "lng": 106.78968806304547,
+    "radius": 53,
+    "riskLevel": "Extreme",
+    "waterDepth": 30,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
+  },
+  {
+    "id": "fr-gen-10",
+    "name": "Điểm ngập tự động 10",
+    "lat": 10.848425353781103,
+    "lng": 106.7959651795709,
+    "radius": 138,
+    "riskLevel": "Extreme",
+    "waterDepth": 35,
+    "description": "Điểm trũng tích tụ nước khi mưa trên 30p, nguy cơ chết máy cao."
   }
 ]

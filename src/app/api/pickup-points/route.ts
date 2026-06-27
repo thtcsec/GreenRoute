@@ -1,32 +1,37 @@
 import { NextResponse, NextRequest } from 'next/server';
-import pickupPointsData from '@/data/pickup_points.json';
+import clientPromise from '@/lib/mongodb';
 import { PickupPoints } from '@/types';
 
-// In-memory store cho pickup points
-// (Do pickup points hiện tại lưu object thay vì array)
-let pickupPoints: PickupPoints = { ...pickupPointsData } as PickupPoints;
+export async function GET(request: NextRequest) {
+  try {
+    const client = await clientPromise;
+    const db = client.db('grab_undp');
+    
+    const doc = await db.collection('pickup_points').findOne({});
+    if (!doc) {
+      return NextResponse.json({ error: 'No data' }, { status: 404 });
+    }
+    const { _id, ...rest } = doc;
 
-export async function GET() {
-  return NextResponse.json(pickupPoints);
+    return NextResponse.json(rest);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const client = await clientPromise;
+    const db = client.db('grab_undp');
     
-    // API POST này dùng để thay thế suggestedPoint hoặc defaultPoint 
-    // trong ngữ cảnh MVP (có thể mở rộng thành mảng nếu cần ở Phase sau)
-    
-    if (body.type === 'default' && body.point) {
-      pickupPoints.defaultPoint = body.point;
-    } else if (body.type === 'suggested' && body.point) {
-      pickupPoints.suggestedPoint = body.point;
-    } else {
-      return NextResponse.json({ error: 'Invalid payload. Need type (default/suggested) and point.' }, { status: 400 });
-    }
+    await db.collection('pickup_points').insertOne(body);
 
-    return NextResponse.json(pickupPoints, { status: 200 });
+    const { _id, ...rest } = body;
+    return NextResponse.json(rest, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    console.error(error);
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 }

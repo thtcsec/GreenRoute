@@ -3,14 +3,19 @@
     "id": "cs-1",
     "name": "Trạm Dừng Chân Nhà Văn Hóa Sinh Viên",
     "lat": 10.8755,
-    "lng": 106.8010,
+    "lng": 106.801,
     "distance": 480,
     "shadeScore": 9,
     "rainCover": true,
     "curbSafety": "High",
     "accessibility": "High",
     "description": "Khu sảnh sinh hoạt mát mẻ có máy lạnh bên trong và trạm chờ xe buýt lớn có mái che rộng bên ngoài.",
-    "amenities": ["Máy lọc nước miễn phí", "Wifi miễn phí", "Nhà vệ sinh sạch sẽ", "Chỗ sạc điện thoại"],
+    "amenities": [
+      "Máy lọc nước miễn phí",
+      "Wifi miễn phí",
+      "Nhà vệ sinh sạch sẽ",
+      "Chỗ sạc điện thoại"
+    ],
     "operatingHours": "06:00-22:00"
   },
   {
@@ -24,7 +29,11 @@
     "curbSafety": "High",
     "accessibility": "High",
     "description": "Nhà chờ xe buýt hiện đại trước cổng trường HCMIU, bao quanh bởi nhiều cây xanh cổ thụ bóng mát lớn.",
-    "amenities": ["Ghế ngồi", "Mái che mưa lớn", "Thùng rác công cộng"],
+    "amenities": [
+      "Ghế ngồi",
+      "Mái che mưa lớn",
+      "Thùng rác công cộng"
+    ],
     "operatingHours": "24/7"
   },
   {
@@ -38,7 +47,537 @@
     "curbSafety": "Medium",
     "accessibility": "Medium",
     "description": "Quán cà phê liên kết với GreenRoute hỗ trợ tài xế nghỉ mát có máy lạnh và giảm giá nước uống.",
-    "amenities": ["Điều hòa", "Nước uống miễn phí", "Chỗ đậu xe rộng", "Ổ cắm sạc"],
+    "amenities": [
+      "Điều hòa",
+      "Nước uống miễn phí",
+      "Chỗ đậu xe rộng",
+      "Ổ cắm sạc"
+    ],
     "operatingHours": "07:00-23:00"
+  },
+  {
+    "id": "cs-gen-1",
+    "name": "Trạm nghỉ mát GreenRoute 1",
+    "lat": 10.872464571590065,
+    "lng": 106.80700002398102,
+    "distance": 860,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-2",
+    "name": "Trạm nghỉ mát GreenRoute 2",
+    "lat": 10.863287874183325,
+    "lng": 106.81985803990857,
+    "distance": 1209,
+    "shadeScore": 8,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá",
+      "Mái che"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-3",
+    "name": "Trạm nghỉ mát GreenRoute 3",
+    "lat": 10.90147778463721,
+    "lng": 106.79400941707281,
+    "distance": 1282,
+    "shadeScore": 10,
+    "rainCover": false,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-4",
+    "name": "Trạm nghỉ mát GreenRoute 4",
+    "lat": 10.852152454816933,
+    "lng": 106.79210955942186,
+    "distance": 1700,
+    "shadeScore": 7,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá",
+      "Mái che"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-5",
+    "name": "Trạm nghỉ mát GreenRoute 5",
+    "lat": 10.895356929795181,
+    "lng": 106.81714856094487,
+    "distance": 1317,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-6",
+    "name": "Trạm nghỉ mát GreenRoute 6",
+    "lat": 10.872564795725184,
+    "lng": 106.80317326002822,
+    "distance": 193,
+    "shadeScore": 9,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-7",
+    "name": "Trạm nghỉ mát GreenRoute 7",
+    "lat": 10.896154719908072,
+    "lng": 106.81816472106684,
+    "distance": 1171,
+    "shadeScore": 8,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá",
+      "Mái che"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-8",
+    "name": "Trạm nghỉ mát GreenRoute 8",
+    "lat": 10.863705721088957,
+    "lng": 106.8239832677985,
+    "distance": 959,
+    "shadeScore": 7,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá",
+      "Mái che"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-9",
+    "name": "Trạm nghỉ mát GreenRoute 9",
+    "lat": 10.868239262128359,
+    "lng": 106.79855815374889,
+    "distance": 1254,
+    "shadeScore": 7,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-10",
+    "name": "Trạm nghỉ mát GreenRoute 10",
+    "lat": 10.866486691699702,
+    "lng": 106.7933652229427,
+    "distance": 1112,
+    "shadeScore": 7,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-11",
+    "name": "Trạm nghỉ mát GreenRoute 11",
+    "lat": 10.902480105442544,
+    "lng": 106.80225798562175,
+    "distance": 457,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-12",
+    "name": "Trạm nghỉ mát GreenRoute 12",
+    "lat": 10.862210211832288,
+    "lng": 106.78670267598419,
+    "distance": 334,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-13",
+    "name": "Trạm nghỉ mát GreenRoute 13",
+    "lat": 10.875209065225377,
+    "lng": 106.79012868342724,
+    "distance": 1286,
+    "shadeScore": 9,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-14",
+    "name": "Trạm nghỉ mát GreenRoute 14",
+    "lat": 10.892636242847681,
+    "lng": 106.7823378144611,
+    "distance": 1181,
+    "shadeScore": 9,
+    "rainCover": false,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-15",
+    "name": "Trạm nghỉ mát GreenRoute 15",
+    "lat": 10.853607319281283,
+    "lng": 106.80493593786062,
+    "distance": 820,
+    "shadeScore": 7,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-16",
+    "name": "Trạm nghỉ mát GreenRoute 16",
+    "lat": 10.868486373115728,
+    "lng": 106.80575759131528,
+    "distance": 409,
+    "shadeScore": 8,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-17",
+    "name": "Trạm nghỉ mát GreenRoute 17",
+    "lat": 10.875786546509708,
+    "lng": 106.82503319332403,
+    "distance": 281,
+    "shadeScore": 8,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-18",
+    "name": "Trạm nghỉ mát GreenRoute 18",
+    "lat": 10.878025412337038,
+    "lng": 106.82660786032194,
+    "distance": 1665,
+    "shadeScore": 8,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-19",
+    "name": "Trạm nghỉ mát GreenRoute 19",
+    "lat": 10.875322574176808,
+    "lng": 106.78004717364466,
+    "distance": 1000,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-20",
+    "name": "Trạm nghỉ mát GreenRoute 20",
+    "lat": 10.896277216138031,
+    "lng": 106.78797829022011,
+    "distance": 2043,
+    "shadeScore": 8,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-21",
+    "name": "Trạm nghỉ mát GreenRoute 21",
+    "lat": 10.870982159572227,
+    "lng": 106.81168799286625,
+    "distance": 977,
+    "shadeScore": 7,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-22",
+    "name": "Trạm nghỉ mát GreenRoute 22",
+    "lat": 10.873445140702554,
+    "lng": 106.82075432941151,
+    "distance": 1673,
+    "shadeScore": 8,
+    "rainCover": false,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-23",
+    "name": "Trạm nghỉ mát GreenRoute 23",
+    "lat": 10.887535141774974,
+    "lng": 106.79962799246057,
+    "distance": 1546,
+    "shadeScore": 7,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-24",
+    "name": "Trạm nghỉ mát GreenRoute 24",
+    "lat": 10.855721066785705,
+    "lng": 106.8113410917948,
+    "distance": 2019,
+    "shadeScore": 8,
+    "rainCover": false,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-25",
+    "name": "Trạm nghỉ mát GreenRoute 25",
+    "lat": 10.895551936131408,
+    "lng": 106.79667361767984,
+    "distance": 672,
+    "shadeScore": 7,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-26",
+    "name": "Trạm nghỉ mát GreenRoute 26",
+    "lat": 10.898749715629446,
+    "lng": 106.79078128722672,
+    "distance": 1292,
+    "shadeScore": 10,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-27",
+    "name": "Trạm nghỉ mát GreenRoute 27",
+    "lat": 10.880370756914573,
+    "lng": 106.82307346641589,
+    "distance": 707,
+    "shadeScore": 7,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-28",
+    "name": "Trạm nghỉ mát GreenRoute 28",
+    "lat": 10.896221131451071,
+    "lng": 106.7914475224797,
+    "distance": 423,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-29",
+    "name": "Trạm nghỉ mát GreenRoute 29",
+    "lat": 10.879678547207368,
+    "lng": 106.82036432507148,
+    "distance": 260,
+    "shadeScore": 8,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-gen-30",
+    "name": "Trạm nghỉ mát GreenRoute 30",
+    "lat": 10.887328978226057,
+    "lng": 106.79323369806603,
+    "distance": 2070,
+    "shadeScore": 10,
+    "rainCover": false,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm dừng chân được bố trí bổ sung tại các tuyến đường ít bóng râm, hỗ trợ tài xế công nghệ nghỉ ngơi nhanh.",
+    "amenities": [
+      "Cây xanh",
+      "Nước uống",
+      "Ghế đá"
+    ],
+    "operatingHours": "06:00-22:00"
   }
 ]

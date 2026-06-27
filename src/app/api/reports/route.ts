@@ -1,22 +1,30 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { ClimateReport } from '@/types';
-
-// In-memory store (chỉ dùng cho hackathon/MVP)
-let reports: ClimateReport[] = [];
+import clientPromise from '@/lib/mongodb';
 
 export async function GET() {
-  // Trả về danh sách report mới nhất trước (sort by timestamp descending)
-  const sortedReports = [...reports].sort((a, b) => 
-    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-  );
-  return NextResponse.json(sortedReports);
+  try {
+    const client = await clientPromise;
+    const db = client.db('grab_undp');
+    
+    // Fetch reports and sort by timestamp descending
+    const docs = await db.collection('reports').find({}).sort({ timestamp: -1 }).toArray();
+    const result = docs.map(doc => {
+      const { _id, ...rest } = doc;
+      return rest as ClimateReport;
+    });
+
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Failed to fetch reports' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
-    // Validation cơ bản
+
     if (!body.type || !body.lat || !body.lng) {
       return NextResponse.json({ error: 'Missing required fields: type, lat, lng' }, { status: 400 });
     }
@@ -30,11 +38,14 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     };
 
-    // Thêm vào store in-memory
-    reports.push(newReport);
+    const client = await clientPromise;
+    const db = client.db('grab_undp');
+    await db.collection('reports').insertOne(newReport);
 
-    return NextResponse.json(newReport, { status: 201 });
+    const { _id, ...rest } = newReport as any;
+    return NextResponse.json(rest as ClimateReport, { status: 201 });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 }
