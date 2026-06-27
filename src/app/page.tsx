@@ -449,7 +449,7 @@ export default function Home() {
           />
           
           {/* Cụm nút công cụ nổi trên bản đồ */}
-          <div className={`absolute right-4 flex flex-col gap-3.5 z-20 transition-all duration-300 ${!isPanelOpen && activeTab === 'map' ? 'bottom-16' : 'bottom-4'}`}>
+          <div className={`absolute right-4 flex flex-col gap-3.5 z-[1000] transition-all duration-300 ${!isPanelOpen && activeTab === 'map' ? 'bottom-16' : 'bottom-4'}`}>
             {/* Nút reset góc nhìn bản đồ về vị trí tài xế */}
             <motion.button
               type="button"
