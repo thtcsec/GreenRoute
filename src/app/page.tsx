@@ -463,6 +463,14 @@ export default function Home() {
             </div>
           )}
 
+          {/* OSRM Error Snackbar */}
+          {osrmError && (
+            <div className="absolute bottom-20 left-4 right-4 z-[1000] bg-red-950/90 border border-red-500/30 p-3 rounded-2xl backdrop-blur-md text-red-200 text-xs text-center shadow-lg">
+              <AlertCircle className="w-3.5 h-3.5 inline mr-1" />
+              {osrmError}
+            </div>
+          )}
+
           {/* Nút reset góc nhìn bản đồ về vị trí tài xế */}
           <button
             onClick={() => {

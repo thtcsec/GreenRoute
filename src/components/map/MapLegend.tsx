@@ -13,7 +13,7 @@ export default function MapLegend({ activeLayer }: MapLegendProps) {
   if (activeLayer === 'none') return null;
 
   return (
-    <div className="absolute bottom-6 right-3 z-[1000] max-w-xs transition-all duration-300 pointer-events-auto">
+    <div className="absolute bottom-6 left-3 z-[1000] max-w-xs transition-all duration-300 pointer-events-auto">
       <div className="bg-gray-950/90 backdrop-blur-md border border-gray-800 rounded-2xl shadow-2xl p-3 text-white">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -23,7 +23,7 @@ export default function MapLegend({ activeLayer }: MapLegendProps) {
             <Layers className="w-4 h-4 text-emerald-400" />
             <span>Chú giải lớp bản đồ</span>
           </div>
-          {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronUp className="w-4 h-4 text-gray-400" />}
+          {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
         </button>
 
         {isExpanded && (
