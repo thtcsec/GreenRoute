@@ -371,10 +371,8 @@ export default function Home() {
         {/* Input */}
         <div className="shrink-0 relative z-30 pt-3 px-3 pb-2 bg-gray-950 border-b border-gray-900">
           <TripInputBar 
-            driverLocation={driverLocation}
-            onSearchRoutes={(origin, dest) => {
-              setActiveTab('journey'); // Chuyển thẳng sang tab hành trình
-            }}
+            driverLocation={gpsLocation || driverLocation}
+            onSearchRoutes={handleSearchRoutes}
           />
         </div>
 
