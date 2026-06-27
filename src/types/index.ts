@@ -1,3 +1,14 @@
+export interface Location {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+export interface TripInput {
+  origin: Location | null;
+  destination: Location | null;
+}
+
 export interface CoolStop {
   id: string;
   name: string;
@@ -10,6 +21,7 @@ export interface CoolStop {
   accessibility: 'High' | 'Medium' | 'Low';
   description: string;
   amenities: string[];
+  operatingHours?: string; // e.g. "24/7" or "06:00-22:00"
 }
 
 export interface HeatZone {
@@ -47,6 +59,8 @@ export interface Route {
   recommendationStatus: string;
   color: string; // hex color for drawing
   coordinates: [number, number][]; // [lat, lng] array
+  estimatedEarning?: number; // VNĐ
+  fuelCost?: number; // VNĐ
 }
 
 export interface PickupPoints {
