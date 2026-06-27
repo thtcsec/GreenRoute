@@ -6,6 +6,7 @@ import { WeatherData, CoolStop, HeatZone, FloodRisk, Route, ScoredRoute, PickupP
 import ErrorBoundary from '@/components/ErrorBoundary';
 import CoolStopCard from '@/components/CoolStopCard';
 import IncomingRide from '@/components/IncomingRide';
+import SafetyPickupModal from '@/components/SafetyPickupModal';
 import RouteCompare from '@/components/RouteCompare';
 import PickupSafety from '@/components/PickupSafety';
 import ReportForm from '@/components/ReportForm';
@@ -42,6 +43,7 @@ export default function Home() {
   
   // UI States cho Demo
   const [showIncomingRide, setShowIncomingRide] = useState(false);
+  const [showSafetyModal, setShowSafetyModal] = useState(false);
 
   // Tọa độ người dùng (Mặc định ở Đại học Quốc tế HCMIU)
   const [driverLocation] = useState<[number, number]>([10.8795, 106.8045]);
@@ -744,11 +746,29 @@ export default function Home() {
               onAccept={() => {
                 setShowIncomingRide(false);
                 // Demo: hardcode origin and destination to trigger route calculation
-                const origin = { name: 'Điểm đón', lat: 10.8725, lng: 106.8048 }; // Tòa nhà Bitexco (mock)
-                const dest = { name: 'Điểm đến', lat: 10.8785, lng: 106.8040 }; // Đại học Quốc Tế
+                const origin = { name: 'Điểm đón (Rủi ro)', lat: 10.8725, lng: 106.8048 }; 
+                const dest = { name: 'Điểm đến', lat: 10.8785, lng: 106.8040 }; 
                 handleSearchRoutes(origin, dest);
+                
+                // Show safety modal immediately after route is drawn
+                if (pickupPoints) {
+                  setShowSafetyModal(true);
+                }
               }}
               onReject={() => setShowIncomingRide(false)}
+            />
+          )}
+
+          {showSafetyModal && pickupPoints && (
+            <SafetyPickupModal 
+              pickupPoints={pickupPoints}
+              onAcceptSafe={() => {
+                setShowSafetyModal(false);
+                const safeOrigin = { name: pickupPoints.suggestedPoint.name, lat: pickupPoints.suggestedPoint.lat, lng: pickupPoints.suggestedPoint.lng };
+                const dest = { name: 'Điểm đến', lat: 10.8785, lng: 106.8040 }; 
+                handleSearchRoutes(safeOrigin, dest);
+              }}
+              onIgnore={() => setShowSafetyModal(false)}
             />
           )}
         </AnimatePresence>
