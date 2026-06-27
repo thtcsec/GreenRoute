@@ -97,21 +97,30 @@ export default function Home() {
     centerMapOnLocation(gpsLocation || driverLocation);
   };
 
-  // --- FETCHING DATA FROM API ---
+  // --- REAL-TIME GPS TRACKING ---
   useEffect(() => {
-    // Feature 1: Real GPS Location (chỉ lưu tọa độ, không tự pan bản đồ)
+    let watchId: number;
     if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
+      watchId = navigator.geolocation.watchPosition(
         (position) => {
           const loc: [number, number] = [position.coords.latitude, position.coords.longitude];
           setGpsLocation(loc);
         },
         (error) => {
-          console.warn("GPS Error:", error.message);
+          console.warn("GPS Tracking Error:", error.message);
         },
-        { timeout: 10000, maximumAge: 30000 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
+    return () => {
+      if (watchId && typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, []);
+
+  // --- FETCHING DATA FROM API ---
+  useEffect(() => {
 
     const fetchData = async () => {
       try {
@@ -434,7 +443,19 @@ export default function Home() {
           />
           
           {/* Cụm nút công cụ nổi trên bản đồ */}
-          <div className="absolute bottom-4 right-4 flex flex-col gap-4 z-20">
+          <div className={`absolute right-4 flex flex-col gap-3.5 z-20 transition-all duration-300 ${!isPanelOpen && activeTab === 'map' ? 'bottom-16' : 'bottom-4'}`}>
+            {/* Nút reset góc nhìn bản đồ về vị trí tài xế */}
+            <motion.button
+              type="button"
+              onClick={handleLocateMe}
+              whileTap={{ scale: 0.92 }}
+              whileHover={{ scale: 1.05 }}
+              className="p-3 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-emerald-400 shadow-xl hover:bg-black/80 hover:text-white transition-all cursor-pointer flex items-center justify-center"
+              title="Định vị tài xế"
+            >
+              <Compass className="w-5 h-5" />
+            </motion.button>
+
             {/* Nút FAB Báo cáo Khẩn cấp */}
             <button
               onClick={() => {
@@ -507,17 +528,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* Nút reset góc nhìn bản đồ về vị trí tài xế */}
-          <motion.button
-            type="button"
-            onClick={handleLocateMe}
-            whileTap={{ scale: 0.92 }}
-            whileHover={{ scale: 1.05 }}
-            className="absolute bottom-5 right-20 z-[1000] p-3 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-emerald-400 shadow-xl hover:bg-black/80 transition-colors cursor-pointer"
-            title="Định vị tài xế"
-          >
-            <Compass className="w-5 h-5" />
-          </motion.button>
+          {/* Old locate button removed to group with other map controls */}
         </div>
 
         {/* Nút vuốt panel (tab Bản đồ) */}

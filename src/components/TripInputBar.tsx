@@ -228,7 +228,7 @@ export default function TripInputBar({
 
   return (
     <div ref={containerRef} className="w-full relative z-40">
-      <div className="relative rounded-[1.25rem] border border-white/10 bg-black/40 backdrop-blur-xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] transition-all duration-500 overflow-hidden">
+      <div className="relative rounded-[1.25rem] border border-white/10 bg-black/40 backdrop-blur-xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] transition-all duration-500">
         {/* Top subtle glow */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
         
@@ -278,7 +278,7 @@ export default function TripInputBar({
 
                 {/* Origin Dropdown */}
                 {activeField === 'origin' && suggestions.length > 0 && (
-                  <div className="absolute z-[100] left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-[0_15px_50px_rgba(0,0,0,0.5)] max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute z-[100] left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-[0_15px_50px_rgba(0,0,0,0.5)] max-h-72 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
                     {isSearching && (
                       <div className="flex items-center gap-2 px-4 py-3 text-xs text-gray-400 font-medium">
                         <Loader2 size={14} className="animate-spin text-emerald-400" />
@@ -344,7 +344,7 @@ export default function TripInputBar({
 
                 {/* Destination Dropdown */}
                 {activeField === 'dest' && suggestions.length > 0 && (
-                  <div className="absolute z-[100] left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-[0_15px_50px_rgba(0,0,0,0.5)] max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute z-[100] left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-[0_15px_50px_rgba(0,0,0,0.5)] max-h-72 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
                     {isSearching && (
                       <div className="flex items-center gap-2 px-4 py-3 text-xs text-gray-400 font-medium">
                         <Loader2 size={14} className="animate-spin text-red-400" />
