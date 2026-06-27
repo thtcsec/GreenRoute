@@ -48,6 +48,7 @@ interface LeafletMapProps {
   gpsLocation: [number, number] | null;
   osrmRoute: [number, number][] | null;
   activeLayer: 'heat' | 'flood' | 'all' | 'none';
+  isTripStarted?: boolean;
 }
 
 export default function LeafletMap({
@@ -65,7 +66,8 @@ export default function LeafletMap({
   onSelectRoute,
   gpsLocation,
   osrmRoute,
-  activeLayer
+  activeLayer,
+  isTripStarted
 }: LeafletMapProps) {
   const [mapReady, setMapReady] = useState(false);
 
@@ -89,16 +91,16 @@ export default function LeafletMap({
   
   // 1. Icon định vị tài xế (màu xanh dương nhấp nháy)
   // 1. Icon định vị tài xế (màu xanh dương nhấp nháy)
-  const createCustomIcon = (color: string, icon: string) => L.divIcon({
-    html: `<div class="flex items-center justify-center w-8 h-8 rounded-full bg-${color}-600 border-2 border-white text-white shadow-lg">${icon}</div>`,
+  const createCustomIcon = (color: string, icon: string, extraClass: string = '') => L.divIcon({
+    html: `<div class="flex items-center justify-center w-8 h-8 rounded-full bg-${color}-600 border-2 border-white text-white shadow-lg transition-all duration-300 ${extraClass}">${icon}</div>`,
     className: 'custom-icon',
     iconSize: [32, 32],
     iconAnchor: [16, 16]
   });
 
-  const driverIcon = createCustomIcon('blue', '🚘');
-  const gpsIcon = createCustomIcon('indigo', '📍');
-  const destIcon = createCustomIcon('red', '🏁');
+  const driverIcon = createCustomIcon('blue', '🚘', isTripStarted ? 'animate-pulse ring-4 ring-blue-500/50' : '');
+  const gpsIcon = createCustomIcon('indigo', '📍', isTripStarted ? 'animate-pulse ring-4 ring-indigo-500/50' : '');
+  const destIcon = createCustomIcon('red', '🏁', 'animate-bounce shadow-2xl ring-4 ring-red-500/30');
 
   // 1.5 Icon định vị GPS thật nhấp nháy (như cũ)
   const gpsPulseIcon = L.divIcon({

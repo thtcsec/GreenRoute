@@ -14,7 +14,17 @@ export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, acti
   // Điểm đề xuất chính (mặc định lấy điểm đầu tiên hoặc điểm đang được kích hoạt)
   const recommendedStop = activeStop || coolstops[0];
 
-  if (!recommendedStop) return null;
+  if (!recommendedStop) {
+    return (
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl text-center">
+        <div className="w-12 h-12 bg-gray-950 rounded-full flex items-center justify-center mx-auto mb-3">
+          <Snowflake className="w-6 h-6 text-gray-500" />
+        </div>
+        <h3 className="text-sm font-bold text-gray-300">Không tìm thấy CoolStop</h3>
+        <p className="text-xs text-gray-500 mt-1">Không có điểm dừng làm mát nào trong bán kính 5km quanh bạn.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-900 border border-emerald-900/50 rounded-2xl p-5 shadow-xl transition-all duration-300 hover:border-emerald-800">
