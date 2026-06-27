@@ -59,6 +59,13 @@ async function run() {
     await routesCol.deleteMany({});
     if (routesData.length > 0) await routesCol.insertMany(routesData);
     
+    // Seed Traffic Zones
+    console.log('Seeding traffic_zones...');
+    const trafficZonesData = JSON.parse(fs.readFileSync(path.join(dataDir, 'traffic_zones.json'), 'utf8'));
+    const trafficZonesCol = db.collection('traffic_zones');
+    await trafficZonesCol.deleteMany({});
+    if (trafficZonesData.length > 0) await trafficZonesCol.insertMany(trafficZonesData);
+    
     console.log('Database seeded successfully!');
   } catch (err) {
     console.error(err);

@@ -272,12 +272,13 @@ export async function GET(request: NextRequest) {
     const db = client.db('grab_undp');
     
     // Fetch data from MongoDB
-    const [dbRoutes, dbHeat, dbFlood, dbCool, dbReports] = await Promise.all([
+    const [dbRoutes, dbHeat, dbFlood, dbCool, dbReports, dbTraffic] = await Promise.all([
       db.collection('routes').find({}).toArray(),
       db.collection('heat_zones').find({}).toArray(),
       db.collection('flood_risks').find({}).toArray(),
       db.collection('coolstops').find({}).toArray(),
-      db.collection('reports').find({}).sort({ timestamp: -1 }).limit(50).toArray() // Recent reports
+      db.collection('reports').find({}).sort({ timestamp: -1 }).limit(50).toArray(), // Recent reports
+      db.collection('traffic_zones').find({}).toArray()
     ]);
 
     // Fetch Weather Data
@@ -308,6 +309,7 @@ export async function GET(request: NextRequest) {
     const floodRisks = dbFlood.map(d => { const { _id, ...rest } = d; return rest as FloodRisk; });
     const coolstops = dbCool.map(d => { const { _id, ...rest } = d; return rest as CoolStop; });
     const reports = dbReports.map(d => { const { _id, ...rest } = d; return rest as ClimateReport; });
+    const trafficZones = dbTraffic.map(d => { const { _id, ...rest } = d; return rest as any; });
 
     if (!originLat || !originLng || !destLat || !destLng) {
       return NextResponse.json(fallbackRoutes);
@@ -333,8 +335,26 @@ export async function GET(request: NextRequest) {
     }
 
     const scoredRoutes: ScoredRoute[] = osrmResults.map((osrm, index) => {
-      const result = calculateClimateScore(osrm.coordinates, heatZones, floodRisks, coolstops, osrm.duration, osrm.distance, weatherData, reports);
-      return { ...osrm, ...result, index };
+      const result = calculateClimateScore(
+        osrm.coordinates, 
+        heatZones, 
+        floodRisks, 
+        coolstops, 
+        trafficZones, // Passed traffic zones
+        osrm.duration, 
+        osrm.distance, 
+        weatherData,
+        reports
+      );
+      
+      const durationWithTraffic = result.totalDuration;
+
+      return { 
+        ...osrm, 
+        ...result, 
+        index,
+        duration: durationWithTraffic 
+      };
     });
 
     const byDuration = [...scoredRoutes].sort((a, b) => a.duration - b.duration);

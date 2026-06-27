@@ -44,7 +44,7 @@ function PickupPointsLayerComponent({ pickupPoints }: PickupPointsLayerProps) {
   return (
     <>
       <Marker position={[pickupPoints.defaultPoint.lat, pickupPoints.defaultPoint.lng]} icon={defaultIcon}>
-        <Popup maxWidth={240} autoPanPadding={[60, 60]}>
+        <Popup maxWidth={240}>
           <div className="font-sans">
             <p className="font-bold text-red-500 text-xs flex items-center gap-1">⚠️ ĐIỂM ĐÓN GỐC (RỦI RO)</p>
             <p className="font-semibold text-white text-sm mt-1">{pickupPoints.defaultPoint.name}</p>
@@ -57,7 +57,7 @@ function PickupPointsLayerComponent({ pickupPoints }: PickupPointsLayerProps) {
       </Marker>
 
       <Marker position={[pickupPoints.suggestedPoint.lat, pickupPoints.suggestedPoint.lng]} icon={suggestedIcon}>
-        <Popup maxWidth={240} autoPanPadding={[60, 60]}>
+        <Popup maxWidth={240}>
           <div className="font-sans">
             <p className="font-bold text-emerald-400 text-xs flex items-center gap-1">✅ ĐIỂM ĐÓN KHUYÊN DÙNG</p>
             <p className="font-semibold text-white text-sm mt-1">{pickupPoints.suggestedPoint.name}</p>

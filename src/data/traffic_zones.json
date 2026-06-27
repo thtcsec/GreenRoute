@@ -1,0 +1,62 @@
+[
+  {
+    "id": "tz-1",
+    "name": "Kẹt xe (Trạm thu phí)",
+    "lat": 10.871393109738026,
+    "lng": 106.79028457191932,
+    "radius": 150,
+    "severity": "Heavy",
+    "delayMin": 8,
+    "description": "Kẹt xe cục bộ do hiệu ứng nhiệt và xe đông."
+  },
+  {
+    "id": "tz-2",
+    "name": "Ùn ứ (Ngã tư)",
+    "lat": 10.875474865359916,
+    "lng": 106.78558106987575,
+    "radius": 120,
+    "severity": "Moderate",
+    "delayMin": 5,
+    "description": "Lưu lượng xe cao, mặt đường hấp thụ nhiệt mạnh gây oi bức."
+  },
+  {
+    "id": "tz-3",
+    "name": "Nút giao Quốc lộ 1 - Bến xe Miền Đông mới",
+    "lat": 10.8653,
+    "lng": 106.8152,
+    "radius": 350,
+    "severity": "Heavy",
+    "delayMin": 15,
+    "description": "Xe cộ ùn ứ kéo dài do mặt đường thiếu bóng râm, nhiệt độ đo được lên tới 42°C, làm xe di chuyển chậm chạp."
+  },
+  {
+    "id": "tz-4",
+    "name": "Đường Lê Hữu Kiều (Khu công nghệ cao)",
+    "lat": 10.8520,
+    "lng": 106.8042,
+    "radius": 200,
+    "severity": "Heavy",
+    "delayMin": 12,
+    "description": "Ùn tắc nghiêm trọng giờ tan tầm, hơi nóng bốc lên từ mặt đường nhựa khiến tài xế mệt mỏi."
+  },
+  {
+    "id": "tz-5",
+    "name": "Ngã ba 621 (Lối vào ĐHQG)",
+    "lat": 10.8720,
+    "lng": 106.8062,
+    "radius": 250,
+    "severity": "Heavy",
+    "delayMin": 18,
+    "description": "Điểm đen kẹt xe. Hiệu ứng đảo nhiệt đô thị (UHI) làm giảm khả năng tập trung của người lái xe."
+  },
+  {
+    "id": "tz-6",
+    "name": "Đoạn đường qua Hồ Đá",
+    "lat": 10.8795,
+    "lng": 106.7932,
+    "radius": 180,
+    "severity": "Moderate",
+    "delayMin": 6,
+    "description": "Lưu lượng phương tiện đông, tuy có hồ nhưng lượng xe lớn xả nhiệt cộng hưởng khiến khu vực bị ùn ứ nhẹ."
+  }
+]

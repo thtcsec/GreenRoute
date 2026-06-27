@@ -6,7 +6,7 @@
  * Climate Score = Math.round((1 - climate_penalty / 10) * 100)
  */
 
-import { HeatZone, FloodRisk, CoolStop, WeatherData, ClimateReport } from '@/types';
+import { HeatZone, FloodRisk, CoolStop, WeatherData, ClimateReport, TrafficZone } from '@/types';
 
 // ─── Haversine Distance (meters) ────────────────────────────────────────────
 export function haversine(a: [number, number], b: [number, number]): number {
@@ -79,6 +79,7 @@ export interface ClimateScoreResult {
   floodRatio: number;
   shadeRatio: number;
   trafficDelay: number;
+  totalDuration: number;
 }
 
 export function calculateClimateScore(
@@ -86,6 +87,7 @@ export function calculateClimateScore(
   heatZones: HeatZone[],
   floodRisks: FloodRisk[],
   coolstops: CoolStop[],
+  trafficZones: TrafficZone[],
   osrmDurationMin: number,
   distanceKm: number,
   weatherData?: WeatherData | null,
@@ -101,6 +103,7 @@ export function calculateClimateScore(
       floodRatio: 0,
       shadeRatio: 0,
       trafficDelay: 0,
+      totalDuration: osrmDurationMin,
     };
   }
 
@@ -108,6 +111,8 @@ export function calculateClimateScore(
   let floodExposure = 0;
   let shadeCount = 0;
   let totalStopDistances = 0;
+  
+  const intersectedTrafficZones = new Set<string>();
 
   const sampleIndices = getSampleIndices(routeCoords.length);
   const totalSamples = sampleIndices.length;
@@ -130,6 +135,13 @@ export function calculateClimateScore(
         pointFlood = Math.max(pointFlood, floodSeverity(zone));
       }
     }
+    
+    // Traffic
+    for (const zone of trafficZones) {
+      if (haversine(point, [zone.lat, zone.lng]) < zone.radius) {
+        intersectedTrafficZones.add(zone.id);
+      }
+    }
 
     // Community Reports feedback loop (300m radius)
     if (reports && reports.length > 0) {
@@ -138,9 +150,9 @@ export function calculateClimateScore(
       for (const report of reports) {
         if (haversine(point, [report.lat, report.lng]) < 300) {
           if (report.type === 'Trời quá nóng' || report.type === 'Thiếu bóng râm') {
-            reportHeatBoost = Math.max(reportHeatBoost, 0.15); // +1.5 on 0-10 scale
+            reportHeatBoost += 10;
           } else if (report.type === 'Đường ngập nước') {
-            reportFloodBoost = Math.max(reportFloodBoost, 0.20); // +2.0 on 0-10 scale
+            reportFloodBoost += 10;
           }
         }
       }
@@ -209,18 +221,26 @@ export function calculateClimateScore(
   const rawScore = (1 - climate_penalty / 10) * 100;
   const score = Math.max(0, Math.min(100, Math.round(rawScore)));
 
-  const idealDuration = (distanceKm / 25) * 60;
-  const trafficDelay = Math.max(0, osrmDurationMin - idealDuration);
+  // Add traffic delay based on intersected zones
+  let trafficDelayMin = 0;
+  for (const zoneId of intersectedTrafficZones) {
+    const zone = trafficZones.find(z => z.id === zoneId);
+    if (zone) trafficDelayMin += zone.delayMin;
+  }
+  
+  // Tổng thời gian bao gồm cả kẹt xe
+  const totalDuration = osrmDurationMin + trafficDelayMin;
 
   return {
     score,
     heatRisk: getHeatRisk(heatRatio),
     floodRisk: getFloodRisk(floodRatio),
-    trafficCongestion: getTrafficLevel(trafficDelay),
+    trafficCongestion: getTrafficLevel(trafficDelayMin),
     heatRatio,
     floodRatio,
     shadeRatio,
-    trafficDelay,
+    trafficDelay: trafficDelayMin,
+    totalDuration,
   };
 }
 

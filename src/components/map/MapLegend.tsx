@@ -103,6 +103,23 @@ export default function MapLegend({ activeLayer }: MapLegendProps) {
                 </div>
               </div>
             </div>
+
+            {/* Traffic Legend */}
+            {(activeLayer === 'all') && (
+              <div>
+                <div className="flex items-center gap-1.5 font-semibold text-purple-400 mt-2 mb-1.5">
+                  <span className="text-[12px]">🚗</span> Mật độ giao thông
+                </div>
+                <div className="space-y-1 pl-1">
+                  <div className="flex items-center gap-1.5 text-gray-300">
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-600 border border-purple-400 inline-block"></span> Kẹt xe nghiêm trọng
+                  </div>
+                  <div className="flex items-center gap-1.5 text-gray-300">
+                    <span className="w-2.5 h-2.5 rounded-full bg-fuchsia-500 border border-fuchsia-400 inline-block"></span> Kẹt xe vừa phải
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

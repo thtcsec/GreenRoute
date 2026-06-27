@@ -4,7 +4,7 @@ import React, { useEffect, useState, memo } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints } from '@/types';
+import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints, TrafficZone } from '@/types';
 
 import HeatZoneLayer from './map/HeatZoneLayer';
 import FloodZoneLayer from './map/FloodZoneLayer';
@@ -14,6 +14,7 @@ import UserReportsLayer from './map/UserReportsLayer';
 import RouteLayer from './map/RouteLayer';
 import UserMarkerLayer from './map/UserMarkerLayer';
 import MapLegend from './map/MapLegend';
+import TrafficLayer from './map/TrafficLayer';
 
 // Sửa lỗi Leaflet icon mặc định trong Next.js/Webpack
 const setupDefaultIcon = () => {
@@ -60,6 +61,7 @@ interface LeafletMapProps {
   selectedRouteId: string | null;
   pickupPoints: PickupPoints | null;
   userReports: ClimateReport[];
+  trafficZones: TrafficZone[];
   focusLocation: [number, number] | null;
   focusBounds: L.LatLngBoundsExpression | null;
   mapFocusKey: number;
@@ -79,6 +81,7 @@ function LeafletMapComponent({
   selectedRouteId,
   pickupPoints,
   userReports,
+  trafficZones,
   focusLocation,
   focusBounds,
   mapFocusKey,
@@ -136,6 +139,9 @@ function LeafletMapComponent({
 
         {/* 3. Vẽ các vùng rủi ro ngập lụt (Flood Zones) */}
         <FloodZoneLayer floodRisks={floodRisks} visible={showFlood} />
+
+        {/* 4. Vẽ các vùng kẹt xe (Traffic Zones) */}
+        <TrafficLayer trafficZones={trafficZones} active={activeLayer === 'all'} />
 
         {/* 4. Marker các điểm dừng chân mát mẻ (CoolStops) */}
         <CoolStopLayer coolstops={coolstops} onSelectCoolStop={onSelectCoolStop} />

@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints, WeatherData, Location } from '@/types';
+import { WeatherData, CoolStop, HeatZone, FloodRisk, Route, ScoredRoute, PickupPoints, ClimateReport, TrafficZone } from '@/types';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import CoolStopCard from '@/components/CoolStopCard';
+import IncomingRide from '@/components/IncomingRide';
 import RouteCompare from '@/components/RouteCompare';
 import PickupSafety from '@/components/PickupSafety';
 import ReportForm from '@/components/ReportForm';
@@ -36,6 +38,10 @@ export default function Home() {
   const [pickupPoints, setPickupPoints] = useState<PickupPoints | null>(null);
   const [userReports, setUserReports] = useState<ClimateReport[]>([]);
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [trafficZones, setTrafficZones] = useState<TrafficZone[]>([]);
+  
+  // UI States cho Demo
+  const [showIncomingRide, setShowIncomingRide] = useState(false);
 
   // Tọa độ người dùng (Mặc định ở Đại học Quốc tế HCMIU)
   const [driverLocation] = useState<[number, number]>([10.8795, 106.8045]);
@@ -132,13 +138,14 @@ export default function Home() {
       try {
         setLoading(true);
         // Gọi song song các API Route Handlers
-        const [resCoolStops, resHeatZones, resFloodRisks, resPickup, resWeather, resReports] = await Promise.all([
+        const [resCoolStops, resHeatZones, resFloodRisks, resPickup, resWeather, resReports, resTraffic] = await Promise.all([
           fetch('/api/coolstops').then(r => r.json()),
           fetch('/api/heat-zones').then(r => r.json()),
           fetch('/api/flood-risks').then(r => r.json()),
           fetch('/api/pickup-points').then(r => r.json()),
           fetch('/api/weather').then(r => r.json()),
-          fetch('/api/reports').then(r => r.json())
+          fetch('/api/reports').then(r => r.json()),
+          fetch('/api/traffic-zones').then(r => r.json())
         ]);
 
         setCoolstops(resCoolStops);
@@ -146,6 +153,7 @@ export default function Home() {
         setFloodRisks(resFloodRisks);
         setPickupPoints(resPickup);
         setWeather(resWeather);
+        setTrafficZones(resTraffic || []);
         
         // Auto-switch bản đồ dựa vào Climate Mode
         if (resWeather) {
@@ -349,9 +357,17 @@ export default function Home() {
             <p className="text-[11px] text-gray-400 font-medium tracking-wide mt-0.5">Team I - iMPACT</p>
           </div>
           <div className="text-right flex flex-col items-end gap-1">
-            <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-bold shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-              PROTOTYPE
-            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowIncomingRide(true)}
+                className="text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 px-2.5 py-1 rounded-full font-bold hover:bg-indigo-500/20 transition-colors shadow-[0_0_10px_rgba(99,102,241,0.2)]"
+              >
+                GỌI XE (DEMO)
+              </button>
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-bold shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                PROTOTYPE
+              </span>
+            </div>
             {weather?.climateMode === 'rain' && (
               <span className="text-[10px] bg-blue-950 text-blue-400 border border-blue-900/50 px-2 py-0.5 rounded-md font-bold flex items-center gap-1 animate-pulse">
                 <Droplets className="w-3 h-3" /> RAIN MODE
@@ -376,29 +392,32 @@ export default function Home() {
         {/* Bản đồ */}
         <div className={`w-full relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 ease-in-out ${
           isPanelOpen && activeTab !== 'map'
-            ? 'h-[15vh] shrink-0'
+            ? 'h-[20%]'
             : activeTab === 'map' 
-              ? isPanelOpen ? 'h-[50vh] shrink-0' : 'flex-1 min-h-0' 
-              : 'h-[32vh] min-h-[220px] shrink-0'
+              ? isPanelOpen ? 'h-[50%]' : 'h-[100%]' 
+              : 'h-[60%]'
         }`}>
-          <MapContainer
-            driverLocation={driverLocation}
-            coolstops={coolstops}
-            heatZones={heatZones}
-            floodRisks={floodRisks}
-            routes={routes}
-            selectedRouteId={selectedRouteId}
-            pickupPoints={pickupPoints}
-            userReports={userReports}
-            focusLocation={focusLocation}
-            focusBounds={focusBounds}
-            mapFocusKey={mapFocusKey}
-            onSelectCoolStop={handleMapSelectCoolStop}
-            onSelectRoute={handleSelectRoute}
-            gpsLocation={gpsLocation}
-            osrmRoute={osrmRoute}
-            activeLayer={activeLayer}
-          />
+          <ErrorBoundary>
+            <MapContainer
+              driverLocation={driverLocation}
+              coolstops={coolstops}
+              heatZones={heatZones}
+              floodRisks={floodRisks}
+              trafficZones={trafficZones}
+              routes={routes}
+              selectedRouteId={selectedRouteId}
+              pickupPoints={pickupPoints}
+              userReports={userReports}
+              focusLocation={focusLocation}
+              focusBounds={focusBounds}
+              mapFocusKey={mapFocusKey}
+              onSelectCoolStop={handleMapSelectCoolStop}
+              onSelectRoute={handleSelectRoute}
+              gpsLocation={gpsLocation}
+              osrmRoute={osrmRoute}
+              activeLayer={activeLayer}
+            />
+          </ErrorBoundary>
           
           {/* Cụm nút công cụ nổi trên bản đồ */}
           <div className={`absolute right-4 flex flex-col gap-3.5 z-[1000] transition-all duration-300 ${!isPanelOpen && activeTab === 'map' ? 'bottom-16' : 'bottom-4'}`}>
@@ -500,12 +519,14 @@ export default function Home() {
         </button>
 
         {/* Nội dung Tab */}
-        <main className={`w-full overflow-y-auto z-20 custom-scrollbar transition-all duration-300 ease-in-out ${
+        <div className={`w-full overflow-y-auto z-20 custom-scrollbar transition-all duration-300 ease-in-out ${
           activeTab === 'map'
             ? isPanelOpen
-              ? 'flex-1 min-h-0 px-4 py-5 pb-4 opacity-100'
-              : 'h-0 p-0 overflow-hidden opacity-0'
-            : 'flex-1 min-h-0 px-4 py-5 pb-4 opacity-100'
+              ? 'h-[50%] px-4 py-5 pb-4 opacity-100'
+              : 'h-0 p-0 opacity-0'
+            : isPanelOpen
+              ? 'h-[80%] px-4 py-5 pb-4 opacity-100'
+              : 'h-[40%] px-4 py-5 pb-4 opacity-100'
         }`}>
           {loading ? (
             <div className="h-full flex items-center justify-center py-10">
@@ -677,7 +698,7 @@ export default function Home() {
             </motion.div>
             </AnimatePresence>
           )}
-        </main>
+        </div>
 
         {/* Thanh Điều Hướng Dưới Cùng */}
         <nav className="shrink-0 h-[72px] bg-black/80 backdrop-blur-2xl border-t border-white/10 grid grid-cols-4 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.3)] pb-safe">
@@ -717,6 +738,20 @@ export default function Home() {
             )
           })}
         </nav>
+        <AnimatePresence>
+          {showIncomingRide && (
+            <IncomingRide 
+              onAccept={() => {
+                setShowIncomingRide(false);
+                // Demo: hardcode origin and destination to trigger route calculation
+                const origin = { name: 'Điểm đón', lat: 10.8725, lng: 106.8048 }; // Tòa nhà Bitexco (mock)
+                const dest = { name: 'Điểm đến', lat: 10.8785, lng: 106.8040 }; // Đại học Quốc Tế
+                handleSearchRoutes(origin, dest);
+              }}
+              onReject={() => setShowIncomingRide(false)}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

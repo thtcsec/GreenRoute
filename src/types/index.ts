@@ -89,6 +89,17 @@ export interface PickupPoints {
   };
 }
 
+export interface TrafficZone {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  radius: number; // in meters
+  severity: 'Heavy' | 'Moderate' | 'Light';
+  delayMin: number; // estimated delay in minutes
+  description?: string;
+}
+
 export interface ClimateReport {
   id: string;
   type: 'Too hot' | 'No shade' | 'Flooded' | 'Hard to stop' | 'Unsafe pickup/drop-off' | 'Traffic jam' | 'Wrong location';
