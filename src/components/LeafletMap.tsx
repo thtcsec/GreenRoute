@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMap, LayerGroup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints } from '@/types';
 
 // Sửa lỗi Leaflet icon mặc định trong Next.js/Webpack
 const setupDefaultIcon = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -44,6 +45,9 @@ interface LeafletMapProps {
   focusBounds: L.LatLngBoundsExpression | null;
   onSelectCoolStop: (stop: CoolStop) => void;
   onSelectRoute: (routeId: string) => void;
+  gpsLocation: [number, number] | null;
+  osrmRoute: [number, number][] | null;
+  activeLayer: 'heat' | 'flood' | 'all' | 'none';
 }
 
 export default function LeafletMap({
@@ -58,11 +62,15 @@ export default function LeafletMap({
   focusLocation,
   focusBounds,
   onSelectCoolStop,
-  onSelectRoute
+  onSelectRoute,
+  gpsLocation,
+  osrmRoute,
+  activeLayer
 }: LeafletMapProps) {
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMapReady(true);
   }, []);
 
@@ -92,8 +100,21 @@ export default function LeafletMap({
     iconAnchor: [12, 12]
   });
 
+  // 1.5 Icon định vị GPS thật (màu xanh lá)
+  const gpsIcon = L.divIcon({
+    html: `
+      <div class="relative flex h-6 w-6">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-6 w-6 bg-emerald-600 border-2 border-white shadow-md"></span>
+      </div>
+    `,
+    className: 'custom-gps-icon',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+
   // 2. Icon điểm dừng mát mẻ (Màu xanh lá có biểu tượng lá cây)
-  const coolStopIcon = (name: string) => L.divIcon({
+  const coolStopIcon = (_name: string) => L.divIcon({
     html: `
       <div class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-600 border-2 border-white text-white shadow-lg transform hover:scale-110 transition-transform duration-200">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 10H6M12 2a4 4 0 0 1 4 4v4H8V6a4 4 0 0 1 4-4Z"/></svg>
@@ -147,7 +168,7 @@ export default function LeafletMap({
   };
 
   // Map center setup
-  const centerLatLong: [number, number] = focusLocation || driverLocation;
+  const centerLatLong: [number, number] = focusLocation || gpsLocation || driverLocation;
 
   return (
     <div className="w-full h-full relative">
@@ -165,18 +186,25 @@ export default function LeafletMap({
         {/* Cập nhật view động */}
         <ChangeView center={centerLatLong} zoom={focusLocation ? 16 : 15} bounds={focusBounds || undefined} />
 
-        {/* 1. Marker vị trí tài xế */}
-        <Marker position={driverLocation} icon={driverIcon}>
+        {/* 1. Marker vị trí người dùng (Ưu tiên GPS thật, nếu không có thì dùng giả lập) */}
+        <Marker 
+          position={gpsLocation || driverLocation} 
+          icon={gpsLocation ? gpsIcon : driverIcon}
+        >
           <Popup>
             <div className="p-1">
-              <p className="font-semibold text-gray-900">Vị trí của bạn</p>
-              <p className="text-xs text-gray-600">Đang ở gần Đại học Quốc tế</p>
+              <p className="font-bold text-emerald-700">
+                {gpsLocation ? "Vị trí GPS thật" : "Vị trí giả lập"}
+              </p>
+              <p className="text-xs text-gray-600">
+                {gpsLocation ? "Từ thiết bị của bạn" : "Dùng để demo tính năng"}
+              </p>
             </div>
           </Popup>
         </Marker>
 
         {/* 2. Vẽ các vùng rủi ro nắng nóng (Heat Zones) */}
-        {heatZones.map((zone) => (
+        {(activeLayer === 'all' || activeLayer === 'heat') && heatZones.map((zone) => (
           <Circle
             key={zone.id}
             center={[zone.lat, zone.lng]}
@@ -201,7 +229,7 @@ export default function LeafletMap({
         ))}
 
         {/* 3. Vẽ các vùng rủi ro ngập lụt (Flood Zones) */}
-        {floodRisks.map((zone) => (
+        {(activeLayer === 'all' || activeLayer === 'flood') && floodRisks.map((zone) => (
           <Circle
             key={zone.id}
             center={[zone.lat, zone.lng]}
@@ -309,24 +337,69 @@ export default function LeafletMap({
           </Marker>
         ))}
 
-        {/* 7. Vẽ các tuyến đường so sánh */}
-        {routes.map((route) => {
-          const isSelected = selectedRouteId === route.id;
-          return (
+        {/* 7. Vẽ các tuyến đường so sánh (Chỉ hiện khi chưa có tuyến OSRM)
+            Render tuyến đã chọn sau cùng để đảm bảo nó luôn hiển thị nổi bật trên top. */}
+        {!osrmRoute && (
+          <>
+            {routes.filter(r => r.id !== selectedRouteId).map(route => (
+              <Polyline
+                key={route.id}
+                positions={route.coordinates}
+                pathOptions={{
+                  color: '#64748b',
+                  weight: 3,
+                  opacity: 0.4
+                }}
+                eventHandlers={{ click: () => onSelectRoute(route.id) }}
+              />
+            ))}
+
+            {/* Render tuyến được chọn ở trên cùng */}
+            {routes.find(r => r.id === selectedRouteId) && (() => {
+              const route = routes.find(r => r.id === selectedRouteId)!;
+              return (
+                <Polyline
+                  key={route.id}
+                  positions={route.coordinates}
+                  pathOptions={{
+                    color: route.color,
+                    weight: 6,
+                    opacity: 0.9
+                  }}
+                  eventHandlers={{ click: () => onSelectRoute(route.id) }}
+                />
+              );
+            })()}
+          </>
+        )}
+
+        {/* 8. Vẽ tuyến đường OSRM thật (Thay thế toàn bộ Polyline giả) */}
+        {osrmRoute && (
+          <LayerGroup>
+            {/* Đường viền (Outline) để nổi bật tuyến đường trên nền bản đồ phức tạp */}
             <Polyline
-              key={route.id}
-              positions={route.coordinates}
+              positions={osrmRoute}
               pathOptions={{
-                color: isSelected ? route.color : '#64748b',
-                weight: isSelected ? 6 : 3,
-                opacity: isSelected ? 0.9 : 0.4
-              }}
-              eventHandlers={{
-                click: () => onSelectRoute(route.id)
+                color: '#022c22', // emerald-950
+                weight: 8,
+                opacity: 0.6,
+                lineCap: 'round',
+                lineJoin: 'round'
               }}
             />
-          );
-        })}
+            {/* Lõi tuyến đường */}
+            <Polyline
+              positions={osrmRoute}
+              pathOptions={{
+                color: '#10b981', // emerald-500
+                weight: 5,
+                opacity: 1,
+                lineCap: 'round',
+                lineJoin: 'round'
+              }}
+            />
+          </LayerGroup>
+        )}
       </MapContainer>
     </div>
   );

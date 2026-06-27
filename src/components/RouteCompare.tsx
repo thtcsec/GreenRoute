@@ -1,7 +1,7 @@
 'use client';
 
 import { Route } from '@/types';
-import { Route as RouteIcon, Clock, Milestone, Thermometer, Droplets, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Route as RouteIcon, Clock, Milestone, Thermometer, Droplets, ShieldCheck } from 'lucide-react';
 
 interface RouteCompareProps {
   routes: Route[];

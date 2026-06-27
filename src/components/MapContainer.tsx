@@ -30,6 +30,9 @@ interface MapContainerProps {
   focusBounds: L.LatLngBoundsExpression | null;
   onSelectCoolStop: (stop: CoolStop) => void;
   onSelectRoute: (routeId: string) => void;
+  gpsLocation: [number, number] | null;
+  osrmRoute: [number, number][] | null;
+  activeLayer: 'heat' | 'flood' | 'all' | 'none';
 }
 
 export default function MapContainer(props: MapContainerProps) {

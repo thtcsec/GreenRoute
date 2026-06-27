@@ -32,7 +32,7 @@ export default function ReportForm({ onSubmitReport }: ReportFormProps) {
     }, 600);
   };
 
-  const typesList: { type: ClimateReport['type']; label: string; icon: any; color: string; desc: string }[] = [
+  const typesList: { type: ClimateReport['type']; label: string; icon: React.ElementType; color: string; desc: string }[] = [
     {
       type: 'Too hot',
       label: 'Trời quá nóng',
