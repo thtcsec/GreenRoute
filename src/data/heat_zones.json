@@ -1,0 +1,32 @@
+[
+  {
+    "id": "hz-1",
+    "name": "Ngã tư Đại học Quốc Gia (VNU Intersection)",
+    "lat": 10.8700,
+    "lng": 106.8030,
+    "radius": 150,
+    "riskLevel": "High",
+    "heatIndex": 42,
+    "description": "Ngã tư bê tông hóa diện tích rộng, hoàn toàn không có bóng râm cây xanh. Hấp nhiệt cực mạnh vào buổi trưa."
+  },
+  {
+    "id": "hz-2",
+    "name": "Bãi đỗ xe lộ thiên - Trung tâm Thể thao VNU",
+    "lat": 10.8740,
+    "lng": 106.7975,
+    "radius": 100,
+    "riskLevel": "Medium-High",
+    "heatIndex": 39,
+    "description": "Bề mặt bê tông hấp thụ nhiệt cao, thích hợp đỗ xe có mái che thay vì đỗ trực tiếp dưới nắng."
+  },
+  {
+    "id": "hz-3",
+    "name": "Đoạn đường nhựa song hành Xa Lộ Hà Nội",
+    "lat": 10.8660,
+    "lng": 106.7990,
+    "radius": 200,
+    "riskLevel": "High",
+    "heatIndex": 41,
+    "description": "Mặt nhựa hấp nhiệt cao kết hợp khí thải phương tiện giao thông lớn, nhiệt độ cảm nhận rất oi bức."
+  }
+]
