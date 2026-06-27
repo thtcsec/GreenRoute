@@ -30,7 +30,8 @@
 - **Styling**: Tailwind CSS
 - **Bản đồ**: Leaflet kết hợp OpenStreetMap thông qua React-Leaflet
 - **Icons**: Lucide React
-- **Quản lý dữ liệu**: Dữ liệu tĩnh JSON cho Demo & `localStorage` lưu trữ báo cáo
+- **Cơ sở dữ liệu**: MongoDB Atlas (Lưu trữ và đồng bộ hóa báo cáo thời tiết thời gian thực của các tài xế)
+- **Đường truyền phát triển**: Cloudflare Tunnel (Wrangler Tunnel) hỗ trợ chạy thử trực tiếp trên điện thoại di động
 
 ---
 
