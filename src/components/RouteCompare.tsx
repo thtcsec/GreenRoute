@@ -1,15 +1,16 @@
 'use client';
 
 import { Route } from '@/types';
-import { Route as RouteIcon, Clock, Milestone, Thermometer, Droplets, CheckCircle2, AlertTriangle, ShieldCheck, Car } from 'lucide-react';
+import { Route as RouteIcon, Clock, Milestone, Thermometer, Droplets, CheckCircle2, AlertTriangle, ShieldCheck, Car, Navigation } from 'lucide-react';
 
 interface RouteCompareProps {
   routes: Route[];
   selectedRouteId: string | null;
   onSelectRoute: (routeId: string) => void;
+  onStartRoute?: (routeId: string) => void;
 }
 
-export default function RouteCompare({ routes, selectedRouteId, onSelectRoute }: RouteCompareProps) {
+export default function RouteCompare({ routes, selectedRouteId, onSelectRoute, onStartRoute }: RouteCompareProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -67,6 +68,24 @@ export default function RouteCompare({ routes, selectedRouteId, onSelectRoute }:
                 </div>
               </div>
 
+              {/* Thu nhập & Chi phí xăng */}
+              {(route.estimatedEarning != null || route.fuelCost != null) && (
+                <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                  {route.estimatedEarning != null && (
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <span className="text-sm">💰</span>
+                      Thu nhập: <span className="font-bold text-emerald-400">{route.estimatedEarning.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                  )}
+                  {route.fuelCost != null && (
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <span className="text-sm">⛽</span>
+                      Xăng: <span className="font-bold text-amber-400">{route.fuelCost.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Chỉ số rủi ro & Điểm khí hậu */}
               <div className="flex items-center justify-between border-t border-gray-850 pt-3">
                 <div className="flex items-center gap-3">
@@ -94,18 +113,46 @@ export default function RouteCompare({ routes, selectedRouteId, onSelectRoute }:
                 </div>
 
                 {/* Điểm khí hậu */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-gray-500">Chỉ số khí hậu:</span>
-                  <div className="flex items-center gap-1 bg-gray-950 px-2 py-0.5 rounded-md border border-gray-850">
-                    <span className={`text-xs font-bold ${
-                      route.climateScore >= 80 ? 'text-emerald-400' : route.climateScore >= 60 ? 'text-amber-400' : 'text-red-400'
-                    }`}>
-                      {route.climateScore}
-                    </span>
-                    <span className="text-[9px] text-gray-600">/100</span>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-500">Chỉ số khí hậu:</span>
+                    <div className="flex items-center gap-1 bg-gray-950 px-2 py-0.5 rounded-md border border-gray-850">
+                      <span className={`text-xs font-bold ${
+                        route.climateScore >= 80 ? 'text-emerald-400' : route.climateScore >= 60 ? 'text-amber-400' : 'text-red-400'
+                      }`}>
+                        {route.climateScore}
+                      </span>
+                      <span className="text-[9px] text-gray-600">/100</span>
+                    </div>
+                  </div>
+                  {/* Visual progress bar for Climate Score */}
+                  <div className="w-24 h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        route.climateScore >= 80
+                          ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
+                          : route.climateScore >= 60
+                            ? 'bg-gradient-to-r from-amber-500 to-amber-400'
+                            : 'bg-gradient-to-r from-red-500 to-red-400'
+                      }`}
+                      style={{ width: `${route.climateScore}%` }}
+                    />
                   </div>
                 </div>
               </div>
+
+              {/* CTA Button for selected route */}
+              {isSelected && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onStartRoute?.(route.id);
+                  }}
+                  className="w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm bg-emerald-500 hover:bg-emerald-600 text-gray-950 flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-emerald-500/10"
+                >
+                  <Navigation className="w-4 h-4" /> Chọn tuyến này
+                </button>
+              )}
             </div>
           );
         })}

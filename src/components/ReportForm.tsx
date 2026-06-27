@@ -2,17 +2,30 @@
 
 import { useState } from 'react';
 import { ClimateReport } from '@/types';
-import { Send, Thermometer, CloudSun, Droplets, Ban, ShieldAlert, Sparkles, Car } from 'lucide-react';
+import { Send, Thermometer, CloudSun, Droplets, Ban, ShieldAlert, Sparkles, Car, Trash2, ClipboardList, ChevronDown } from 'lucide-react';
+
+function timeAgo(timestamp: string): string {
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return 'Vừa xong';
+  if (minutes < 60) return `${minutes} phút trước`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} giờ trước`;
+  return `${Math.floor(hours / 24)} ngày trước`;
+}
 
 interface ReportFormProps {
   onSubmitReport: (type: ClimateReport['type'], note: string) => void;
+  reports?: ClimateReport[];
+  onDeleteReport?: (reportId: string) => void;
 }
 
-export default function ReportForm({ onSubmitReport }: ReportFormProps) {
+export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: ReportFormProps) {
   const [reportType, setReportType] = useState<ClimateReport['type']>('Too hot');
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showAllReports, setShowAllReports] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +89,22 @@ export default function ReportForm({ onSubmitReport }: ReportFormProps) {
       desc: 'Đoạn đường ùn tắc kéo dài'
     }
   ];
+
+  const reportTypeMap: Record<ClimateReport['type'], { label: string; icon: any }> = {
+    'Too hot': { label: 'Trời quá nóng', icon: Thermometer },
+    'No shade': { label: 'Thiếu bóng râm', icon: CloudSun },
+    'Flooded': { label: 'Đường ngập nước', icon: Droplets },
+    'Hard to stop': { label: 'Khó dừng đỗ', icon: Ban },
+    'Unsafe pickup/drop-off': { label: 'Đón trả không an toàn', icon: ShieldAlert },
+    'Traffic jam': { label: 'Kẹt xe / Tắc đường', icon: Car },
+  };
+
+  // Sort reports by timestamp descending (most recent first)
+  const sortedReports = reports
+    ? [...reports].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    : [];
+  const visibleReports = showAllReports ? sortedReports : sortedReports.slice(0, 5);
+  const hasMoreReports = sortedReports.length > 5;
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl">
@@ -159,6 +188,66 @@ export default function ReportForm({ onSubmitReport }: ReportFormProps) {
           )}
         </button>
       </form>
+
+      {/* Lịch sử báo cáo */}
+      <div className="mt-5 pt-5 border-t border-gray-800">
+        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <ClipboardList className="w-3.5 h-3.5" /> Lịch sử báo cáo
+        </h4>
+
+        {sortedReports.length === 0 ? (
+          <div className="bg-gray-950/50 border border-gray-800 rounded-xl p-6 text-center">
+            <ClipboardList className="w-8 h-8 text-gray-700 mx-auto mb-2" />
+            <p className="text-xs text-gray-500">Chưa có báo cáo nào</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {visibleReports.map((report) => {
+              const typeInfo = reportTypeMap[report.type];
+              const Icon = typeInfo?.icon || ShieldAlert;
+
+              return (
+                <div
+                  key={report.id}
+                  className="bg-gray-950/50 border border-gray-800 rounded-xl p-3 flex items-center gap-3 group transition-all hover:border-gray-700"
+                >
+                  <div className="p-1.5 rounded-lg bg-gray-900 shrink-0">
+                    <Icon className="w-3.5 h-3.5 text-gray-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-gray-200">{typeInfo?.label || report.type}</span>
+                      <span className="text-[10px] text-gray-600">·</span>
+                      <span className="text-[10px] text-gray-500">{timeAgo(report.timestamp)}</span>
+                    </div>
+                    {report.note && (
+                      <p className="text-[11px] text-gray-500 mt-0.5 truncate">{report.note}</p>
+                    )}
+                  </div>
+                  {onDeleteReport && (
+                    <button
+                      onClick={() => onDeleteReport(report.id)}
+                      className="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-950/30 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shrink-0"
+                      title="Xoá báo cáo"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+
+            {hasMoreReports && !showAllReports && (
+              <button
+                onClick={() => setShowAllReports(true)}
+                className="w-full py-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center justify-center gap-1 transition-colors cursor-pointer"
+              >
+                <ChevronDown className="w-3.5 h-3.5" /> Xem tất cả ({sortedReports.length} báo cáo)
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

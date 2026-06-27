@@ -11,6 +11,8 @@
     "isRecommended": false,
     "recommendationStatus": "Không khuyến nghị: Kẹt xe nặng tại ngã tư hấp nhiệt cực độ. Shipper sẽ bị phơi nắng lâu do tắc nghẽn.",
     "color": "#ef4444",
+    "estimatedEarning": 25000,
+    "fuelCost": 4200,
     "coordinates": [
       [10.8720, 106.7920],
       [10.8700, 106.7950],
@@ -31,6 +33,8 @@
     "isRecommended": true,
     "recommendationStatus": "Khuyên dùng! Tránh toàn bộ điểm kẹt xe và ngập nước, bóng râm mát, di chuyển thông thoáng (+2 phút).",
     "color": "#22c55e",
+    "estimatedEarning": 25000,
+    "fuelCost": 4800,
     "coordinates": [
       [10.8720, 106.7920],
       [10.8740, 106.7940],
@@ -51,6 +55,8 @@
     "isRecommended": false,
     "recommendationStatus": "Không khuyên dùng: Đường vành đai trống thoáng và rất mát, nhưng quãng đường vòng quá xa (+9 phút).",
     "color": "#3b82f6",
+    "estimatedEarning": 25000,
+    "fuelCost": 9600,
     "coordinates": [
       [10.8720, 106.7920],
       [10.8770, 106.7910],
