@@ -16,8 +16,8 @@ export async function GET() {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Failed to fetch reports' }, { status: 500 });
+    console.error("MongoDB reports error, returning empty list fallback:", error);
+    return NextResponse.json([]);
   }
 }
 

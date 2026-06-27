@@ -35,7 +35,7 @@ function HeatZoneLayerComponent({ heatZones, visible }: HeatZoneLayerProps) {
 
   return (
     <>
-      {heatZones.map((zone) => {
+      {(Array.isArray(heatZones) ? heatZones : []).map((zone) => {
         const { stroke, fill } = getHeatColor(zone.heatIndex);
         const fillOpacity = getHeatOpacity(zone.heatIndex);
         const isExtreme = zone.heatIndex >= 41;

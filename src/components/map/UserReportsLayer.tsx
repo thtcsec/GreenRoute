@@ -44,7 +44,7 @@ function UserReportsLayerComponent({ userReports }: UserReportsLayerProps) {
 
   return (
     <>
-      {userReports.map((report) => (
+      {(Array.isArray(userReports) ? userReports : []).map((report) => (
         <Marker
           key={report.id}
           position={[report.lat, report.lng]}

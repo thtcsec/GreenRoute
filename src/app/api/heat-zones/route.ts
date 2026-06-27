@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { HeatZone } from '@/types';
+import heatZonesData from '@/data/heat_zones.json';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,8 +16,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
+    console.error("MongoDB heat_zones error, using JSON fallback:", error);
+    return NextResponse.json(heatZonesData as HeatZone[]);
   }
 }
 

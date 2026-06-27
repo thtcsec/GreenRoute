@@ -31,7 +31,7 @@ function FloodZoneLayerComponent({ floodRisks, visible }: FloodZoneLayerProps) {
 
   return (
     <>
-      {floodRisks.map((zone) => {
+      {(Array.isArray(floodRisks) ? floodRisks : []).map((zone) => {
         const style = getFloodStyle(zone.riskLevel, zone.waterDepth);
 
         return (

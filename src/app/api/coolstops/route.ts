@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { CoolStop } from '@/types';
+import coolstopsData from '@/data/coolstops.json';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -30,8 +31,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
+    console.error("MongoDB coolstops error, using JSON fallback:", error);
+    return NextResponse.json(coolstopsData as CoolStop[]);
   }
 }
 
