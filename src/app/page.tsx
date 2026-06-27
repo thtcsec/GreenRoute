@@ -577,12 +577,6 @@ export default function Home() {
 
               {activeTab === 'journey' && (
                 <div className="space-y-6">
-                  {/* Thanh nhập điểm đi - điểm đến */}
-                  <TripInputBar
-                    driverLocation={gpsLocation || driverLocation}
-                    onSearchRoutes={handleSearchRoutes}
-                  />
-
                   {/* Tuyến đường */}
                   <RouteCompare
                     routes={routes}
