@@ -1,60 +1,52 @@
 import { NextResponse, NextRequest } from 'next/server';
-import coolstopsData from '@/data/coolstops.json';
+import clientPromise from '@/lib/mongodb';
 import { CoolStop } from '@/types';
-
-// In-memory store (chỉ dùng cho hackathon/MVP)
-const coolstops = [...coolstopsData] as CoolStop[];
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const latStr = searchParams.get('lat');
   const lngStr = searchParams.get('lng');
 
-  const result = [...coolstops];
-
-  // Nếu có tọa độ, có thể tính khoảng cách (nếu cần filter)
-  if (latStr && lngStr) {
-    const lat = parseFloat(latStr);
-    const lng = parseFloat(lngStr);
+  try {
+    const client = await clientPromise;
+    const db = client.db('grab_undp');
     
-    // Sort by distance (simplified distance calculation)
-    result.sort((a, b) => {
-      const distA = Math.sqrt(Math.pow(a.lat - lat, 2) + Math.pow(a.lng - lng, 2));
-      const distB = Math.sqrt(Math.pow(b.lat - lat, 2) + Math.pow(b.lng - lng, 2));
-      return distA - distB;
+    const docs = await db.collection('coolstops').find({}).toArray();
+    let result = docs.map(doc => {
+      const { _id, ...rest } = doc;
+      return rest as CoolStop;
     });
-  }
 
-  return NextResponse.json(result);
+    if (latStr && lngStr) {
+      const lat = parseFloat(latStr);
+      const lng = parseFloat(lngStr);
+
+      result.sort((a, b) => {
+        const distA = Math.sqrt(Math.pow(a.lat - lat, 2) + Math.pow(a.lng - lng, 2));
+        const distB = Math.sqrt(Math.pow(b.lat - lat, 2) + Math.pow(b.lng - lng, 2));
+        return distA - distB;
+      });
+    }
+
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const client = await clientPromise;
+    const db = client.db('grab_undp');
     
-    // Validation cơ bản
-    if (!body.name || !body.lat || !body.lng) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+    await db.collection('coolstops').insertOne(body);
 
-    const newStop: CoolStop = {
-      id: `cs-${Date.now()}`,
-      name: body.name,
-      lat: body.lat,
-      lng: body.lng,
-      distance: body.distance || 0,
-      shadeScore: body.shadeScore || 5,
-      rainCover: body.rainCover || false,
-      curbSafety: body.curbSafety || 'Medium',
-      accessibility: body.accessibility || 'Medium',
-      description: body.description || '',
-      amenities: body.amenities || []
-    };
-
-    coolstops.push(newStop);
-
-    return NextResponse.json(newStop, { status: 201 });
+    const { _id, ...rest } = body;
+    return NextResponse.json(rest as CoolStop, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    console.error(error);
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 }

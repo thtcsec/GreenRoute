@@ -31,5 +31,155 @@
     "riskLevel": "High",
     "heatIndex": 41,
     "description": "Mặt nhựa hấp nhiệt cao kết hợp khí thải phương tiện giao thông lớn, nhiệt độ cảm nhận rất oi bức."
+  },
+  {
+    "id": "hz-gen-1",
+    "name": "Vùng lõi bê tông 1",
+    "lat": 10.886048074862327,
+    "lng": 106.78163446184315,
+    "radius": 385,
+    "riskLevel": "Medium-High",
+    "heatIndex": 39,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-2",
+    "name": "Vùng lõi bê tông 2",
+    "lat": 10.862976566012644,
+    "lng": 106.77563849384936,
+    "radius": 221,
+    "riskLevel": "High",
+    "heatIndex": 39,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-3",
+    "name": "Vùng lõi bê tông 3",
+    "lat": 10.907688644177192,
+    "lng": 106.80873164001652,
+    "radius": 303,
+    "riskLevel": "Medium-High",
+    "heatIndex": 40,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-4",
+    "name": "Vùng lõi bê tông 4",
+    "lat": 10.855649341395612,
+    "lng": 106.77361266799261,
+    "radius": 358,
+    "riskLevel": "High",
+    "heatIndex": 40,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-5",
+    "name": "Vùng lõi bê tông 5",
+    "lat": 10.887501256958686,
+    "lng": 106.81399724985587,
+    "radius": 140,
+    "riskLevel": "Medium-High",
+    "heatIndex": 38,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-6",
+    "name": "Vùng lõi bê tông 6",
+    "lat": 10.89399218480622,
+    "lng": 106.82921530480894,
+    "radius": 321,
+    "riskLevel": "Medium-High",
+    "heatIndex": 42,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-7",
+    "name": "Vùng lõi bê tông 7",
+    "lat": 10.896676956783407,
+    "lng": 106.77960475475268,
+    "radius": 391,
+    "riskLevel": "High",
+    "heatIndex": 38,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-8",
+    "name": "Vùng lõi bê tông 8",
+    "lat": 10.9122867177956,
+    "lng": 106.80215921684709,
+    "radius": 319,
+    "riskLevel": "Medium-High",
+    "heatIndex": 41,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-9",
+    "name": "Vùng lõi bê tông 9",
+    "lat": 10.867192492906193,
+    "lng": 106.77027315452354,
+    "radius": 206,
+    "riskLevel": "High",
+    "heatIndex": 39,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-10",
+    "name": "Vùng lõi bê tông 10",
+    "lat": 10.861423054432798,
+    "lng": 106.82719470945733,
+    "radius": 333,
+    "riskLevel": "Medium-High",
+    "heatIndex": 39,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-11",
+    "name": "Vùng lõi bê tông 11",
+    "lat": 10.869728981498508,
+    "lng": 106.81704108927865,
+    "radius": 233,
+    "riskLevel": "High",
+    "heatIndex": 40,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-12",
+    "name": "Vùng lõi bê tông 12",
+    "lat": 10.863652315112489,
+    "lng": 106.79355231893975,
+    "radius": 350,
+    "riskLevel": "High",
+    "heatIndex": 42,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-13",
+    "name": "Vùng lõi bê tông 13",
+    "lat": 10.874633969758916,
+    "lng": 106.77635656811456,
+    "radius": 204,
+    "riskLevel": "High",
+    "heatIndex": 38,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-14",
+    "name": "Vùng lõi bê tông 14",
+    "lat": 10.895204435003308,
+    "lng": 106.81034022817654,
+    "radius": 353,
+    "riskLevel": "High",
+    "heatIndex": 42,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+  },
+  {
+    "id": "hz-gen-15",
+    "name": "Vùng lõi bê tông 15",
+    "lat": 10.882644921686582,
+    "lng": 106.81220359557975,
+    "radius": 208,
+    "riskLevel": "Medium-High",
+    "heatIndex": 41,
+    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
   }
 ]

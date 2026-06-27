@@ -23,6 +23,7 @@ interface MapContainerProps {
   gpsLocation: [number, number] | null;
   osrmRoute: [number, number][] | null;
   activeLayer: 'heat' | 'flood' | 'all' | 'none';
+  isTripStarted?: boolean;
 }
 
 export default function MapContainer(props: MapContainerProps) {
