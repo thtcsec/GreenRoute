@@ -1,0 +1,22 @@
+[
+  {
+    "id": "fr-1",
+    "name": "Đường song hành ngập sâu (gần Đại học TDTT)",
+    "lat": 10.8720,
+    "lng": 106.7960,
+    "radius": 120,
+    "riskLevel": "Extreme",
+    "waterDepth": 40,
+    "description": "Vùng trũng thấp thoát nước kém. Khi mưa lớn thường ngập sâu trên 30-40cm, dễ gây hư hỏng động cơ xe máy."
+  },
+  {
+    "id": "fr-2",
+    "name": "Đoạn dốc thoát nước chậm - KTX Khu B (Cổng sau)",
+    "lat": 10.8820,
+    "lng": 106.8090,
+    "radius": 90,
+    "riskLevel": "High",
+    "waterDepth": 25,
+    "description": "Khu vực giao lộ ngập nước cục bộ tạm thời khi mưa lớn dồn dập, đường trơn trượt nguy hiểm."
+  }
+]

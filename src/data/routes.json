@@ -1,0 +1,60 @@
+[
+  {
+    "id": "route-fastest",
+    "name": "Tuyến Nhanh Nhất (Fastest Route)",
+    "time": 6,
+    "distance": 2.1,
+    "heatRisk": "High",
+    "floodRisk": "Low",
+    "climateScore": 45,
+    "isRecommended": false,
+    "recommendationStatus": "Không khuyến nghị: Tiếp xúc nhiệt độ cao liên tục. Chỉ nên đi khi đang vội gấp.",
+    "color": "#ef4444",
+    "coordinates": [
+      [10.8720, 106.7920],
+      [10.8700, 106.7950],
+      [10.8700, 106.8030],
+      [10.8750, 106.8040],
+      [10.8783, 106.8063]
+    ]
+  },
+  {
+    "id": "route-balanced",
+    "name": "Tuyến Cân Bằng (Balanced Route)",
+    "time": 8,
+    "distance": 2.4,
+    "heatRisk": "Low",
+    "floodRisk": "Low",
+    "climateScore": 88,
+    "isRecommended": true,
+    "recommendationStatus": "Khuyên dùng! Cân bằng tốt nhất giữa bóng râm che mát, an toàn và thời gian di chuyển hợp lý (+2 phút).",
+    "color": "#22c55e",
+    "coordinates": [
+      [10.8720, 106.7920],
+      [10.8740, 106.7940],
+      [10.8760, 106.7980],
+      [10.8755, 106.8010],
+      [10.8783, 106.8063]
+    ]
+  },
+  {
+    "id": "route-coolest",
+    "name": "Tuyến Mát Nhất (Coolest Route)",
+    "time": 15,
+    "distance": 4.8,
+    "heatRisk": "Very Low",
+    "floodRisk": "Low",
+    "climateScore": 96,
+    "isRecommended": false,
+    "recommendationStatus": "Không khuyên dùng: Tốn quá nhiều thời gian di chuyển phụ (+9 phút so với tuyến Nhanh nhất).",
+    "color": "#3b82f6",
+    "coordinates": [
+      [10.8720, 106.7920],
+      [10.8770, 106.7910],
+      [10.8840, 106.7970],
+      [10.8860, 106.8020],
+      [10.8820, 106.8070],
+      [10.8783, 106.8063]
+    ]
+  }
+]

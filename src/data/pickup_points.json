@@ -1,0 +1,16 @@
+{
+  "defaultPoint": {
+    "name": "Cổng phụ A - Đại học Quốc Tế (Cạnh công trường)",
+    "lat": 10.8785,
+    "lng": 106.8040,
+    "riskLevel": "High",
+    "reason": "Khu vực đang thi công, không có cây xanh che mát, lòng đường hẹp xe bus ra vào thường xuyên gây bụi bặm và nhiệt độ thực tế cao."
+  },
+  "suggestedPoint": {
+    "name": "Nhà chờ xe buýt nội bộ HCMIU (Cách 60m)",
+    "lat": 10.8780,
+    "lng": 106.8048,
+    "riskLevel": "Low",
+    "reason": "Có mái che lớn và hàng cây xanh bóng râm mát, vỉa hè rộng rãi an toàn hơn cho khách đợi và tài xế dừng đỗ gom khách."
+  }
+}

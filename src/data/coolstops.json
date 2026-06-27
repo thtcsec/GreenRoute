@@ -1,0 +1,41 @@
+[
+  {
+    "id": "cs-1",
+    "name": "Trạm Dừng Chân Nhà Văn Hóa Sinh Viên",
+    "lat": 10.8755,
+    "lng": 106.8010,
+    "distance": 480,
+    "shadeScore": 9,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Khu sảnh sinh hoạt mát mẻ có máy lạnh bên trong và trạm chờ xe buýt lớn có mái che rộng bên ngoài.",
+    "amenities": ["Máy lọc nước miễn phí", "Wifi miễn phí", "Nhà vệ sinh sạch sẽ", "Chỗ sạc điện thoại"]
+  },
+  {
+    "id": "cs-2",
+    "name": "Nhà chờ xe buýt Đại Học Quốc Tế (HCMIU)",
+    "lat": 10.8783,
+    "lng": 106.8063,
+    "distance": 220,
+    "shadeScore": 8,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Nhà chờ xe buýt hiện đại trước cổng trường HCMIU, bao quanh bởi nhiều cây xanh cổ thụ bóng mát lớn.",
+    "amenities": ["Ghế ngồi", "Mái che mưa lớn", "Thùng rác công cộng"]
+  },
+  {
+    "id": "cs-3",
+    "name": "Cà phê Đối Tác Shipper - Làng Đại Học",
+    "lat": 10.8742,
+    "lng": 106.8028,
+    "distance": 620,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "Medium",
+    "description": "Quán cà phê liên kết với GreenRoute hỗ trợ tài xế nghỉ mát có máy lạnh và giảm giá nước uống.",
+    "amenities": ["Điều hòa", "Nước uống miễn phí", "Chỗ đậu xe rộng", "Ổ cắm sạc"]
+  }
+]
