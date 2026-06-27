@@ -11,7 +11,7 @@ import TripInputBar from '@/components/TripInputBar';
 import ClimateAlertBanner from '@/components/ClimateAlertBanner';
 
 // Import icons
-import { Map, Snowflake, Route as RouteIcon, ShieldCheck, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X, Droplets } from 'lucide-react';
+import { Map, Snowflake, Route as RouteIcon, ShieldCheck, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X, Droplets, ChevronUp, ChevronDown } from 'lucide-react';
 
 // Load MapContainer dynamically to prevent SSR issues
 const MapContainer = dynamic(() => import('@/components/MapContainer'), {
@@ -56,6 +56,10 @@ export default function Home() {
 
   // Modal Báo cáo khẩn cấp
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+  // Map bottom sheet + trip state (Hoàng An UX)
+  const [isTripStarted, setIsTripStarted] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   // Trạng thái tải dữ liệu
   const [loading, setLoading] = useState(true);
@@ -186,7 +190,8 @@ export default function Home() {
   // 1. Khi nhấn dẫn đường tới CoolStop
   const handleNavigateToCoolStop = async (stop: CoolStop) => {
     setActiveCoolStop(stop);
-    setActiveTab('map'); // Chuyển về màn hình bản đồ để tài xế quan sát đường đi
+    setActiveTab('map');
+    setIsPanelOpen(false);
     
     // Feature 2: OSRM Routing
     const origin = gpsLocation || driverLocation;
@@ -272,6 +277,7 @@ export default function Home() {
     setFocusLocation([lat, lng]);
     setFocusBounds(null);
     setActiveTab('map');
+    setIsPanelOpen(false);
   };
 
   // 4. Khi người dùng báo cáo khí hậu mới
@@ -307,6 +313,7 @@ export default function Home() {
         setFocusLocation([newReport.lat, newReport.lng]);
         setFocusBounds(null);
         setActiveTab('map');
+        setIsPanelOpen(false);
       }
     } catch (error) {
       console.error('Lỗi khi gửi báo cáo:', error);
@@ -355,10 +362,10 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black font-sans text-gray-200 sm:py-6 overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center bg-black font-sans text-gray-200 sm:py-6 overflow-hidden">
       
       {/* Container Mobile Shape */}
-      <div className="w-full max-w-[480px] h-[100dvh] sm:h-[90vh] sm:max-h-[850px] flex flex-col bg-gradient-to-b from-gray-900 to-black sm:border border-white/10 sm:rounded-[2.5rem] sm:shadow-[0_0_80px_rgba(16,185,129,0.15)] relative overflow-hidden">
+      <div className="w-full max-w-[480px] h-full sm:h-[90vh] sm:max-h-[850px] flex flex-col bg-gradient-to-b from-gray-900 to-black sm:border border-white/10 sm:rounded-[2.5rem] sm:shadow-[0_0_80px_rgba(16,185,129,0.15)] relative overflow-hidden">
         
         {/* Header */}
         <header className="shrink-0 px-5 py-3.5 bg-black/40 backdrop-blur-xl border-b border-white/5 flex items-center justify-between z-30">
@@ -400,7 +407,7 @@ export default function Home() {
         </div>
 
         {/* Bản đồ */}
-        <div className="shrink-0 w-full h-[32vh] min-h-[220px] relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)]">
+        <div className={`shrink-0 w-full relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 ${!isPanelOpen && activeTab === 'map' ? 'flex-1 min-h-0' : 'h-[32vh] min-h-[220px]'}`}>
           <MapContainer
             driverLocation={driverLocation}
             coolstops={coolstops}
@@ -504,49 +511,20 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Cảnh báo khí hậu khẩn cấp trên đầu nội dung — dùng dữ liệu Weather live */}
-        {weather && weather.alertLevel !== 'low' && (
-        <div className="px-4 pt-5 relative z-20">
-          <div className={`relative overflow-hidden flex items-start gap-3 p-4 rounded-2xl border backdrop-blur-xl ${
-            weather.alertLevel === 'extreme' ? 'bg-red-950/50 border-red-500/30 text-red-200 shadow-[0_0_30px_rgba(220,38,38,0.15)]' 
-            : weather.alertLevel === 'high' ? 'bg-orange-950/50 border-orange-500/30 text-orange-200 shadow-[0_0_30px_rgba(249,115,22,0.15)]'
-            : 'bg-yellow-950/50 border-yellow-500/30 text-yellow-200 shadow-[0_0_30px_rgba(234,179,8,0.15)]'
-          }`}>
-            <div className="absolute top-0 left-0 w-1 h-full bg-current opacity-50"></div>
-            <AlertTriangle className={`w-6 h-6 shrink-0 mt-0.5 animate-pulse ${
-              weather.alertLevel === 'extreme' ? 'text-red-500' : weather.alertLevel === 'high' ? 'text-orange-500' : 'text-yellow-500'
-            }`} />
-            <div>
-              <p className="text-sm font-extrabold text-white tracking-wide">
-                {weather.weatherCondition} — Cảm nhận <span className="text-[1.1em]">{weather.feelsLike}°C</span>
-              </p>
-              <p className={`text-xs mt-1.5 leading-relaxed font-medium ${
-                weather.alertLevel === 'extreme' ? 'text-red-300' : weather.alertLevel === 'high' ? 'text-orange-300' : 'text-yellow-300'
-              }`}>
-                {weather.rainVolume > 0 
-                  ? `Lượng mưa ${weather.rainVolume}mm. Cẩn thận ngập sâu, hãy dùng tuyến đường GreenRoute đề xuất.`
-                  : `Tia UV ở mức ${weather.uvIndex}. Hãy chủ động tránh đỗ tại ngã tư và sử dụng trạm CoolStop phía dưới.`
-                }
-              </p>
-            </div>
-          </div>
-        </div>
+        {/* Nút vuốt panel (tab Bản đồ) */}
+        {activeTab === 'map' && (
+          <button
+            type="button"
+            onClick={() => setIsPanelOpen(!isPanelOpen)}
+            className={`w-full h-10 shrink-0 flex items-center justify-center bg-black/60 backdrop-blur-md border-b border-white/10 text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer z-40 ${!isPanelOpen ? 'absolute bottom-[72px] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]' : ''}`}
+            title={isPanelOpen ? 'Thu gọn thông tin' : 'Mở rộng thông tin'}
+          >
+            {isPanelOpen ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
+          </button>
         )}
 
-        {/* Cảnh báo khí hậu */}
-        <div className="shrink-0 relative z-20 pt-4 px-4 bg-transparent">
-          <ClimateAlertBanner 
-            driverLocation={driverLocation}
-            heatZones={heatZones}
-            floodRisks={floodRisks}
-            weather={weather}
-            onGoToCoolStop={() => setActiveTab('coolstop')}
-            onGoToRoutes={() => setActiveTab('journey')}
-          />
-        </div>
-
         {/* Nội dung Tab */}
-        <main className="flex-1 overflow-y-auto px-4 py-5 pb-24 z-20 custom-scrollbar">
+        <main className={`flex-1 min-h-0 overflow-y-auto px-4 py-5 pb-24 z-20 custom-scrollbar ${activeTab === 'map' && !isPanelOpen ? 'hidden' : ''}`}>
           {loading ? (
             <div className="h-full flex items-center justify-center py-10">
               <div className="flex flex-col items-center gap-4">
@@ -556,6 +534,44 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+              {weather && weather.alertLevel !== 'low' && (
+                <div className="relative z-20">
+                  <div className={`relative overflow-hidden flex items-start gap-3 p-4 rounded-2xl border backdrop-blur-xl ${
+                    weather.alertLevel === 'extreme' ? 'bg-red-950/50 border-red-500/30 text-red-200 shadow-[0_0_30px_rgba(220,38,38,0.15)]'
+                    : weather.alertLevel === 'high' ? 'bg-orange-950/50 border-orange-500/30 text-orange-200 shadow-[0_0_30px_rgba(249,115,22,0.15)]'
+                    : 'bg-yellow-950/50 border-yellow-500/30 text-yellow-200 shadow-[0_0_30px_rgba(234,179,8,0.15)]'
+                  }`}>
+                    <div className="absolute top-0 left-0 w-1 h-full bg-current opacity-50"></div>
+                    <AlertTriangle className={`w-6 h-6 shrink-0 mt-0.5 animate-pulse ${
+                      weather.alertLevel === 'extreme' ? 'text-red-500' : weather.alertLevel === 'high' ? 'text-orange-500' : 'text-yellow-500'
+                    }`} />
+                    <div>
+                      <p className="text-sm font-extrabold text-white tracking-wide">
+                        {weather.weatherCondition} — Cảm nhận <span className="text-[1.1em]">{weather.feelsLike}°C</span>
+                      </p>
+                      <p className={`text-xs mt-1.5 leading-relaxed font-medium ${
+                        weather.alertLevel === 'extreme' ? 'text-red-300' : weather.alertLevel === 'high' ? 'text-orange-300' : 'text-yellow-300'
+                      }`}>
+                        {weather.rainVolume > 0
+                          ? `Lượng mưa ${weather.rainVolume}mm. Cẩn thận ngập sâu, hãy dùng tuyến GreenRoute đề xuất.`
+                          : `Tia UV ở mức ${weather.uvIndex}. Hãy tránh đỗ tại ngã tư và dùng CoolStop phía dưới.`
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <ClimateAlertBanner
+                driverLocation={driverLocation}
+                heatZones={heatZones}
+                floodRisks={floodRisks}
+                weather={weather}
+                onGoToCoolStop={() => setActiveTab('coolstop')}
+                onGoToRoutes={() => setActiveTab('journey')}
+              />
+
               {activeTab === 'map' && (
                 <div className="space-y-5">
                   <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative overflow-hidden">
@@ -603,24 +619,41 @@ export default function Home() {
 
               {activeTab === 'journey' && (
                 <div className="space-y-6">
-                  {/* Tuyến đường */}
-                  <RouteCompare
-                    routes={routes}
-                    selectedRouteId={selectedRouteId}
-                    onSelectRoute={handleSelectRoute}
-                    onStartRoute={(id) => alert('Hành trình bắt đầu! 🚗 Vui lòng đi theo hướng dẫn.')}
-                  />
-                  
-                  <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-                  
-                  {/* Điểm đón trả an toàn */}
-                  <div>
-                    <h3 className="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-4 px-1">Điểm đón an toàn quanh đây</h3>
-                    <PickupSafety
-                      pickupPoints={pickupPoints}
-                      onNavigateToPoint={handleNavigateToPickup}
+                  {routes.length > 0 ? (
+                    <RouteCompare
+                      routes={routes}
+                      selectedRouteId={selectedRouteId}
+                      onSelectRoute={handleSelectRoute}
+                      isTripStarted={isTripStarted}
+                      onStartRoute={() => {
+                        setIsTripStarted(true);
+                        setFocusBounds(null);
+                        setFocusLocation(gpsLocation || driverLocation);
+                        setActiveTab('map');
+                        setIsPanelOpen(false);
+                      }}
                     />
-                  </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-10 opacity-70">
+                      <div className="w-16 h-16 bg-black/40 border border-white/10 rounded-full flex items-center justify-center mb-4">
+                        <Map className="w-8 h-8 text-gray-500" />
+                      </div>
+                      <h3 className="text-sm font-bold text-gray-300">Hãy chọn điểm đến trước</h3>
+                      <p className="text-xs text-gray-500 mt-1">Dùng thanh tìm kiếm phía trên để tìm chuyến đi</p>
+                    </div>
+                  )}
+
+                  <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                  {!isTripStarted && (
+                    <div>
+                      <h3 className="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-4 px-1">Điểm đón an toàn quanh đây</h3>
+                      <PickupSafety
+                        pickupPoints={pickupPoints}
+                        onNavigateToPoint={handleNavigateToPickup}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -636,7 +669,17 @@ export default function Home() {
               <button
                 key={tab.id}
                 onClick={() => {
-                  setActiveTab(tab.id as any);
+                  if (tab.id === 'map') {
+                    if (activeTab === 'map') {
+                      setIsPanelOpen(!isPanelOpen);
+                    } else {
+                      setActiveTab('map');
+                      setIsPanelOpen(false);
+                    }
+                  } else {
+                    setActiveTab(tab.id as 'map' | 'coolstop' | 'journey');
+                    setIsPanelOpen(true);
+                  }
                   if (tab.id === 'coolstop' && coolstops.length > 0 && !activeCoolStop) {
                     setActiveCoolStop(coolstops[0]);
                   }

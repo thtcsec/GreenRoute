@@ -1,16 +1,45 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Route } from '@/types';
-import { Route as RouteIcon, Clock, Milestone, Thermometer, Droplets, CheckCircle2, AlertTriangle, ShieldCheck, Car, Navigation } from 'lucide-react';
+import { Route as RouteIcon, Clock, Milestone, Thermometer, Droplets, ShieldCheck, Car, Navigation, ChevronUp } from 'lucide-react';
 
 interface RouteCompareProps {
   routes: Route[];
   selectedRouteId: string | null;
   onSelectRoute: (routeId: string) => void;
   onStartRoute?: (routeId: string) => void;
+  isTripStarted?: boolean;
 }
 
-export default function RouteCompare({ routes, selectedRouteId, onSelectRoute, onStartRoute }: RouteCompareProps) {
+export default function RouteCompare({ routes, selectedRouteId, onSelectRoute, onStartRoute, isTripStarted }: RouteCompareProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (isTripStarted) setIsCollapsed(true);
+  }, [isTripStarted]);
+
+  if (isCollapsed) {
+    return (
+      <button
+        type="button"
+        onClick={() => setIsCollapsed(false)}
+        className="w-full flex items-center justify-between p-4 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors shadow-lg text-left"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <Navigation className="w-5 h-5 text-emerald-400" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-emerald-400">Đang điều hướng</h4>
+            <p className="text-[11px] text-gray-400">Nhấn để xem lại các tuyến đường</p>
+          </div>
+        </div>
+        <ChevronUp className="w-5 h-5 text-gray-500" />
+      </button>
+    );
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
