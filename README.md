@@ -53,3 +53,18 @@ Mở trình duyệt truy cập: [http://localhost:3000](http://localhost:3000)
 npm run build
 ```
 Dự án được cấu hình sẵn sàng để deploy lên Vercel một cách nhanh chóng.
+
+### 4. Chia sẻ ứng dụng & Demo trên điện thoại (Cloudflare Tunnel)
+Để tạo một đường truyền công khai (Public URL) miễn phí giúp ban giám khảo hoặc các thành viên quét mã QR truy cập trực tiếp ứng dụng đang chạy ở `localhost:3000` trên điện thoại di động:
+
+Sử dụng lệnh **Quick Tunnel** tích hợp sẵn trong Wrangler (không cần đăng nhập Cloudflare):
+```bash
+npx wrangler tunnel quick-start http://localhost:3000
+```
+
+Sau khi chạy lệnh trên, Wrangler sẽ tải xuống công cụ `cloudflared` và in ra một đường dẫn ngẫu nhiên có đuôi dạng:
+`https://xxx-xxx-xxx.trycloudflare.com`
+
+**Cách dùng:**
+1. Hãy quét mã QR hoặc truy cập đường link `.trycloudflare.com` này trên điện thoại di động để demo trực tiếp.
+2. Mọi thao tác trên điện thoại sẽ gọi trực tiếp đến API trên máy tính của bạn và cập nhật bản đồ theo thời gian thực.
