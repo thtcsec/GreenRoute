@@ -99,4 +99,13 @@ export interface WeatherData {
   windSpeed: number;
   icon: string;
   alertLevel: 'extreme' | 'high' | 'moderate' | 'low';
+  precipProbability: number;
+  climateMode: 'rain' | 'heat' | 'normal';
+}
+
+export interface FloodForecastData {
+  source: 'google-flood-api' | 'static';
+  status: string;
+  polygons?: { lat: number; lng: number }[][];
+  gauges?: { id: string; name: string; waterLevel: number; lat: number; lng: number }[];
 }

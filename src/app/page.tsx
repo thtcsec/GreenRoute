@@ -11,7 +11,7 @@ import TripInputBar from '@/components/TripInputBar';
 import ClimateAlertBanner from '@/components/ClimateAlertBanner';
 
 // Import icons
-import { Map, Snowflake, Route as RouteIcon, ShieldCheck, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X } from 'lucide-react';
+import { Map, Snowflake, Route as RouteIcon, ShieldCheck, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X, Droplets } from 'lucide-react';
 
 // Load MapContainer dynamically to prevent SSR issues
 const MapContainer = dynamic(() => import('@/components/MapContainer'), {
@@ -108,6 +108,12 @@ export default function Home() {
         setPickupPoints(resPickup);
         setWeather(resWeather);
         
+        // Auto-switch bản đồ dựa vào Climate Mode
+        if (resWeather) {
+          if (resWeather.climateMode === 'rain') setActiveLayer('flood');
+          else if (resWeather.climateMode === 'heat') setActiveLayer('heat');
+        }
+        
         // Cập nhật reports từ API kết hợp với localStorage (nếu có offline data)
         const storedReports = localStorage.getItem('greenroute_reports');
         if (storedReports) {
@@ -149,6 +155,10 @@ export default function Home() {
       try {
         const resWeather = await fetch('/api/weather').then(r => r.json());
         setWeather(resWeather);
+        if (resWeather) {
+          if (resWeather.climateMode === 'rain') setActiveLayer('flood');
+          else if (resWeather.climateMode === 'heat') setActiveLayer('heat');
+        }
       } catch (e) {
         console.error('Lỗi khi refresh weather:', e);
       }
@@ -361,10 +371,20 @@ export default function Home() {
             </div>
             <p className="text-[10px] text-gray-500 font-medium">Team I - iMPACT</p>
           </div>
-          <div className="text-right">
+          <div className="text-right flex flex-col items-end gap-1">
             <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-900/50 px-2 py-0.5 rounded-md font-bold">
               MVP PROTOTYPE
             </span>
+            {weather?.climateMode === 'rain' && (
+              <span className="text-[10px] bg-blue-950 text-blue-400 border border-blue-900/50 px-2 py-0.5 rounded-md font-bold flex items-center gap-1 animate-pulse">
+                <Droplets className="w-3 h-3" /> RAIN MODE
+              </span>
+            )}
+            {weather?.climateMode === 'heat' && (
+              <span className="text-[10px] bg-orange-950 text-orange-400 border border-orange-900/50 px-2 py-0.5 rounded-md font-bold flex items-center gap-1 animate-pulse">
+                <Flame className="w-3 h-3" /> HEAT MODE
+              </span>
+            )}
           </div>
         </header>
 
@@ -513,6 +533,7 @@ export default function Home() {
             driverLocation={driverLocation}
             heatZones={heatZones}
             floodRisks={floodRisks}
+            weather={weather}
             onGoToCoolStop={() => setActiveTab('coolstop')}
             onGoToRoutes={() => setActiveTab('journey')}
           />

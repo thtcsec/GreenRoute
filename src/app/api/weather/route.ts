@@ -65,6 +65,14 @@ export async function GET() {
       precipProbability = data.hourly.precipitation_probability[currentHour] || 0;
     }
 
+    // Xác định climateMode
+    let climateMode: WeatherData['climateMode'] = 'normal';
+    if (precipitation >= 2 || precipProbability >= 60) {
+      climateMode = 'rain';
+    } else if (feelsLike >= 35 || uvIndex >= 8) {
+      climateMode = 'heat';
+    }
+
     const weatherData: WeatherData = {
       temperature,
       feelsLike,
@@ -75,6 +83,8 @@ export async function GET() {
       windSpeed: +(windSpeed / 3.6).toFixed(1), // km/h → m/s
       icon,
       alertLevel,
+      precipProbability,
+      climateMode,
     };
 
     return NextResponse.json(weatherData);
@@ -124,5 +134,7 @@ function getMockWeatherData(): WeatherData {
     windSpeed: 2.5,
     icon: 'https://openweathermap.org/img/wn/01d@2x.png',
     alertLevel: 'extreme',
+    precipProbability: 0,
+    climateMode: 'heat',
   };
 }

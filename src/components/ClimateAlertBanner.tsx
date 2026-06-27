@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Thermometer, Droplets, X } from 'lucide-react';
-import { HeatZone, FloodRisk } from '@/types';
+import { HeatZone, FloodRisk, WeatherData } from '@/types';
 
 interface ClimateAlertBannerProps {
   driverLocation: [number, number];
   heatZones: HeatZone[];
   floodRisks: FloodRisk[];
+  weather: WeatherData | null;
   onGoToCoolStop: () => void;
   onGoToRoutes: () => void;
 }
@@ -71,6 +72,7 @@ export default function ClimateAlertBanner({
   driverLocation,
   heatZones,
   floodRisks,
+  weather,
   onGoToCoolStop,
   onGoToRoutes,
 }: ClimateAlertBannerProps) {
@@ -92,7 +94,7 @@ export default function ClimateAlertBanner({
           riskLevel: zone.riskLevel,
           detail: `${zone.heatIndex}°C`,
           distance: Math.round(dist),
-          severityRank: severityRank(zone.riskLevel),
+          severityRank: severityRank(zone.riskLevel) - (weather?.climateMode === 'heat' ? 10 : 0),
         });
       }
     }
@@ -107,7 +109,7 @@ export default function ClimateAlertBanner({
           riskLevel: zone.riskLevel,
           detail: `${zone.waterDepth} cm`,
           distance: Math.round(dist),
-          severityRank: severityRank(zone.riskLevel),
+          severityRank: severityRank(zone.riskLevel) - (weather?.climateMode === 'rain' ? 10 : 0),
         });
       }
     }
@@ -115,7 +117,7 @@ export default function ClimateAlertBanner({
     // Sort by severity (most severe first)
     alerts.sort((a, b) => a.severityRank - b.severityRank);
     return alerts;
-  }, [driverLocation, heatZones, floodRisks, dismissedIds]);
+  }, [driverLocation, heatZones, floodRisks, dismissedIds, weather]);
 
   // ── Auto-cycle through alerts ─────────────────────────────────────────
 
@@ -196,6 +198,11 @@ export default function ClimateAlertBanner({
               Mức độ: {alert.riskLevel} · {isHeat ? 'Chỉ số nhiệt' : 'Ngập sâu'}:{' '}
               {alert.detail}
             </p>
+            {weather?.precipProbability !== undefined && weather.precipProbability > 0 && alert.type === 'flood' && (
+              <p className="text-[10px] text-blue-200/80 mt-0.5 italic">
+                Xác suất mưa hiện tại: {weather.precipProbability}%
+              </p>
+            )}
 
             {/* CTA buttons */}
             <div className="flex gap-2 mt-2">
