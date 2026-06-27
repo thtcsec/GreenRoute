@@ -428,7 +428,11 @@ export default function Home() {
         </div>
 
         {/* Bản đồ */}
-        <div className={`shrink-0 w-full relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 ${!isPanelOpen && activeTab === 'map' ? 'flex-1 min-h-0' : 'h-[32vh] min-h-[220px]'}`}>
+        <div className={`w-full relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)] ${
+          activeTab === 'map' 
+            ? 'flex-1 min-h-0' 
+            : 'h-[32vh] min-h-[220px] shrink-0'
+        }`}>
           <MapContainer
             driverLocation={driverLocation}
             coolstops={coolstops}
@@ -542,7 +546,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className={`w-full h-10 shrink-0 flex items-center justify-center bg-black/60 backdrop-blur-md border-b border-white/10 text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer z-40 ${!isPanelOpen ? 'absolute bottom-[72px] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]' : ''}`}
+            className="w-full h-10 shrink-0 flex items-center justify-center bg-black/60 backdrop-blur-md border-b border-white/10 text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer z-40 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
             title={isPanelOpen ? 'Thu gọn thông tin' : 'Mở rộng thông tin'}
           >
             {isPanelOpen ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
@@ -550,7 +554,13 @@ export default function Home() {
         )}
 
         {/* Nội dung Tab */}
-        <main className={`flex-1 min-h-0 overflow-y-auto px-4 py-5 pb-4 z-20 custom-scrollbar ${activeTab === 'map' && !isPanelOpen ? 'hidden' : ''}`}>
+        <main className={`w-full overflow-y-auto z-20 custom-scrollbar transition-all duration-300 ease-in-out ${
+          activeTab === 'map'
+            ? isPanelOpen
+              ? 'h-[46vh] min-h-[280px] px-4 py-5 pb-4 opacity-100'
+              : 'h-0 p-0 overflow-hidden opacity-0'
+            : 'flex-1 min-h-0 px-4 py-5 pb-4 opacity-100'
+        }`}>
           {loading ? (
             <div className="h-full flex items-center justify-center py-10">
               <div className="flex flex-col items-center gap-4">
