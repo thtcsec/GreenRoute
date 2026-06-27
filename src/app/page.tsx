@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints, WeatherData } from '@/types';
+import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints, WeatherData, Location } from '@/types';
 import CoolStopCard from '@/components/CoolStopCard';
 import RouteCompare from '@/components/RouteCompare';
 import PickupSafety from '@/components/PickupSafety';
@@ -93,11 +93,10 @@ export default function Home() {
       try {
         setLoading(true);
         // Gọi song song các API Route Handlers
-        const [resCoolStops, resHeatZones, resFloodRisks, resRoutes, resPickup, resWeather, resReports] = await Promise.all([
+        const [resCoolStops, resHeatZones, resFloodRisks, resPickup, resWeather, resReports] = await Promise.all([
           fetch('/api/coolstops').then(r => r.json()),
           fetch('/api/heat-zones').then(r => r.json()),
           fetch('/api/flood-risks').then(r => r.json()),
-          fetch('/api/routes').then(r => r.json()),
           fetch('/api/pickup-points').then(r => r.json()),
           fetch('/api/weather').then(r => r.json()),
           fetch('/api/reports').then(r => r.json())
@@ -112,11 +111,8 @@ export default function Home() {
         // Cập nhật reports từ API kết hợp với localStorage (nếu có offline data)
         const storedReports = localStorage.getItem('greenroute_reports');
         if (storedReports) {
-          // Trong thực tế sẽ cần merge, MVP đơn giản ta set từ API trước
-          // sau đó gộp thêm từ localStorage
           const localReps = JSON.parse(storedReports);
           const merged = [...resReports];
-          // Tránh trùng lặp ID
           localReps.forEach((lr: ClimateReport) => {
             if (!merged.find(mr => mr.id === lr.id)) merged.push(lr);
           });
@@ -125,35 +121,17 @@ export default function Home() {
           setUserReports(resReports);
         }
 
-        const dataRoutes = resRoutes;
-
-        // Thay vì dùng đường chim bay giả lập, gọi OSRM để bám sát đường đi thực tế cho các tuyến so sánh
+        // Tải tuyến đường mặc định qua API routes (sử dụng OSRM + Climate Score phía server)
         const currentOrigin = gpsLocation || driverLocation;
+        const defaultDest: [number, number] = [10.8783, 106.8063]; // ĐH Quốc tế HCMIU
+        const resRoutes = await fetch(
+          `/api/routes?originLat=${currentOrigin[0]}&originLng=${currentOrigin[1]}&destLat=${defaultDest[0]}&destLng=${defaultDest[1]}`
+        ).then(r => r.json());
 
-        const realRoutes = await Promise.all(dataRoutes.map(async (route: Route) => {
-          try {
-            // Chỉ lấy điểm hiện tại và điểm CUỐI CÙNG của tuyến đường để vẽ đường đi thực tế
-            const destination = route.coordinates[route.coordinates.length - 1];
-            const waypointsArr = [currentOrigin, destination]; 
-            
-            const waypoints = waypointsArr.map(c => `${c[1]},${c[0]}`).join(';');
-            const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson`);
-            const osrmData = await osrmRes.json();
-            
-            if (osrmData.routes && osrmData.routes.length > 0) {
-              const realCoords = osrmData.routes[0].geometry.coordinates.map((c: number[]) => [c[1], c[0]] as [number, number]);
-              return { ...route, coordinates: realCoords };
-            }
-          } catch (err) {
-            console.error('Lỗi khi fetch OSRM cho tuyến so sánh:', err);
-          }
-          return route;
-        }));
-
-        setRoutes(realRoutes);
+        setRoutes(resRoutes);
 
         // Lấy route balanced làm mặc định
-        const balancedRoute = realRoutes.find((r: Route) => r.id === 'route-balanced');
+        const balancedRoute = resRoutes.find((r: Route) => r.id === 'route-balanced');
         if (balancedRoute) {
           updateFocusBounds(balancedRoute.coordinates);
         }
@@ -336,6 +314,29 @@ export default function Home() {
     setActiveTab('coolstop');
   };
 
+  // 5. Khi người dùng tìm kiếm tuyến đường (TripInputBar)
+  const handleSearchRoutes = async (origin: Location, destination: Location) => {
+    setLoading(true);
+    setActiveTab('journey');
+    try {
+      const res = await fetch(
+        `/api/routes?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}`
+      );
+      const newRoutes = await res.json();
+      setRoutes(newRoutes);
+      setSelectedRouteId('route-balanced');
+      // Fit map to show all routes
+      const allCoords = newRoutes.flatMap((r: Route) => r.coordinates);
+      if (allCoords.length > 0) {
+        updateFocusBounds(allCoords);
+      }
+    } catch (err) {
+      console.error('Lỗi khi tìm tuyến đường:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Chỉ giữ 3 tab chính, các nút bấm sẽ to và rõ ràng hơn
   const tabs = [
     { id: 'map', label: 'Bản đồ', icon: Map },
@@ -478,33 +479,35 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Cảnh báo khí hậu khẩn cấp trên đầu nội dung */}
+        {/* Cảnh báo khí hậu khẩn cấp trên đầu nội dung — dùng dữ liệu Weather live */}
+        {weather && weather.alertLevel !== 'low' && (
         <div className="px-4 pt-4 relative z-20">
-          <div className="flex items-start gap-3 p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-red-200">
-            <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5 animate-pulse" />
+          <div className={`flex items-start gap-3 p-3 rounded-xl border ${
+            weather.alertLevel === 'extreme' ? 'bg-red-950/40 border-red-900/50 text-red-200' 
+            : weather.alertLevel === 'high' ? 'bg-orange-950/40 border-orange-900/50 text-orange-200'
+            : 'bg-yellow-950/40 border-yellow-900/50 text-yellow-200'
+          }`}>
+            <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 animate-pulse ${
+              weather.alertLevel === 'extreme' ? 'text-red-500' : weather.alertLevel === 'high' ? 'text-orange-500' : 'text-yellow-500'
+            }`} />
             <div>
-              <p className="text-xs font-bold text-white uppercase tracking-wider">Cảnh báo nắng nóng cực đoan (VNU Vùng Cam)</p>
-              <p className="text-[11px] text-red-300 mt-0.5">Nhiệt độ cảm nhận thực tế đạt 41°C. Hãy chủ động tránh đỗ tại ngã tư và sử dụng trạm **CoolStop** được đề xuất phía dưới.</p>
+              <p className="text-xs font-bold text-white uppercase tracking-wider">
+                {weather.weatherCondition} — Cảm nhận {weather.feelsLike}°C
+              </p>
+              <p className={`text-[11px] mt-0.5 ${
+                weather.alertLevel === 'extreme' ? 'text-red-300' : weather.alertLevel === 'high' ? 'text-orange-300' : 'text-yellow-300'
+              }`}>
+                {weather.rainVolume > 0 
+                  ? `Lượng mưa ${weather.rainVolume}mm. Cẩn thận ngập tại các điểm trũng, hãy dùng tuyến đường GreenRoute đề xuất.`
+                  : `UV ${weather.uvIndex}. Hãy chủ động tránh đỗ tại ngã tư và sử dụng trạm CoolStop được đề xuất phía dưới.`
+                }
+              </p>
             </div>
           </div>
         </div>
-
-        {/* Cảnh báo khí hậu khẩn cấp trên đầu nội dung (Nếu có weather.alertLevel extreme hoặc high) */}
-        {weather && (weather.alertLevel === 'extreme' || weather.alertLevel === 'high') && (
-          <div className="px-4 pt-4 relative z-20">
-            <div className={`flex items-start gap-3 p-3 rounded-xl border ${weather.alertLevel === 'extreme' ? 'bg-red-950/40 border-red-900/50 text-red-200' : 'bg-orange-950/40 border-orange-900/50 text-orange-200'}`}>
-              <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 animate-pulse ${weather.alertLevel === 'extreme' ? 'text-red-500' : 'text-orange-500'}`} />
-              <div>
-                <p className="text-xs font-bold text-white uppercase tracking-wider">
-                  Cảnh báo thời tiết: {weather.alertLevel === 'extreme' ? 'CỰC ĐOAN' : 'NGUY HIỂM'}
-                </p>
-                <p className={`text-[11px] mt-0.5 ${weather.alertLevel === 'extreme' ? 'text-red-300' : 'text-orange-300'}`}>
-                  Nhiệt độ cảm nhận <b>{weather.feelsLike}°C</b>, UV <b>{weather.uvIndex}</b>. {weather.rainVolume > 0 ? `Lượng mưa: ${weather.rainVolume}mm.` : 'Hãy tránh đỗ tại ngã tư và sử dụng trạm **CoolStop** được đề xuất.'}
-                </p>
-              </div>
-            </div>
-          </div>
         )}
+
+
 
         {/* Cảnh báo khí hậu */}
         <div className="shrink-0 relative z-20 pt-3 px-3 bg-gray-950">
@@ -574,6 +577,12 @@ export default function Home() {
 
               {activeTab === 'journey' && (
                 <div className="space-y-6">
+                  {/* Thanh nhập điểm đi - điểm đến */}
+                  <TripInputBar
+                    driverLocation={gpsLocation || driverLocation}
+                    onSearchRoutes={handleSearchRoutes}
+                  />
+
                   {/* Tuyến đường */}
                   <RouteCompare
                     routes={routes}

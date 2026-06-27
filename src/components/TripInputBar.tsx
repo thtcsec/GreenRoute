@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowUpDown, Search, MapPin, Crosshair } from 'lucide-react';
+import { ArrowUpDown, Search, MapPin, Crosshair, Loader2 } from 'lucide-react';
 import { Location } from '@/types';
 
-const MOCK_LOCATIONS: Location[] = [
-  { name: 'Đại học Quốc tế HCMIU - Cổng chính', lat: 10.8783, lng: 106.8063 },
+// Các địa điểm mẫu được hiển thị ngay lập tức khi người dùng focus vào ô tìm kiếm
+const PRESET_LOCATIONS: Location[] = [
+  { name: 'ĐH Quốc tế HCMIU - Cổng chính', lat: 10.8783, lng: 106.8063 },
   { name: 'Ký túc xá Khu B - ĐHQG', lat: 10.882, lng: 106.809 },
   { name: 'Nhà Văn Hóa Sinh Viên ĐHQG', lat: 10.8755, lng: 106.801 },
   { name: 'Bệnh viện ĐHQG HCM', lat: 10.87, lng: 106.803 },
-  { name: 'Trung tâm Thể dục Thể thao ĐHQG', lat: 10.874, lng: 106.7975 },
+  { name: 'Trung tâm TDTT ĐHQG', lat: 10.874, lng: 106.7975 },
   { name: 'Làng Đại Học Thủ Đức', lat: 10.8742, lng: 106.8028 },
 ];
 
@@ -34,21 +35,19 @@ export default function TripInputBar({
   const [originText, setOriginText] = useState(defaultOrigin.name);
   const [destText, setDestText] = useState('');
 
-  const [activeField, setActiveField] = useState<'origin' | 'dest' | null>(
-    null
-  );
+  const [activeField, setActiveField] = useState<'origin' | 'dest' | null>(null);
+  const [suggestions, setSuggestions] = useState<Location[]>(PRESET_LOCATIONS);
+  const [isSearching, setIsSearching] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const originInputRef = useRef<HTMLInputElement>(null);
   const destInputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setActiveField(null);
       }
     }
@@ -67,37 +66,111 @@ export default function TripInputBar({
     }
   }, [driverLocation, origin?.name]);
 
-  const getFilteredSuggestions = useCallback(
-    (query: string) => {
-      if (!query || query === 'Vị trí hiện tại') return MOCK_LOCATIONS;
-      const lower = query.toLowerCase();
-      return MOCK_LOCATIONS.filter((loc) =>
-        loc.name.toLowerCase().includes(lower)
+  // ─── Nominatim Geocoding (OpenStreetMap, miễn phí, không cần key) ─────────
+  // API: https://nominatim.openstreetmap.org/search
+  // Rate limit: 1 request/giây → debounce 600ms
+  // viewbox: giới hạn khu vực Thủ Đức / ĐHQG HCM
+  const searchNominatim = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setSuggestions(PRESET_LOCATIONS);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?` +
+        `q=${encodeURIComponent(query)}&format=json&limit=5` +
+        `&viewbox=106.75,10.90,106.85,10.83&bounded=1` +
+        `&countrycodes=vn` +
+        `&accept-language=vi`,
+        {
+          headers: {
+            'User-Agent': 'GreenRoute-Hackathon/1.0',
+          },
+        }
       );
+      const data = await res.json();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const results: Location[] = data.map((item: any) => ({
+        name: item.display_name.split(',').slice(0, 3).join(', ').trim(),
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lon),
+      }));
+
+      // Kết hợp kết quả Nominatim với preset gợi ý phù hợp
+      const presetMatches = PRESET_LOCATIONS.filter(loc =>
+        loc.name.toLowerCase().includes(query.toLowerCase())
+      );
+
+      // Loại bỏ trùng lặp (nếu preset và Nominatim trả cùng 1 địa điểm)
+      const combined = [...presetMatches];
+      for (const r of results) {
+        const isDuplicate = combined.some(
+          c => Math.abs(c.lat - r.lat) < 0.001 && Math.abs(c.lng - r.lng) < 0.001
+        );
+        if (!isDuplicate) combined.push(r);
+      }
+
+      setSuggestions(combined.slice(0, 6));
+    } catch (err) {
+      console.warn('Nominatim search error:', err);
+      // Fallback: lọc từ preset
+      setSuggestions(
+        PRESET_LOCATIONS.filter(loc =>
+          loc.name.toLowerCase().includes(query.toLowerCase())
+        )
+      );
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Debounced search khi user gõ
+  const handleInputChange = useCallback(
+    (value: string, field: 'origin' | 'dest') => {
+      if (field === 'origin') {
+        setOriginText(value);
+        setOrigin(null);
+      } else {
+        setDestText(value);
+        setDestination(null);
+      }
+
+      // Clear previous timer
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+
+      // Debounce 600ms để tránh spam Nominatim
+      debounceRef.current = setTimeout(() => {
+        searchNominatim(value);
+      }, 600);
     },
-    []
+    [searchNominatim]
   );
 
   const handleOriginFocus = () => {
     setActiveField('origin');
+    setSuggestions(PRESET_LOCATIONS);
     if (originText === 'Vị trí hiện tại') {
       setOriginText('');
     }
   };
 
   const handleOriginBlur = () => {
-    // Delay to allow click on suggestion
     setTimeout(() => {
       if (activeField === 'origin' && !origin) {
         setOriginText('');
       } else if (origin?.name === 'Vị trí hiện tại' && originText === '') {
         setOriginText('Vị trí hiện tại');
       }
-    }, 200);
+    }, 250);
   };
 
   const handleDestFocus = () => {
     setActiveField('dest');
+    setSuggestions(PRESET_LOCATIONS);
   };
 
   const handleSelectSuggestion = (location: Location) => {
@@ -105,7 +178,6 @@ export default function TripInputBar({
       setOrigin(location);
       setOriginText(location.name);
       setActiveField(null);
-      // Move focus to destination if empty
       if (!destination) {
         setTimeout(() => destInputRef.current?.focus(), 100);
       }
@@ -148,19 +220,6 @@ export default function TripInputBar({
 
   const isSearchDisabled = !destination;
 
-  const currentSuggestions = activeField
-    ? getFilteredSuggestions(activeField === 'origin' ? originText : destText)
-    : [];
-
-  const descriptionMap: Record<string, string> = {
-    'Đại học Quốc tế HCMIU - Cổng chính': 'Khu phố 6, Linh Trung, Thủ Đức',
-    'Ký túc xá Khu B - ĐHQG': 'Đông Hòa, Dĩ An, Bình Dương',
-    'Nhà Văn Hóa Sinh Viên ĐHQG': 'Linh Trung, Thủ Đức, TP.HCM',
-    'Bệnh viện ĐHQG HCM': 'Linh Trung, Thủ Đức, TP.HCM',
-    'Trung tâm Thể dục Thể thao ĐHQG': 'Linh Trung, Thủ Đức, TP.HCM',
-    'Làng Đại Học Thủ Đức': 'Linh Trung, Thủ Đức, TP.HCM',
-  };
-
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -194,10 +253,7 @@ export default function TripInputBar({
                     ref={originInputRef}
                     type="text"
                     value={originText}
-                    onChange={(e) => {
-                      setOriginText(e.target.value);
-                      setOrigin(null);
-                    }}
+                    onChange={(e) => handleInputChange(e.target.value, 'origin')}
                     onFocus={handleOriginFocus}
                     onBlur={handleOriginBlur}
                     placeholder="Điểm đón"
@@ -214,11 +270,17 @@ export default function TripInputBar({
                 </div>
 
                 {/* Origin Dropdown */}
-                {activeField === 'origin' && currentSuggestions.length > 0 && (
+                {activeField === 'origin' && suggestions.length > 0 && (
                   <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-gray-800 bg-gray-900 shadow-2xl max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-1 duration-150">
-                    {currentSuggestions.map((loc) => (
+                    {isSearching && (
+                      <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500">
+                        <Loader2 size={12} className="animate-spin" />
+                        Đang tìm kiếm...
+                      </div>
+                    )}
+                    {suggestions.map((loc, idx) => (
                       <button
-                        key={`origin-${loc.lat}-${loc.lng}`}
+                        key={`origin-${loc.lat}-${loc.lng}-${idx}`}
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handleSelectSuggestion(loc)}
@@ -232,9 +294,6 @@ export default function TripInputBar({
                           <p className="text-sm text-gray-200 truncate">
                             {loc.name}
                           </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {descriptionMap[loc.name] ?? ''}
-                          </p>
                         </div>
                       </button>
                     ))}
@@ -242,7 +301,7 @@ export default function TripInputBar({
                 )}
               </div>
 
-              {/* Swap Button - Centered between fields */}
+              {/* Swap Button */}
               <div className="relative flex items-center justify-center h-0 z-10">
                 <button
                   type="button"
@@ -262,22 +321,28 @@ export default function TripInputBar({
                     ref={destInputRef}
                     type="text"
                     value={destText}
-                    onChange={(e) => {
-                      setDestText(e.target.value);
-                      setDestination(null);
-                    }}
+                    onChange={(e) => handleInputChange(e.target.value, 'dest')}
                     onFocus={handleDestFocus}
                     placeholder="Nhập điểm đến..."
                     className="flex-1 min-w-0 bg-transparent text-sm text-gray-200 placeholder-gray-500 outline-none"
                   />
+                  {isSearching && activeField === 'dest' && (
+                    <Loader2 size={14} className="animate-spin text-gray-500" />
+                  )}
                 </div>
 
                 {/* Destination Dropdown */}
-                {activeField === 'dest' && currentSuggestions.length > 0 && (
+                {activeField === 'dest' && suggestions.length > 0 && (
                   <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-gray-800 bg-gray-900 shadow-2xl max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-1 duration-150">
-                    {currentSuggestions.map((loc) => (
+                    {isSearching && (
+                      <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500">
+                        <Loader2 size={12} className="animate-spin" />
+                        Đang tìm kiếm...
+                      </div>
+                    )}
+                    {suggestions.map((loc, idx) => (
                       <button
-                        key={`dest-${loc.lat}-${loc.lng}`}
+                        key={`dest-${loc.lat}-${loc.lng}-${idx}`}
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handleSelectSuggestion(loc)}
@@ -290,9 +355,6 @@ export default function TripInputBar({
                         <div className="min-w-0">
                           <p className="text-sm text-gray-200 truncate">
                             {loc.name}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {descriptionMap[loc.name] ?? ''}
                           </p>
                         </div>
                       </button>
@@ -307,7 +369,7 @@ export default function TripInputBar({
               type="button"
               onClick={() => {
                 handleSearch();
-                setIsCollapsed(true); // Tự động thu gọn khi tìm kiếm
+                setIsCollapsed(true);
               }}
               disabled={isSearchDisabled}
               className={`mt-3 w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
@@ -320,7 +382,7 @@ export default function TripInputBar({
               Tìm chuyến đi
             </button>
             
-            {/* Nút thu gọn (Mũi tên lên) */}
+            {/* Collapse button */}
             <button
               onClick={() => setIsCollapsed(true)}
               className="absolute -bottom-3.5 left-1/2 transform -translate-x-1/2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 hover:text-emerald-400 rounded-full p-1 shadow-lg transition-colors z-10"
