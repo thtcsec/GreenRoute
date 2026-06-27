@@ -161,6 +161,25 @@ async function generateRouteCandidates(
 
 type ScoredRoute = OsrmRoute & ReturnType<typeof calculateClimateScore> & { index: number };
 
+/** Nội suy điểm dọc tuyến để tránh polyline 2–3 điểm (đường zigzag) */
+function interpolateRoute(
+  points: [number, number][],
+  stepsPerSegment = 16
+): [number, number][] {
+  if (points.length < 2) return points;
+  const result: [number, number][] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i];
+    const b = points[i + 1];
+    for (let s = 0; s < stepsPerSegment; s++) {
+      const t = s / stepsPerSegment;
+      result.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]);
+    }
+  }
+  result.push(points[points.length - 1]);
+  return result;
+}
+
 // ─── GET: Sinh 3 tuyến đường thông minh ─────────────────────────────────────
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -186,9 +205,9 @@ export async function GET(request: NextRequest) {
       const midLng = (origin[1] + destination[1]) / 2;
 
       osrmResults = [
-        { coordinates: [origin, destination], distance: dist, duration: baseTime },
-        { coordinates: [origin, [midLat + 0.005, midLng], destination], distance: dist * 1.1, duration: baseTime * 1.1 },
-        { coordinates: [origin, [midLat, midLng - 0.005], destination], distance: dist * 1.2, duration: baseTime * 1.2 },
+        { coordinates: interpolateRoute([origin, destination]), distance: dist, duration: baseTime },
+        { coordinates: interpolateRoute([origin, [midLat + 0.005, midLng], destination]), distance: dist * 1.1, duration: baseTime * 1.1 },
+        { coordinates: interpolateRoute([origin, [midLat, midLng - 0.005], destination]), distance: dist * 1.2, duration: baseTime * 1.2 },
       ];
     }
 

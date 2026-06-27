@@ -12,8 +12,10 @@ interface RouteLayerProps {
 }
 
 function RouteLayerComponent({ routes, selectedRouteId, osrmRoute, onSelectRoute }: RouteLayerProps) {
+  const isValidPolyline = (coords: [number, number][]) => coords.length >= 8;
+
   // Nếu đang có tuyến đường OSRM thực tế, chỉ hiển thị tuyến OSRM
-  if (osrmRoute) {
+  if (osrmRoute && isValidPolyline(osrmRoute)) {
     return (
       <LayerGroup>
         {/* Đường viền (Outline) để nổi bật tuyến đường trên nền bản đồ */}
@@ -42,8 +44,8 @@ function RouteLayerComponent({ routes, selectedRouteId, osrmRoute, onSelectRoute
     );
   }
 
-  const unselectedRoutes = routes.filter((r) => r.id !== selectedRouteId);
-  const selectedRoute = routes.find((r) => r.id === selectedRouteId);
+  const unselectedRoutes = routes.filter((r) => r.id !== selectedRouteId && isValidPolyline(r.coordinates));
+  const selectedRoute = routes.find((r) => r.id === selectedRouteId && isValidPolyline(r.coordinates));
 
   return (
     <LayerGroup>

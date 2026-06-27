@@ -14,6 +14,7 @@ function createReportIcon(type: string) {
   if (type === 'Flooded') color = 'bg-blue-500';
   if (type === 'Too hot') color = 'bg-orange-600';
   if (type === 'Traffic jam') color = 'bg-rose-700';
+  if (type === 'Wrong location') color = 'bg-purple-600';
 
   return L.divIcon({
     html: `
@@ -37,6 +38,7 @@ function UserReportsLayerComponent({ userReports }: UserReportsLayerProps) {
     if (type === 'Too hot' || type === 'No shade') return hotIcon;
     if (type === 'Flooded') return floodIcon;
     if (type === 'Traffic jam') return jamIcon;
+    if (type === 'Wrong location') return defaultIcon;
     return defaultIcon;
   };
 
@@ -58,6 +60,7 @@ function UserReportsLayerComponent({ userReports }: UserReportsLayerProps) {
                 {report.type === 'Hard to stop' && '⛔ Khó dừng đỗ'}
                 {report.type === 'Unsafe pickup/drop-off' && '❌ Điểm đón không an toàn'}
                 {report.type === 'Traffic jam' && '🚗 Kẹt xe / Tắc đường'}
+                {report.type === 'Wrong location' && '📍 Địa điểm sai sót'}
               </p>
               {report.note && <p className="text-xs text-gray-700 mt-1 bg-amber-50 p-1.5 rounded border border-amber-100">Ghi chú: {report.note}</p>}
               <p className="text-[10px] text-gray-500 mt-1">Gửi lúc: {new Date(report.timestamp).toLocaleTimeString()}</p>

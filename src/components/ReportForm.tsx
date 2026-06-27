@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ClimateReport } from '@/types';
-import { Send, Thermometer, CloudSun, Droplets, Ban, ShieldAlert, Sparkles, Car, Trash2, ClipboardList, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { Send, Thermometer, CloudSun, Droplets, Ban, ShieldAlert, Sparkles, Car, Trash2, ClipboardList, ChevronDown, CheckCircle2, MapPinOff } from 'lucide-react';
 
 function timeAgo(timestamp: string): string {
   const diff = Date.now() - new Date(timestamp).getTime();
@@ -18,10 +18,11 @@ interface ReportFormProps {
   onSubmitReport: (type: ClimateReport['type'], note: string) => void;
   reports?: ClimateReport[];
   onDeleteReport?: (reportId: string) => void;
+  defaultType?: ClimateReport['type'];
 }
 
-export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: ReportFormProps) {
-  const [reportType, setReportType] = useState<ClimateReport['type']>('Too hot');
+export default function ReportForm({ onSubmitReport, reports, onDeleteReport, defaultType = 'Too hot' }: ReportFormProps) {
+  const [reportType, setReportType] = useState<ClimateReport['type']>(defaultType);
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -99,6 +100,15 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
       activeBg: 'bg-red-950/40',
       activeBorder: 'border-red-500/50',
       desc: 'Đoạn đường ùn tắc kéo dài'
+    },
+    {
+      type: 'Wrong location',
+      label: 'Địa điểm sai sót',
+      icon: MapPinOff,
+      activeColor: 'text-purple-300',
+      activeBg: 'bg-purple-950/40',
+      activeBorder: 'border-purple-500/50',
+      desc: 'Pin/địa chỉ trên bản đồ không đúng'
     }
   ];
 
@@ -109,6 +119,7 @@ export default function ReportForm({ onSubmitReport, reports, onDeleteReport }: 
     'Hard to stop': { label: 'Khó dừng đỗ', icon: Ban },
     'Unsafe pickup/drop-off': { label: 'Đón trả không an toàn', icon: ShieldAlert },
     'Traffic jam': { label: 'Kẹt xe / Tắc đường', icon: Car },
+    'Wrong location': { label: 'Địa điểm sai sót', icon: MapPinOff },
   };
 
   // Sort reports by timestamp descending (most recent first)

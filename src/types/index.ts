@@ -85,7 +85,7 @@ export interface PickupPoints {
 
 export interface ClimateReport {
   id: string;
-  type: 'Too hot' | 'No shade' | 'Flooded' | 'Hard to stop' | 'Unsafe pickup/drop-off' | 'Traffic jam';
+  type: 'Too hot' | 'No shade' | 'Flooded' | 'Hard to stop' | 'Unsafe pickup/drop-off' | 'Traffic jam' | 'Wrong location';
   lat: number;
   lng: number;
   note?: string;

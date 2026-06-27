@@ -11,7 +11,7 @@ import TripInputBar from '@/components/TripInputBar';
 import ClimateAlertBanner from '@/components/ClimateAlertBanner';
 
 // Import icons
-import { Map, Snowflake, Route as RouteIcon, ShieldCheck, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X, Droplets, ChevronUp, ChevronDown } from 'lucide-react';
+import { Map, Snowflake, Route as RouteIcon, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X, Droplets, ChevronUp, ChevronDown, MapPinOff } from 'lucide-react';
 
 // Load MapContainer dynamically to prevent SSR issues
 const MapContainer = dynamic(() => import('@/components/MapContainer'), {
@@ -38,7 +38,7 @@ export default function Home() {
 
   // Tọa độ người dùng (Mặc định ở Đại học Quốc tế HCMIU)
   const [driverLocation] = useState<[number, number]>([10.8795, 106.8045]);
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>('route-balanced');
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [activeCoolStop, setActiveCoolStop] = useState<CoolStop | null>(null);
   const [focusLocation, setFocusLocation] = useState<[number, number] | null>(null);
   const [focusBounds, setFocusBounds] = useState<[[number, number], [number, number]] | null>(null);
@@ -51,11 +51,8 @@ export default function Home() {
   const [osrmError, setOsrmError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Tab di động chủ đạo (Đã tối ưu lại còn 3 tabs)
-  const [activeTab, setActiveTab] = useState<'map' | 'coolstop' | 'journey'>('map');
-
-  // Modal Báo cáo khẩn cấp
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  // Tab di động chủ đạo
+  const [activeTab, setActiveTab] = useState<'map' | 'coolstop' | 'journey' | 'report'>('map');
 
   // Map bottom sheet + trip state (Hoàng An UX)
   const [isTripStarted, setIsTripStarted] = useState(false);
@@ -129,21 +126,6 @@ export default function Home() {
           setUserReports(merged);
         } else {
           setUserReports(resReports);
-        }
-
-        // Tải tuyến đường mặc định qua API routes (sử dụng OSRM + Climate Score phía server)
-        const currentOrigin = gpsLocation || driverLocation;
-        const defaultDest: [number, number] = [10.8783, 106.8063]; // ĐH Quốc tế HCMIU
-        const resRoutes = await fetch(
-          `/api/routes?originLat=${currentOrigin[0]}&originLng=${currentOrigin[1]}&destLat=${defaultDest[0]}&destLng=${defaultDest[1]}`
-        ).then(r => r.json());
-
-        setRoutes(resRoutes);
-
-        // Lấy route balanced làm mặc định
-        const balancedRoute = resRoutes.find((r: Route) => r.id === 'route-balanced');
-        if (balancedRoute) {
-          updateFocusBounds(balancedRoute.coordinates);
         }
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu từ API:', error);
@@ -340,6 +322,9 @@ export default function Home() {
         `/api/routes?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}`
       );
       const newRoutes = await res.json();
+      if (!Array.isArray(newRoutes)) {
+        throw new Error('Invalid routes response');
+      }
       setRoutes(newRoutes);
       setSelectedRouteId('route-balanced');
       // Fit map to show all routes
@@ -359,6 +344,7 @@ export default function Home() {
     { id: 'map', label: 'Bản đồ', icon: Map },
     { id: 'coolstop', label: 'CoolStop', icon: Snowflake },
     { id: 'journey', label: 'Hành trình', icon: RouteIcon },
+    { id: 'report', label: 'Báo lỗi', icon: MapPinOff },
   ];
 
   return (
@@ -430,7 +416,10 @@ export default function Home() {
           <div className="absolute bottom-4 right-4 flex flex-col gap-4 z-20">
             {/* Nút FAB Báo cáo Khẩn cấp */}
             <button
-              onClick={() => setIsReportModalOpen(true)}
+              onClick={() => {
+                setActiveTab('report');
+                setIsPanelOpen(true);
+              }}
               className="p-3.5 rounded-full bg-gradient-to-br from-red-500 to-rose-700 border border-red-400/50 text-white shadow-[0_0_25px_rgba(225,29,72,0.6)] animate-bounce hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center relative"
               title="Báo cáo nhanh"
             >
@@ -524,7 +513,7 @@ export default function Home() {
         )}
 
         {/* Nội dung Tab */}
-        <main className={`flex-1 min-h-0 overflow-y-auto px-4 py-5 pb-24 z-20 custom-scrollbar ${activeTab === 'map' && !isPanelOpen ? 'hidden' : ''}`}>
+        <main className={`flex-1 min-h-0 overflow-y-auto px-4 py-5 pb-4 z-20 custom-scrollbar ${activeTab === 'map' && !isPanelOpen ? 'hidden' : ''}`}>
           {loading ? (
             <div className="h-full flex items-center justify-center py-10">
               <div className="flex flex-col items-center gap-4">
@@ -535,7 +524,7 @@ export default function Home() {
           ) : (
             <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-              {weather && weather.alertLevel !== 'low' && (
+              {activeTab !== 'report' && weather && weather.alertLevel !== 'low' && (
                 <div className="relative z-20">
                   <div className={`relative overflow-hidden flex items-start gap-3 p-4 rounded-2xl border backdrop-blur-xl ${
                     weather.alertLevel === 'extreme' ? 'bg-red-950/50 border-red-500/30 text-red-200 shadow-[0_0_30px_rgba(220,38,38,0.15)]'
@@ -563,6 +552,7 @@ export default function Home() {
                 </div>
               )}
 
+              {activeTab !== 'report' && (
               <ClimateAlertBanner
                 driverLocation={driverLocation}
                 heatZones={heatZones}
@@ -571,6 +561,29 @@ export default function Home() {
                 onGoToCoolStop={() => setActiveTab('coolstop')}
                 onGoToRoutes={() => setActiveTab('journey')}
               />
+              )}
+
+              {activeTab === 'report' && (
+                <div className="space-y-4">
+                  <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-4 rounded-2xl">
+                    <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                      <MapPinOff className="w-5 h-5 text-purple-400" />
+                      Báo cáo địa điểm sai sót
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
+                      Pin CoolStop, vùng nắng/ngập hoặc điểm đón hiển thị sai? Gửi báo cáo để team cập nhật dữ liệu pilot.
+                    </p>
+                  </div>
+                  <ReportForm
+                    defaultType="Wrong location"
+                    onSubmitReport={(type, note) => {
+                      handleSubmitReport(type, note);
+                    }}
+                    reports={userReports}
+                    onDeleteReport={handleDeleteReport}
+                  />
+                </div>
+              )}
 
               {activeTab === 'map' && (
                 <div className="space-y-5">
@@ -661,7 +674,7 @@ export default function Home() {
         </main>
 
         {/* Thanh Điều Hướng Dưới Cùng */}
-        <nav className="absolute bottom-0 left-0 right-0 h-[72px] bg-black/80 backdrop-blur-2xl border-t border-white/10 grid grid-cols-3 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.3)] pb-safe">
+        <nav className="shrink-0 h-[72px] bg-black/80 backdrop-blur-2xl border-t border-white/10 grid grid-cols-4 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.3)] pb-safe">
           {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -677,14 +690,14 @@ export default function Home() {
                       setIsPanelOpen(false);
                     }
                   } else {
-                    setActiveTab(tab.id as 'map' | 'coolstop' | 'journey');
+                    setActiveTab(tab.id as 'map' | 'coolstop' | 'journey' | 'report');
                     setIsPanelOpen(true);
                   }
                   if (tab.id === 'coolstop' && coolstops.length > 0 && !activeCoolStop) {
                     setActiveCoolStop(coolstops[0]);
                   }
                 }}
-                className={`relative flex flex-col items-center justify-center gap-1 select-none transition-all duration-300 cursor-pointer ${
+                className={`relative flex flex-col items-center justify-center gap-0.5 select-none transition-all duration-300 cursor-pointer ${
                   isActive ? 'text-emerald-400 scale-105' : 'text-gray-500 hover:text-gray-300'
                 }`}
               >
@@ -692,49 +705,12 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/10 to-transparent pointer-events-none" />
                 )}
                 {isActive && <span className="absolute top-1.5 w-1 h-1 bg-emerald-400 rounded-full shadow-[0_0_10px_#10b981]" />}
-                <Icon className={`w-6 h-6 transition-transform mt-2 ${isActive ? 'drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
-                <span className={`text-[10px] font-bold tracking-wide mt-1 ${isActive ? 'text-emerald-400' : 'text-gray-400'}`}>{tab.label}</span>
+                <Icon className={`w-5 h-5 transition-transform mt-1.5 ${isActive ? 'drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`text-[9px] font-bold tracking-wide ${isActive ? 'text-emerald-400' : 'text-gray-400'}`}>{tab.label}</span>
               </button>
             )
           })}
         </nav>
-
-        {/* Modal Báo cáo (Hiển thị nổi lấp đầy bên dưới) */}
-        {isReportModalOpen && (
-          <div className="absolute inset-0 z-50 flex flex-col justify-end">
-            <div 
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
-              onClick={() => setIsReportModalOpen(false)}
-            />
-            
-            <div className="relative bg-gray-950 border-t border-gray-800 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] p-5 max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-full duration-300 custom-scrollbar">
-              <div className="w-12 h-1.5 bg-gray-800 rounded-full mx-auto mb-5"></div>
-              
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-                  <AlertTriangle className="w-6 h-6 text-red-500" />
-                  Báo cáo & Cảnh báo
-                </h2>
-                <button 
-                  onClick={() => setIsReportModalOpen(false)} 
-                  className="p-2 bg-gray-900 hover:bg-gray-800 rounded-full text-gray-400 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <ReportForm 
-                onSubmitReport={(type, note) => {
-                  handleSubmitReport(type, note);
-                  setIsReportModalOpen(false);
-                }} 
-                reports={userReports}
-                onDeleteReport={handleDeleteReport}
-              />
-            </div>
-          </div>
-        )}
-
       </div>
     </div>
   );
