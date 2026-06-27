@@ -8,9 +8,10 @@ interface CoolStopCardProps {
   onNavigate: (stop: CoolStop) => void;
   onSelectStop?: (stop: CoolStop) => void;
   activeStop: CoolStop | null;
+  currentShadeScore?: number;
 }
 
-export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, activeStop }: CoolStopCardProps) {
+export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, activeStop, currentShadeScore = 2 }: CoolStopCardProps) {
   // Điểm đề xuất chính (mặc định lấy điểm đầu tiên hoặc điểm đang được kích hoạt)
   const recommendedStop = activeStop || coolstops[0];
 
@@ -27,7 +28,7 @@ export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, acti
   }
 
   return (
-    <div className="relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all duration-300">
+    <div className="relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all duration-300">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 via-cyan-500 to-blue-500 opacity-70"></div>
       
       {/* Horizontal scrollable list of all CoolStops */}
@@ -72,9 +73,9 @@ export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, acti
         </div>
       )}
 
-      <div className="flex items-start justify-between mb-5">
+      <div className="flex items-start justify-between mb-3">
         <div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/30 mb-3 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/30 mb-2 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> Gợi ý tối ưu
           </span>
           <div className="flex items-center gap-2">
@@ -94,34 +95,34 @@ export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, acti
         </div>
       </div>
 
-      <p className="text-xs text-gray-300 mb-5 bg-white/5 p-3.5 rounded-xl border border-white/10 leading-relaxed shadow-inner">
+      <p className="text-xs text-gray-300 mb-3 bg-white/5 p-3 rounded-xl border border-white/10 leading-relaxed shadow-inner">
         {recommendedStop.description}
       </p>
 
       {/* Chỉ số chất lượng điểm dừng */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="bg-black/30 p-3 rounded-2xl border border-white/5 hover:bg-black/40 transition-colors">
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="bg-black/30 p-2.5 rounded-2xl border border-white/5 hover:bg-black/40 transition-colors">
           <span className="text-[9px] text-gray-500 block uppercase font-bold tracking-wider mb-1">Bóng râm (Shade)</span>
           <div className="flex items-center gap-1.5">
             <Snowflake className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
             <span className="text-sm font-black text-white">{recommendedStop.shadeScore}/10</span>
           </div>
         </div>
-        <div className="bg-black/30 p-3 rounded-2xl border border-white/5 hover:bg-black/40 transition-colors">
+        <div className="bg-black/30 p-2.5 rounded-2xl border border-white/5 hover:bg-black/40 transition-colors">
           <span className="text-[9px] text-gray-500 block uppercase font-bold tracking-wider mb-1">Che mưa (Rain)</span>
           <div className="flex items-center gap-1.5">
             <Droplets className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]" />
             <span className="text-sm font-black text-white">{recommendedStop.rainCover ? 'Có mái che' : 'Lộ thiên'}</span>
           </div>
         </div>
-        <div className="bg-black/30 p-3 rounded-2xl border border-white/5 hover:bg-black/40 transition-colors">
+        <div className="bg-black/30 p-2.5 rounded-2xl border border-white/5 hover:bg-black/40 transition-colors">
           <span className="text-[9px] text-gray-500 block uppercase font-bold tracking-wider mb-1">An toàn (Safety)</span>
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
             <span className="text-sm font-black text-white">{recommendedStop.curbSafety === 'High' ? 'Rất an toàn' : 'Tạm ổn'}</span>
           </div>
         </div>
-        <div className="bg-black/30 p-3 rounded-2xl border border-white/5 hover:bg-black/40 transition-colors">
+        <div className="bg-black/30 p-2.5 rounded-2xl border border-white/5 hover:bg-black/40 transition-colors">
           <span className="text-[9px] text-gray-500 block uppercase font-bold tracking-wider mb-1">Tiện ích (Amenities)</span>
           <div className="flex items-center gap-1.5">
             <Coffee className="w-5 h-5 text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]" />
@@ -133,14 +134,14 @@ export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, acti
       </div>
 
       {/* So sánh điểm dừng */}
-      <div className="border-t border-white/10 pt-5 mb-5 relative">
-        <h4 className="text-[10px] font-extrabold text-gray-500 mb-3 uppercase tracking-widest text-center">So sánh khí hậu</h4>
-        <div className="space-y-3 relative">
+      <div className="border-t border-white/10 pt-4 mb-4 relative">
+        <h4 className="text-[10px] font-extrabold text-gray-500 mb-2 uppercase tracking-widest text-center">So sánh khí hậu</h4>
+        <div className="space-y-2 relative">
           <div className="absolute top-1/2 left-4 -translate-y-1/2 w-0.5 h-10 bg-gradient-to-b from-red-500/50 to-emerald-500/50 rounded-full z-0"></div>
           
           <div className="flex items-center justify-between text-xs bg-red-950/40 border border-red-500/20 p-3 rounded-xl text-red-200 relative z-10 shadow-[0_0_15px_rgba(220,38,38,0.1)]">
             <span className="font-bold flex items-center gap-2"><ShieldAlert className="w-4 h-4 text-red-400 animate-pulse" /> Vị trí hiện tại</span>
-            <span className="font-black text-red-400">Shade: 2/10</span>
+            <span className="font-black text-red-400">Shade: {currentShadeScore}/10</span>
           </div>
           <div className="flex items-center justify-between text-xs bg-emerald-950/40 border border-emerald-500/30 p-3 rounded-xl text-emerald-200 relative z-10 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
             <span className="font-bold flex items-center gap-2"><Snowflake className="w-4 h-4 text-emerald-400" /> Điểm CoolStop</span>

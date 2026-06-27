@@ -6,12 +6,11 @@ import { Location } from '@/types';
 
 // Các địa điểm mẫu được hiển thị ngay lập tức khi người dùng focus vào ô tìm kiếm
 const PRESET_LOCATIONS: Location[] = [
-  { name: 'ĐH Quốc tế HCMIU - Cổng chính', address: 'Khu phố 6, Phường Linh Trung, TP. Thủ Đức', lat: 10.8783, lng: 106.8063 },
-  { name: 'Ký túc xá Khu B - ĐHQG', address: 'Ký túc xá Khu B, Đại học Quốc gia TP.HCM, Phường Linh Trung', lat: 10.882, lng: 106.809 },
-  { name: 'Nhà Văn Hóa Sinh Viên ĐHQG', address: 'Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung', lat: 10.8755, lng: 106.801 },
-  { name: 'Bệnh viện ĐHQG HCM', address: 'Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung', lat: 10.87, lng: 106.803 },
-  { name: 'Trung tâm TDTT ĐHQG', address: 'Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung', lat: 10.874, lng: 106.7975 },
-  { name: 'Làng Đại Học Thủ Đức', address: 'Đường Hàn Thuyên, Phường Linh Trung, TP. Thủ Đức', lat: 10.8742, lng: 106.8028 },
+  { name: 'Ký túc xá Khu B - ĐHQG', address: 'Đường Nguyễn Du, Dĩ An, Bình Dương', lat: 10.884, lng: 106.782 },
+  { name: 'Nhà Văn hóa Sinh viên ĐHQG', address: 'Khu A, ĐHQG TP.HCM, Phường Linh Trung', lat: 10.876, lng: 106.801 },
+  { name: 'ĐH Quốc tế (HCMIU)', address: 'Khu phố 6, Phường Linh Trung, TP. Thủ Đức', lat: 10.8795, lng: 106.8045 },
+  { name: 'Khu Du lịch Suối Tiên', address: '120 Xa lộ Hà Nội, Phường Tân Phú, TP. Thủ Đức', lat: 10.863, lng: 106.802 },
+  { name: 'Ngã ba 621', address: 'Xa lộ Hà Nội, Phường Linh Trung, TP. Thủ Đức', lat: 10.872, lng: 106.806 },
 ];
 
 interface TripInputBarProps {

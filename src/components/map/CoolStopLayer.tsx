@@ -107,12 +107,6 @@ function CoolStopLayerComponent({ coolstops, onSelectCoolStop }: CoolStopLayerPr
 
                 <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">{stop.description}</p>
 
-                <button
-                  onClick={() => onSelectCoolStop(stop)}
-                  className="w-full py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg shadow transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                >
-                  📍 Dẫn đường tới đây
-                </button>
               </div>
             </Popup>
           </Marker>

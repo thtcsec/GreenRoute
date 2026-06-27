@@ -1,185 +1,82 @@
 [
   {
     "id": "hz-1",
-    "name": "Ngã tư Đại học Quốc Gia (VNU Intersection)",
-    "address": "Giao lộ Đại lộ Võ Văn Kiệt & Đường Hàn Thuyên, Phường Linh Trung, TP. Thủ Đức",
-    "lat": 10.8700,
-    "lng": 106.8030,
-    "radius": 150,
+    "name": "Vùng nóng (Khu 1)",
+    "lat": 10.867800982681372,
+    "lng": 106.7961973740524,
+    "radius": 139,
     "riskLevel": "High",
-    "heatIndex": 42,
-    "description": "Ngã tư bê tông hóa diện tích rộng, hoàn toàn không có bóng râm cây xanh. Hấp nhiệt cực mạnh vào buổi trưa."
+    "heatIndex": 40,
+    "description": "Đoạn đường bê tông hấp thụ nhiệt mạnh, thiếu bóng cây."
   },
   {
     "id": "hz-2",
-    "name": "Bãi đỗ xe lộ thiên - Trung tâm Thể thao VNU",
-    "address": "Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung, TP. Thủ Đức",
-    "lat": 10.8740,
-    "lng": 106.7975,
-    "radius": 100,
-    "riskLevel": "Medium-High",
-    "heatIndex": 39,
-    "description": "Bề mặt bê tông hấp thụ nhiệt cao, thích hợp đỗ xe có mái che thay vì đỗ trực tiếp dưới nắng."
+    "name": "Vùng nóng (Khu 2)",
+    "lat": 10.873716142756436,
+    "lng": 106.7886418701389,
+    "radius": 152,
+    "riskLevel": "High",
+    "heatIndex": 38,
+    "description": "Đoạn đường bê tông hấp thụ nhiệt mạnh, thiếu bóng cây."
   },
   {
     "id": "hz-3",
-    "name": "Đoạn đường nhựa song hành Xa Lộ Hà Nội",
-    "address": "Xa lộ Hà Nội, đoạn qua Khu Làng Đại học, Phường Linh Trung, TP. Thủ Đức",
-    "lat": 10.8660,
-    "lng": 106.7990,
-    "radius": 200,
-    "riskLevel": "High",
-    "heatIndex": 41,
-    "description": "Mặt nhựa hấp nhiệt cao kết hợp khí thải phương tiện giao thông lớn, nhiệt độ cảm nhận rất oi bức."
-  },
-  {
-    "id": "hz-gen-1",
-    "name": "Vùng lõi bê tông 1",
-    "lat": 10.886048074862327,
-    "lng": 106.78163446184315,
-    "radius": 385,
-    "riskLevel": "Medium-High",
-    "heatIndex": 39,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-2",
-    "name": "Vùng lõi bê tông 2",
-    "lat": 10.862976566012644,
-    "lng": 106.77563849384936,
-    "radius": 221,
-    "riskLevel": "High",
-    "heatIndex": 39,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-3",
-    "name": "Vùng lõi bê tông 3",
-    "lat": 10.907688644177192,
-    "lng": 106.80873164001652,
-    "radius": 303,
-    "riskLevel": "Medium-High",
-    "heatIndex": 40,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-4",
-    "name": "Vùng lõi bê tông 4",
-    "lat": 10.855649341395612,
-    "lng": 106.77361266799261,
-    "radius": 358,
+    "name": "Vùng nóng (Khu 3)",
+    "lat": 10.871393109738026,
+    "lng": 106.79028457191932,
+    "radius": 135,
     "riskLevel": "High",
     "heatIndex": 40,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+    "description": "Đoạn đường bê tông hấp thụ nhiệt mạnh, thiếu bóng cây."
   },
   {
-    "id": "hz-gen-5",
-    "name": "Vùng lõi bê tông 5",
-    "lat": 10.887501256958686,
-    "lng": 106.81399724985587,
-    "radius": 140,
+    "id": "hz-4",
+    "name": "Vùng nóng (Khu 4)",
+    "lat": 10.875725742114502,
+    "lng": 106.79169733209513,
+    "radius": 199,
     "riskLevel": "Medium-High",
     "heatIndex": 38,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+    "description": "Đoạn đường bê tông hấp thụ nhiệt mạnh, thiếu bóng cây."
   },
   {
-    "id": "hz-gen-6",
-    "name": "Vùng lõi bê tông 6",
-    "lat": 10.89399218480622,
-    "lng": 106.82921530480894,
-    "radius": 321,
+    "id": "hz-5",
+    "name": "Vùng nóng (Khu 5)",
+    "lat": 10.876341175567733,
+    "lng": 106.79492525415307,
+    "radius": 196,
     "riskLevel": "Medium-High",
-    "heatIndex": 42,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-7",
-    "name": "Vùng lõi bê tông 7",
-    "lat": 10.896676956783407,
-    "lng": 106.77960475475268,
-    "radius": 391,
-    "riskLevel": "High",
     "heatIndex": 38,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+    "description": "Đoạn đường bê tông hấp thụ nhiệt mạnh, thiếu bóng cây."
   },
   {
-    "id": "hz-gen-8",
-    "name": "Vùng lõi bê tông 8",
-    "lat": 10.9122867177956,
-    "lng": 106.80215921684709,
-    "radius": 319,
+    "id": "hz-6",
+    "name": "Vùng nóng (Khu 6)",
+    "lat": 10.876791401992365,
+    "lng": 106.78938227727829,
+    "radius": 137,
     "riskLevel": "Medium-High",
     "heatIndex": 41,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+    "description": "Đoạn đường bê tông hấp thụ nhiệt mạnh, thiếu bóng cây."
   },
   {
-    "id": "hz-gen-9",
-    "name": "Vùng lõi bê tông 9",
-    "lat": 10.867192492906193,
-    "lng": 106.77027315452354,
-    "radius": 206,
-    "riskLevel": "High",
-    "heatIndex": 39,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-10",
-    "name": "Vùng lõi bê tông 10",
-    "lat": 10.861423054432798,
-    "lng": 106.82719470945733,
-    "radius": 333,
+    "id": "hz-7",
+    "name": "Vùng nóng (Khu 7)",
+    "lat": 10.868702164838307,
+    "lng": 106.79555336620543,
+    "radius": 167,
     "riskLevel": "Medium-High",
-    "heatIndex": 39,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-11",
-    "name": "Vùng lõi bê tông 11",
-    "lat": 10.869728981498508,
-    "lng": 106.81704108927865,
-    "radius": 233,
-    "riskLevel": "High",
-    "heatIndex": 40,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-12",
-    "name": "Vùng lõi bê tông 12",
-    "lat": 10.863652315112489,
-    "lng": 106.79355231893975,
-    "radius": 350,
-    "riskLevel": "High",
-    "heatIndex": 42,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-13",
-    "name": "Vùng lõi bê tông 13",
-    "lat": 10.874633969758916,
-    "lng": 106.77635656811456,
-    "radius": 204,
-    "riskLevel": "High",
     "heatIndex": 38,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+    "description": "Đoạn đường bê tông hấp thụ nhiệt mạnh, thiếu bóng cây."
   },
   {
-    "id": "hz-gen-14",
-    "name": "Vùng lõi bê tông 14",
-    "lat": 10.895204435003308,
-    "lng": 106.81034022817654,
-    "radius": 353,
+    "id": "hz-8",
+    "name": "Vùng nóng (Khu 8)",
+    "lat": 10.875474865359916,
+    "lng": 106.78558106987575,
+    "radius": 185,
     "riskLevel": "High",
     "heatIndex": 42,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
-  },
-  {
-    "id": "hz-gen-15",
-    "name": "Vùng lõi bê tông 15",
-    "lat": 10.882644921686582,
-    "lng": 106.81220359557975,
-    "radius": 208,
-    "riskLevel": "Medium-High",
-    "heatIndex": 41,
-    "description": "Khu vực mật độ giao thông cao, mặt đường hấp thụ nhiệt mạnh, cảm nhận oi bức."
+    "description": "Đoạn đường bê tông hấp thụ nhiệt mạnh, thiếu bóng cây."
   }
 ]

@@ -44,27 +44,27 @@ function PickupPointsLayerComponent({ pickupPoints }: PickupPointsLayerProps) {
   return (
     <>
       <Marker position={[pickupPoints.defaultPoint.lat, pickupPoints.defaultPoint.lng]} icon={defaultIcon}>
-        <Popup>
-          <div className="p-1 font-sans">
-            <p className="font-bold text-red-600 text-xs flex items-center gap-1">⚠️ ĐIỂM ĐÓN GỐC (RỦI RO)</p>
-            <p className="font-semibold text-gray-900 text-sm mt-0.5">{pickupPoints.defaultPoint.name}</p>
+        <Popup maxWidth={240} autoPanPadding={[60, 60]}>
+          <div className="font-sans">
+            <p className="font-bold text-red-500 text-xs flex items-center gap-1">⚠️ ĐIỂM ĐÓN GỐC (RỦI RO)</p>
+            <p className="font-semibold text-white text-sm mt-1">{pickupPoints.defaultPoint.name}</p>
             {pickupPoints.defaultPoint.address && (
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">{pickupPoints.defaultPoint.address}</p>
+              <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{pickupPoints.defaultPoint.address}</p>
             )}
-            <p className="text-xs text-gray-700 mt-1 bg-red-50 p-1.5 rounded border border-red-100">Lý do: {pickupPoints.defaultPoint.reason}</p>
+            <p className="text-xs text-red-200 mt-2 bg-red-950/40 p-2 rounded-lg border border-red-500/20">Lý do: {pickupPoints.defaultPoint.reason}</p>
           </div>
         </Popup>
       </Marker>
 
       <Marker position={[pickupPoints.suggestedPoint.lat, pickupPoints.suggestedPoint.lng]} icon={suggestedIcon}>
-        <Popup>
-          <div className="p-1 font-sans">
-            <p className="font-bold text-emerald-600 text-xs flex items-center gap-1">✅ ĐIỂM ĐÓN KHUYÊN DÙNG</p>
-            <p className="font-semibold text-gray-900 text-sm mt-0.5">{pickupPoints.suggestedPoint.name}</p>
+        <Popup maxWidth={240} autoPanPadding={[60, 60]}>
+          <div className="font-sans">
+            <p className="font-bold text-emerald-400 text-xs flex items-center gap-1">✅ ĐIỂM ĐÓN KHUYÊN DÙNG</p>
+            <p className="font-semibold text-white text-sm mt-1">{pickupPoints.suggestedPoint.name}</p>
             {pickupPoints.suggestedPoint.address && (
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">{pickupPoints.suggestedPoint.address}</p>
+              <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{pickupPoints.suggestedPoint.address}</p>
             )}
-            <p className="text-xs text-gray-700 mt-1 bg-emerald-50 p-1.5 rounded border border-emerald-100">Lý do: {pickupPoints.suggestedPoint.reason}</p>
+            <p className="text-xs text-emerald-200 mt-2 bg-emerald-950/40 p-2 rounded-lg border border-emerald-500/20">Lý do: {pickupPoints.suggestedPoint.reason}</p>
           </div>
         </Popup>
       </Marker>

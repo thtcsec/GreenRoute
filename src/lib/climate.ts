@@ -1,11 +1,12 @@
 /**
  * GreenRoute — Climate Scoring Engine
  *
- * Score = 100 - HeatPenalty - FloodPenalty - TrafficPenalty - SunExposurePenalty + ShadeBonus
- * Clamped to [0, 100]
+ * Formula:
+ * climate_penalty (0-10) = (heat * 0.40) + (flood * 0.30) + (shade_lack * 0.20) + (stop_risk * 0.10)
+ * Climate Score = Math.round((1 - climate_penalty / 10) * 100)
  */
 
-import { HeatZone, FloodRisk, CoolStop } from '@/types';
+import { HeatZone, FloodRisk, CoolStop, WeatherData, ClimateReport } from '@/types';
 
 // ─── Haversine Distance (meters) ────────────────────────────────────────────
 export function haversine(a: [number, number], b: [number, number]): number {
@@ -25,9 +26,8 @@ export function haversine(a: [number, number], b: [number, number]): number {
 
 // ─── Sampling ───────────────────────────────────────────────────────────────
 const SAMPLE_INTERVAL = 5;
-const COOLSTOP_SHADE_RADIUS = 200; // mét
+const COOLSTOP_SHADE_RADIUS = 200; // meters
 
-/** Luôn lấy mẫu điểm đầu/cuối để không bỏ sót vùng nguy hiểm ở hai đầu tuyến */
 export function getSampleIndices(length: number, interval = SAMPLE_INTERVAL): number[] {
   if (length <= 0) return [];
   const indices = new Set<number>([0, length - 1]);
@@ -63,11 +63,12 @@ function floodSeverity(zone: FloodRisk): number {
 }
 
 // ─── Climate Score Algorithm ────────────────────────────────────────────────
-const HEAT_WEIGHT = 5;
-const FLOOD_WEIGHT = 8;
-const TRAFFIC_WEIGHT = 2;
-const SHADE_WEIGHT = 3;
-const SUN_EXPOSURE_WEIGHT = 12; // Phạt thêm khi nắng gắt mà không có bóng râm
+const WEIGHTS = {
+  heat: 0.40,
+  flood: 0.30,
+  shade_lack: 0.20,
+  stop_risk: 0.10
+};
 
 export interface ClimateScoreResult {
   score: number;
@@ -86,7 +87,9 @@ export function calculateClimateScore(
   floodRisks: FloodRisk[],
   coolstops: CoolStop[],
   osrmDurationMin: number,
-  distanceKm: number
+  distanceKm: number,
+  weatherData?: WeatherData | null,
+  reports?: ClimateReport[] | null
 ): ClimateScoreResult {
   if (!routeCoords || routeCoords.length === 0) {
     return {
@@ -104,57 +107,110 @@ export function calculateClimateScore(
   let heatExposure = 0;
   let floodExposure = 0;
   let shadeCount = 0;
+  let totalStopDistances = 0;
+
   const sampleIndices = getSampleIndices(routeCoords.length);
   const totalSamples = sampleIndices.length;
 
   for (const idx of sampleIndices) {
     const point = routeCoords[idx];
 
+    // Heat
     let pointHeat = 0;
     for (const zone of heatZones) {
       if (haversine(point, [zone.lat, zone.lng]) < zone.radius) {
         pointHeat = Math.max(pointHeat, heatSeverity(zone));
       }
     }
-    heatExposure += pointHeat;
-
+    
+    // Flood
     let pointFlood = 0;
     for (const zone of floodRisks) {
       if (haversine(point, [zone.lat, zone.lng]) < zone.radius) {
         pointFlood = Math.max(pointFlood, floodSeverity(zone));
       }
     }
-    floodExposure += pointFlood;
 
-    for (const stop of coolstops) {
-      if (haversine(point, [stop.lat, stop.lng]) < COOLSTOP_SHADE_RADIUS) {
-        shadeCount++;
-        break;
+    // Community Reports feedback loop (300m radius)
+    if (reports && reports.length > 0) {
+      let reportHeatBoost = 0;
+      let reportFloodBoost = 0;
+      for (const report of reports) {
+        if (haversine(point, [report.lat, report.lng]) < 300) {
+          if (report.type === 'Trời quá nóng' || report.type === 'Thiếu bóng râm') {
+            reportHeatBoost = Math.max(reportHeatBoost, 0.15); // +1.5 on 0-10 scale
+          } else if (report.type === 'Đường ngập nước') {
+            reportFloodBoost = Math.max(reportFloodBoost, 0.20); // +2.0 on 0-10 scale
+          }
+        }
       }
+      pointHeat += reportHeatBoost;
+      pointFlood += reportFloodBoost;
+    }
+
+    heatExposure += Math.min(1, pointHeat);
+    floodExposure += Math.min(1, pointFlood);
+
+    // Shade & Stop Risk
+    let minStopDistance = Infinity;
+    for (const stop of coolstops) {
+      const dist = haversine(point, [stop.lat, stop.lng]);
+      if (dist < minStopDistance) {
+        minStopDistance = dist;
+      }
+      if (dist < COOLSTOP_SHADE_RADIUS) {
+        shadeCount++;
+      }
+    }
+    
+    // Add report penalty to stop distance if "Khó dừng đỗ" or "Đón trả không an toàn" is reported nearby
+    if (reports) {
+      for (const report of reports) {
+        if (haversine(point, [report.lat, report.lng]) < 300) {
+          if (report.type === 'Khó dừng đỗ' || report.type === 'Đón trả không an toàn') {
+            minStopDistance += 200; // Increase effective distance
+          }
+        }
+      }
+    }
+    totalStopDistances += minStopDistance;
+  }
+
+  let heatRatio = heatExposure / totalSamples;
+  let floodRatio = floodExposure / totalSamples;
+  const shadeRatio = Math.min(1, shadeCount / totalSamples); // capped at 1
+  
+  // Weather Boosters
+  if (weatherData) {
+    if (weatherData.feelsLike >= 38 || weatherData.climateMode === 'heat') {
+      heatRatio = Math.min(1, heatRatio * 1.2);
+    }
+    if (weatherData.rainVolume > 5 || weatherData.precipProbability > 60 || weatherData.climateMode === 'rain') {
+      floodRatio = Math.min(1, floodRatio * 1.2);
     }
   }
 
-  const heatRatio = heatExposure / totalSamples;
-  const floodRatio = floodExposure / totalSamples;
-  const shadeRatio = shadeCount / totalSamples;
+  // Calculate Sub-Scores (0-10 scale)
+  const heatScore = heatRatio * 10;
+  const floodScore = floodRatio * 10;
+  const shadeLackScore = (1 - shadeRatio) * 10;
+  
+  const avgStopDist = totalStopDistances / totalSamples;
+  // Stop risk logic: >500m -> high risk (10), <100m -> low risk (0)
+  const stopRiskScore = Math.min(10, Math.max(0, (avgStopDist - 100) / 40)); 
+
+  // Core Formula
+  const climate_penalty = 
+    (heatScore * WEIGHTS.heat) + 
+    (floodScore * WEIGHTS.flood) + 
+    (shadeLackScore * WEIGHTS.shade_lack) + 
+    (stopRiskScore * WEIGHTS.stop_risk);
+
+  const rawScore = (1 - climate_penalty / 10) * 100;
+  const score = Math.max(0, Math.min(100, Math.round(rawScore)));
 
   const idealDuration = (distanceKm / 25) * 60;
   const trafficDelay = Math.max(0, osrmDurationMin - idealDuration);
-
-  // Phạt nắng nóng không bóng râm: heat cao + shade thấp
-  const sunExposurePenalty =
-    heatRatio > 0.25 && shadeRatio < 0.15
-      ? (heatRatio - 0.25) * SUN_EXPOSURE_WEIGHT * 10
-      : 0;
-
-  const rawScore = 100
-    - (heatRatio * 100 * HEAT_WEIGHT / 10)
-    - (floodRatio * 100 * FLOOD_WEIGHT / 10)
-    - (trafficDelay * TRAFFIC_WEIGHT)
-    - sunExposurePenalty
-    + (shadeRatio * 100 * SHADE_WEIGHT / 10);
-
-  const score = Math.max(0, Math.min(100, Math.round(rawScore)));
 
   return {
     score,
@@ -166,6 +222,13 @@ export function calculateClimateScore(
     shadeRatio,
     trafficDelay,
   };
+}
+
+// ─── Route Decision Logic ──────────────────────────────────────────────────
+export const TIME_THRESHOLD_MINS = 5;
+
+export function shouldRecommendBalanced(fastest: { time: number, climateScore: number }, balanced: { time: number, climateScore: number }): boolean {
+  return balanced.time <= fastest.time + TIME_THRESHOLD_MINS && balanced.climateScore > fastest.climateScore;
 }
 
 function getHeatRisk(ratio: number): 'High' | 'Medium' | 'Low' | 'Very Low' {
@@ -186,18 +249,4 @@ function getTrafficLevel(delayMin: number): 'Heavy' | 'Moderate' | 'Light' | 'Cl
   if (delayMin > 3) return 'Moderate';
   if (delayMin > 1) return 'Light';
   return 'Clear';
-}
-
-export function rankRouteStrategy(
-  climateScore: number,
-  durationMin: number
-): { strategy: 'fastest' | 'balanced' | 'coolest'; label: string; color: string } {
-  const efficiency = climateScore / Math.max(durationMin, 1);
-  if (efficiency > 8) {
-    return { strategy: 'balanced', label: 'Tuyến Cân Bằng (Balanced Route)', color: '#22c55e' };
-  }
-  if (climateScore > 80) {
-    return { strategy: 'coolest', label: 'Tuyến Mát Nhất (Coolest Route)', color: '#3b82f6' };
-  }
-  return { strategy: 'fastest', label: 'Tuyến Nhanh Nhất (Fastest Route)', color: '#ef4444' };
 }

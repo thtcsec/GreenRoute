@@ -210,72 +210,13 @@ export default function Home() {
   // 1. Khi nhấn dẫn đường tới CoolStop
   const handleNavigateToCoolStop = async (stop: CoolStop) => {
     setActiveCoolStop(stop);
-    setActiveTab('map');
     setIsPanelOpen(false);
     
-    // Feature 2: OSRM Routing
     const origin = gpsLocation || driverLocation;
-    const dest: [number, number] = [stop.lat, stop.lng];
-    
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    abortControllerRef.current = new AbortController();
-    
-    try {
-      setOsrmError(null);
-      const res = await fetch(
-        `https://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${dest[1]},${dest[0]}?overview=full&geometries=geojson`,
-        { signal: abortControllerRef.current.signal }
-      );
-      if (!res.ok) throw new Error('OSRM network error');
-      const data = await res.json();
-      
-      if (data.routes && data.routes.length > 0) {
-        const route = data.routes[0];
-        const coords = route.geometry.coordinates.map((c: number[]) => [c[1], c[0]] as [number, number]);
-        setOsrmRoute(coords);
-        setOsrmInfo({
-          distance: +(route.distance / 1000).toFixed(1),
-          duration: +(route.duration / 60).toFixed(0)
-        });
-        updateFocusBounds(coords);
-
-        // Try to match this OSRM polyline to one of the predefined routes so the UI highlights it
-        try {
-          if (routes && routes.length > 0) {
-            const scores = routes.map(r => {
-              // for each OSRM point find nearest point in route r
-              const dists = coords.map((p: [number, number]) => {
-                const nearest = r.coordinates.reduce((min, q) => Math.min(min, haversineDist(p, q)), Infinity);
-                return nearest;
-              });
-              const avg = dists.reduce((s: number, v: number) => s + v, 0) / dists.length;
-              return { id: r.id, avg };
-            });
-            scores.sort((a, b) => a.avg - b.avg);
-            const best = scores[0];
-            // If average distance < 200m consider it a match
-            if (best && best.avg < 200) {
-              setSelectedRouteId(best.id);
-            }
-          }
-        } catch (matchErr) {
-          console.warn('Error matching OSRM to predefined routes', matchErr);
-        }
-        
-      } else {
-        throw new Error('No route found');
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error && err.name !== 'AbortError') {
-        setOsrmRoute(null);
-        setOsrmInfo(null);
-        setOsrmError('Không thể lấy chỉ đường thật, giữ nguyên bản đồ.');
-        centerMapOnLocation(dest);
-        setTimeout(() => setOsrmError(null), 3000);
-      }
-    }
+    await handleSearchRoutes(
+      { name: 'Vị trí hiện tại', lat: origin[0], lng: origin[1] },
+      { name: stop.name, lat: stop.lat, lng: stop.lng }
+    );
   };
 
   const handleSelectRoute = (routeId: string) => {
@@ -292,18 +233,22 @@ export default function Home() {
   };
 
   // 3. Khi chỉ đường tới điểm đón thay thế
-  const handleNavigateToPickup = (lat: number, lng: number, _name: string) => {
-    centerMapOnLocation([lat, lng]);
-    setActiveTab('map');
+  const handleNavigateToPickup = async (lat: number, lng: number, _name: string) => {
     setIsPanelOpen(false);
+    
+    const origin = gpsLocation || driverLocation;
+    await handleSearchRoutes(
+      { name: 'Vị trí hiện tại', lat: origin[0], lng: origin[1] },
+      { name: name || 'Điểm đón an toàn', lat, lng }
+    );
   };
 
   // 4. Khi người dùng báo cáo khí hậu mới
   const handleSubmitReport = async (type: ClimateReport['type'], note: string) => {
     // Tài xế báo cáo ngay tại tọa độ xung quanh vị trí của mình (lệch một tí để demo sinh động)
     const baseLoc = gpsLocation || driverLocation;
-    const offsetLat = (Math.random() - 0.5) * 0.003;
-    const offsetLng = (Math.random() - 0.5) * 0.003;
+    const offsetLat = (Math.random() - 0.5) * 0.0005;
+    const offsetLng = (Math.random() - 0.5) * 0.0005;
     
     const newReportPayload = {
       type,
@@ -346,6 +291,7 @@ export default function Home() {
   const handleMapSelectCoolStop = (stop: CoolStop) => {
     setActiveCoolStop(stop);
     setActiveTab('coolstop');
+    setIsPanelOpen(true);
   };
 
   // 5. Khi người dùng tìm kiếm tuyến đường (TripInputBar)
@@ -428,10 +374,12 @@ export default function Home() {
         </div>
 
         {/* Bản đồ */}
-        <div className={`w-full relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)] ${
-          activeTab === 'map' 
-            ? 'flex-1 min-h-0' 
-            : 'h-[32vh] min-h-[220px] shrink-0'
+        <div className={`w-full relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 ease-in-out ${
+          isPanelOpen && activeTab !== 'map'
+            ? 'h-[15vh] shrink-0'
+            : activeTab === 'map' 
+              ? isPanelOpen ? 'h-[50vh] shrink-0' : 'flex-1 min-h-0' 
+              : 'h-[32vh] min-h-[220px] shrink-0'
         }`}>
           <MapContainer
             driverLocation={driverLocation}
@@ -541,23 +489,21 @@ export default function Home() {
           {/* Old locate button removed to group with other map controls */}
         </div>
 
-        {/* Nút vuốt panel (tab Bản đồ) */}
-        {activeTab === 'map' && (
-          <button
-            type="button"
-            onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="w-full h-10 shrink-0 flex items-center justify-center bg-black/60 backdrop-blur-md border-b border-white/10 text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer z-40 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
-            title={isPanelOpen ? 'Thu gọn thông tin' : 'Mở rộng thông tin'}
-          >
-            {isPanelOpen ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
-          </button>
-        )}
+        {/* Nút vuốt panel */}
+        <button
+          type="button"
+          onClick={() => setIsPanelOpen(!isPanelOpen)}
+          className="w-full h-10 shrink-0 flex items-center justify-center bg-black/60 backdrop-blur-md border-b border-white/10 text-gray-400 hover:text-emerald-400 transition-colors cursor-pointer z-40 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
+          title={isPanelOpen ? 'Thu gọn thông tin' : 'Mở rộng thông tin'}
+        >
+          {isPanelOpen ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
+        </button>
 
         {/* Nội dung Tab */}
         <main className={`w-full overflow-y-auto z-20 custom-scrollbar transition-all duration-300 ease-in-out ${
           activeTab === 'map'
             ? isPanelOpen
-              ? 'h-[46vh] min-h-[280px] px-4 py-5 pb-4 opacity-100'
+              ? 'flex-1 min-h-0 px-4 py-5 pb-4 opacity-100'
               : 'h-0 p-0 overflow-hidden opacity-0'
             : 'flex-1 min-h-0 px-4 py-5 pb-4 opacity-100'
         }`}>
@@ -666,8 +612,22 @@ export default function Home() {
                           {coolstops.length > 0 ? `${coolstops[0].name} (${coolstops[0].distance}m)` : 'Đang tải...'}
                         </span>
                       </li>
+                      <li className="flex justify-between items-center bg-white/5 p-2 rounded-lg">
+                        <span>Thời gian di chuyển</span>
+                        <span className="text-white font-bold">{osrmInfo ? osrmInfo.duration + ' phút' : 'Chưa có'}</span>
+                      </li>
                     </ul>
                   </div>
+
+                  {pickupPoints && !isTripStarted && (
+                    <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
+                      <PickupSafety
+                        pickupPoints={pickupPoints}
+                        onNavigateToPoint={handleNavigateToPickup}
+                      />
+                    </div>
+                  )}
+                  
                   <CoolStopCard
                     coolstops={coolstops}
                     onNavigate={handleNavigateToCoolStop}
@@ -712,17 +672,6 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-
-                  {!isTripStarted && (
-                    <div>
-                      <h3 className="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-4 px-1">Điểm đón an toàn quanh đây</h3>
-                      <PickupSafety
-                        pickupPoints={pickupPoints}
-                        onNavigateToPoint={handleNavigateToPickup}
-                      />
-                    </div>
-                  )}
                 </div>
               )}
             </motion.div>

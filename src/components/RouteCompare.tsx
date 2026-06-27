@@ -82,11 +82,20 @@ export default function RouteCompare({ routes, selectedRouteId, onSelectRoute, o
                     <ShieldCheck className="w-3.5 h-3.5" /> Tối ưu nhất
                   </span>
                 )}
-                {!route.isRecommended && route.id === 'route-coolest' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-red-500/20 text-red-300 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)] shrink-0">
-                    Chậm (+9p)
-                  </span>
-                )}
+                {(() => {
+                  if (!route.isRecommended && route.id === 'route-coolest') {
+                    const fastestRoute = routes.find(r => r.id === 'route-fastest');
+                    const delta = fastestRoute ? route.time - fastestRoute.time : 0;
+                    if (delta > 0) {
+                      return (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-red-500/20 text-red-300 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)] shrink-0">
+                          Chậm (+{delta}p)
+                        </span>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
               </div>
 
               {/* Thông số chuyến đi */}

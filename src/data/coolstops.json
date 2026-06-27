@@ -1,56 +1,272 @@
 [
   {
     "id": "cs-1",
-    "name": "Trạm Dừng Chân Nhà Văn Hóa Sinh Viên",
-    "address": "Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung, TP. Thủ Đức",
-    "lat": 10.8755,
-    "lng": 106.8010,
-    "distance": 480,
-    "shadeScore": 9,
+    "name": "Điểm mát (Trạm 1)",
+    "lat": 10.872432213280266,
+    "lng": 106.78646895502052,
+    "distance": 812,
+    "shadeScore": 7,
     "rainCover": true,
     "curbSafety": "High",
     "accessibility": "High",
-    "description": "Khu sảnh sinh hoạt mát mẻ có máy lạnh bên trong và trạm chờ xe buýt lớn có mái che rộng bên ngoài.",
-    "amenities": ["Máy lọc nước miễn phí", "Wifi miễn phí", "Nhà vệ sinh sạch sẽ", "Chỗ sạc điện thoại"],
-    "operatingHours": "06:00-22:00",
-    "type": "Cooling Station",
-    "capacity": 25,
-    "status": "Available"
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Máy lạnh",
+      "Nước uống",
+      "Wifi"
+    ],
+    "operatingHours": "06:00-22:00"
   },
   {
     "id": "cs-2",
-    "name": "Nhà chờ xe buýt Đại Học Quốc Tế (HCMIU)",
-    "address": "Khu phố 6, Phường Linh Trung, TP. Thủ Đức (trước cổng chính HCMIU)",
-    "lat": 10.8783,
-    "lng": 106.8063,
-    "distance": 220,
+    "name": "Điểm mát (Trạm 2)",
+    "lat": 10.87053741724349,
+    "lng": 106.78640150795526,
+    "distance": 861,
+    "shadeScore": 9,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Ghế ngồi",
+      "Nước uống",
+      "Wifi"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-3",
+    "name": "Điểm mát (Trạm 3)",
+    "lat": 10.86556439293133,
+    "lng": 106.78621064361046,
+    "distance": 636,
+    "shadeScore": 7,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Nước uống",
+      "Ghế ngồi",
+      "Máy lạnh"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-4",
+    "name": "Điểm mát (Trạm 4)",
+    "lat": 10.873483075882115,
+    "lng": 106.79537258981635,
+    "distance": 683,
+    "shadeScore": 8,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Máy lạnh",
+      "Nước uống",
+      "Ghế ngồi"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-5",
+    "name": "Điểm mát (Trạm 5)",
+    "lat": 10.868043070432048,
+    "lng": 106.78854574357926,
+    "distance": 832,
+    "shadeScore": 7,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Wifi",
+      "Ghế ngồi",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-6",
+    "name": "Điểm mát (Trạm 6)",
+    "lat": 10.8747307815458,
+    "lng": 106.78552391166559,
+    "distance": 518,
     "shadeScore": 8,
     "rainCover": true,
     "curbSafety": "High",
     "accessibility": "High",
-    "description": "Nhà chờ xe buýt hiện đại trước cổng trường HCMIU, bao quanh bởi nhiều cây xanh cổ thụ bóng mát lớn.",
-    "amenities": ["Ghế ngồi", "Mái che mưa lớn", "Thùng rác công cộng"],
-    "operatingHours": "24/7",
-    "type": "Shaded Rest Area",
-    "capacity": 15,
-    "status": "Available"
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Nước uống",
+      "Máy lạnh",
+      "Wifi"
+    ],
+    "operatingHours": "06:00-22:00"
   },
   {
-    "id": "cs-3",
-    "name": "Cà phê Đối Tác Shipper - Làng Đại Học",
-    "address": "Đường Hàn Thuyên, Khu Làng Đại học, Phường Linh Trung, TP. Thủ Đức",
-    "lat": 10.8742,
-    "lng": 106.8028,
-    "distance": 620,
+    "id": "cs-7",
+    "name": "Điểm mát (Trạm 7)",
+    "lat": 10.876055728985916,
+    "lng": 106.78566176701091,
+    "distance": 662,
+    "shadeScore": 9,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Wifi",
+      "Ghế ngồi",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-8",
+    "name": "Điểm mát (Trạm 8)",
+    "lat": 10.867850184448326,
+    "lng": 106.7926244237896,
+    "distance": 564,
+    "shadeScore": 9,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Máy lạnh",
+      "Wifi",
+      "Ghế ngồi"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-9",
+    "name": "Điểm mát (Trạm 9)",
+    "lat": 10.869804404416941,
+    "lng": 106.79475670227885,
+    "distance": 199,
+    "shadeScore": 7,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Máy lạnh",
+      "Ghế ngồi",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-10",
+    "name": "Điểm mát (Trạm 10)",
+    "lat": 10.873520057797132,
+    "lng": 106.78953765233679,
+    "distance": 532,
+    "shadeScore": 7,
+    "rainCover": true,
+    "curbSafety": "Medium",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Wifi",
+      "Ghế ngồi",
+      "Máy lạnh"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-11",
+    "name": "Điểm mát (Trạm 11)",
+    "lat": 10.877268145074279,
+    "lng": 106.78950698160833,
+    "distance": 300,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Nước uống",
+      "Máy lạnh",
+      "Wifi"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-12",
+    "name": "Điểm mát (Trạm 12)",
+    "lat": 10.869990108806308,
+    "lng": 106.78662499690117,
+    "distance": 891,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Ghế ngồi",
+      "Nước uống",
+      "Wifi"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-13",
+    "name": "Điểm mát (Trạm 13)",
+    "lat": 10.869827022265099,
+    "lng": 106.79333837465347,
+    "distance": 608,
     "shadeScore": 10,
     "rainCover": true,
     "curbSafety": "Medium",
-    "accessibility": "Medium",
-    "description": "Quán cà phê liên kết với GreenRoute hỗ trợ tài xế nghỉ mát có máy lạnh và giảm giá nước uống.",
-    "amenities": ["Điều hòa", "Nước uống miễn phí", "Chỗ đậu xe rộng", "Ổ cắm sạc"],
-    "operatingHours": "07:00-23:00",
-    "type": "Air-conditioned Shelter",
-    "capacity": 30,
-    "status": "Crowded"
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Máy lạnh",
+      "Nước uống",
+      "Ghế ngồi"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-14",
+    "name": "Điểm mát (Trạm 14)",
+    "lat": 10.865965788072693,
+    "lng": 106.79183208459132,
+    "distance": 847,
+    "shadeScore": 10,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Ghế ngồi",
+      "Wifi",
+      "Nước uống"
+    ],
+    "operatingHours": "06:00-22:00"
+  },
+  {
+    "id": "cs-15",
+    "name": "Điểm mát (Trạm 15)",
+    "lat": 10.871986463156796,
+    "lng": 106.78911980847117,
+    "distance": 831,
+    "shadeScore": 9,
+    "rainCover": true,
+    "curbSafety": "High",
+    "accessibility": "High",
+    "description": "Trạm nghỉ chân thân thiện, có mái che và bóng râm.",
+    "amenities": [
+      "Wifi",
+      "Máy lạnh",
+      "Ghế ngồi"
+    ],
+    "operatingHours": "06:00-22:00"
   }
 ]

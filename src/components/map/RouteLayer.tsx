@@ -1,7 +1,8 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Polyline, LayerGroup } from 'react-leaflet';
+import { Polyline, LayerGroup, Marker } from 'react-leaflet';
+import L from 'leaflet';
 import { Route } from '@/types';
 
 interface RouteLayerProps {
@@ -13,6 +14,17 @@ interface RouteLayerProps {
 
 function RouteLayerComponent({ routes, selectedRouteId, osrmRoute, onSelectRoute }: RouteLayerProps) {
   const isValidPolyline = (coords: [number, number][]) => coords.length >= 8;
+
+  const destIcon = L.divIcon({
+    html: `
+      <div class="flex items-center justify-center w-5 h-5 rounded-full bg-red-600 border-2 border-white shadow-md">
+        <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+      </div>
+    `,
+    className: 'custom-dest-marker',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
 
   // Nếu đang có tuyến đường OSRM thực tế, chỉ hiển thị tuyến OSRM
   if (osrmRoute && isValidPolyline(osrmRoute)) {
@@ -40,12 +52,16 @@ function RouteLayerComponent({ routes, selectedRouteId, osrmRoute, onSelectRoute
             lineJoin: 'round'
           }}
         />
+        <Marker position={osrmRoute[osrmRoute.length - 1]} icon={destIcon} />
       </LayerGroup>
     );
   }
 
   const unselectedRoutes = routes.filter((r) => r.id !== selectedRouteId && isValidPolyline(r.coordinates));
   const selectedRoute = routes.find((r) => r.id === selectedRouteId && isValidPolyline(r.coordinates));
+  const destCoords = routes.length > 0 && isValidPolyline(routes[0].coordinates) 
+    ? routes[0].coordinates[routes[0].coordinates.length - 1] 
+    : null;
 
   return (
     <LayerGroup>
@@ -80,6 +96,9 @@ function RouteLayerComponent({ routes, selectedRouteId, osrmRoute, onSelectRoute
           eventHandlers={{ click: () => onSelectRoute(selectedRoute.id) }}
         />
       )}
+
+      {/* 3. Render destination marker */}
+      {destCoords && <Marker position={destCoords} icon={destIcon} />}
     </LayerGroup>
   );
 }
