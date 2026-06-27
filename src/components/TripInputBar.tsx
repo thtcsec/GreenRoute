@@ -223,32 +223,35 @@ export default function TripInputBar({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div ref={containerRef} className="w-full">
-      <div className="relative rounded-2xl border border-gray-800 bg-gray-900/90 backdrop-blur-xl shadow-2xl transition-all duration-300">
+    <div ref={containerRef} className="w-full relative z-40">
+      <div className="relative rounded-[1.25rem] border border-white/10 bg-black/40 backdrop-blur-xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] transition-all duration-500 overflow-hidden">
+        {/* Top subtle glow */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+        
         {isCollapsed ? (
           <div 
-            className="flex items-center justify-between p-3.5 cursor-pointer hover:bg-gray-800/50 rounded-2xl transition-colors"
+            className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 transition-colors"
             onClick={() => setIsCollapsed(false)}
           >
-            <div className="flex items-center gap-2.5 text-sm">
-              <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
-              <span className="text-gray-200 font-medium truncate max-w-[100px]">{originText || 'Vị trí hiện tại'}</span>
-              <span className="text-gray-600 font-bold">→</span>
-              <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.4)]" />
-              <span className="text-gray-400 truncate max-w-[120px]">{destText || 'Bạn muốn đi đâu?'}</span>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+              <span className="text-white font-extrabold truncate max-w-[100px] drop-shadow-md">{originText || 'Vị trí hiện tại'}</span>
+              <span className="text-gray-500 font-bold">→</span>
+              <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]" />
+              <span className="text-gray-400 font-medium truncate max-w-[120px]">{destText || 'Bạn muốn đi đâu?'}</span>
             </div>
-            <button className="text-gray-500 hover:text-emerald-400">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            <button className="text-gray-400 hover:text-emerald-400 bg-white/5 p-1.5 rounded-full transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
           </div>
         ) : (
-          <div className="p-3">
+          <div className="p-3.5">
             {/* Input Fields Container */}
-            <div className="relative flex flex-col gap-0">
+            <div className="relative flex flex-col gap-2">
               {/* Origin Input */}
               <div className="relative">
-                <div className="relative flex items-center gap-2.5 rounded-xl border border-gray-800 bg-gray-950 px-3 py-2.5 transition-all duration-200 focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/20">
-                  <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
+                <div className="relative flex items-center gap-3 rounded-2xl border border-white/5 bg-black/50 px-4 py-3 transition-all duration-300 focus-within:border-emerald-500/50 focus-within:bg-emerald-950/10 focus-within:shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                  <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                   <input
                     ref={originInputRef}
                     type="text"
@@ -257,24 +260,24 @@ export default function TripInputBar({
                     onFocus={handleOriginFocus}
                     onBlur={handleOriginBlur}
                     placeholder="Điểm đón"
-                    className="flex-1 min-w-0 bg-transparent text-sm text-gray-200 placeholder-gray-500 outline-none"
+                    className="flex-1 min-w-0 bg-transparent text-sm font-bold text-white placeholder-gray-500 outline-none"
                   />
                   <button
                     type="button"
                     onClick={handleResetOrigin}
-                    className="flex-shrink-0 p-1 rounded-lg text-gray-500 hover:text-emerald-400 hover:bg-gray-800 transition-colors duration-150"
+                    className="flex-shrink-0 p-1.5 rounded-xl text-gray-500 hover:text-emerald-400 hover:bg-white/10 transition-all duration-200"
                     title="Dùng vị trí hiện tại"
                   >
-                    <Crosshair size={16} />
+                    <Crosshair size={18} />
                   </button>
                 </div>
 
                 {/* Origin Dropdown */}
                 {activeField === 'origin' && suggestions.length > 0 && (
-                  <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-gray-800 bg-gray-900 shadow-2xl max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="absolute z-[100] left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-[0_15px_50px_rgba(0,0,0,0.5)] max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
                     {isSearching && (
-                      <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500">
-                        <Loader2 size={12} className="animate-spin" />
+                      <div className="flex items-center gap-2 px-4 py-3 text-xs text-gray-400 font-medium">
+                        <Loader2 size={14} className="animate-spin text-emerald-400" />
                         Đang tìm kiếm...
                       </div>
                     )}
@@ -284,14 +287,14 @@ export default function TripInputBar({
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handleSelectSuggestion(loc)}
-                        className="w-full flex items-start gap-2.5 px-3 py-2.5 text-left hover:bg-gray-800/60 transition-colors duration-100 first:rounded-t-xl last:rounded-b-xl"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/10 transition-colors duration-150 border-b border-white/5 last:border-0"
                       >
                         <MapPin
                           size={16}
-                          className="flex-shrink-0 mt-0.5 text-gray-500"
+                          className="flex-shrink-0 text-emerald-500"
                         />
                         <div className="min-w-0">
-                          <p className="text-sm text-gray-200 truncate">
+                          <p className="text-sm font-bold text-gray-200 truncate group-hover:text-white">
                             {loc.name}
                           </p>
                         </div>
@@ -301,22 +304,23 @@ export default function TripInputBar({
                 )}
               </div>
 
-              {/* Swap Button */}
-              <div className="relative flex items-center justify-center h-0 z-10">
+              {/* Swap Button - Positioned absolutely between inputs */}
+              <div className="absolute top-1/2 left-[20px] -translate-y-1/2 z-10 w-0.5 h-6 bg-gray-800"></div>
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20">
                 <button
                   type="button"
                   onClick={handleSwap}
-                  className="absolute flex items-center justify-center w-8 h-8 rounded-full border border-gray-700 bg-gray-800 text-gray-400 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-gray-750 transition-all duration-200 shadow-lg"
+                  className="flex items-center justify-center w-8 h-8 rounded-full border border-white/10 bg-black/60 backdrop-blur-md text-gray-400 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-black/80 hover:scale-110 active:scale-90 transition-all duration-300 shadow-xl"
                   title="Hoán đổi điểm đón và điểm đến"
                 >
-                  <ArrowUpDown size={14} />
+                  <ArrowUpDown size={14} strokeWidth={2.5} />
                 </button>
               </div>
 
               {/* Destination Input */}
-              <div className="relative mt-2">
-                <div className="relative flex items-center gap-2.5 rounded-xl border border-gray-800 bg-gray-950 px-3 py-2.5 transition-all duration-200 focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/20">
-                  <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.4)]" />
+              <div className="relative">
+                <div className="relative flex items-center gap-3 rounded-2xl border border-white/5 bg-black/50 px-4 py-3 transition-all duration-300 focus-within:border-red-500/50 focus-within:bg-red-950/10 focus-within:shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                  <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]" />
                   <input
                     ref={destInputRef}
                     type="text"
@@ -324,19 +328,19 @@ export default function TripInputBar({
                     onChange={(e) => handleInputChange(e.target.value, 'dest')}
                     onFocus={handleDestFocus}
                     placeholder="Nhập điểm đến..."
-                    className="flex-1 min-w-0 bg-transparent text-sm text-gray-200 placeholder-gray-500 outline-none"
+                    className="flex-1 min-w-0 bg-transparent text-sm font-bold text-white placeholder-gray-500 outline-none pr-10"
                   />
                   {isSearching && activeField === 'dest' && (
-                    <Loader2 size={14} className="animate-spin text-gray-500" />
+                    <Loader2 size={16} className="animate-spin text-red-400 absolute right-4" />
                   )}
                 </div>
 
                 {/* Destination Dropdown */}
                 {activeField === 'dest' && suggestions.length > 0 && (
-                  <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-gray-800 bg-gray-900 shadow-2xl max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="absolute z-[100] left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-[0_15px_50px_rgba(0,0,0,0.5)] max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
                     {isSearching && (
-                      <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500">
-                        <Loader2 size={12} className="animate-spin" />
+                      <div className="flex items-center gap-2 px-4 py-3 text-xs text-gray-400 font-medium">
+                        <Loader2 size={14} className="animate-spin text-red-400" />
                         Đang tìm kiếm...
                       </div>
                     )}
@@ -346,14 +350,14 @@ export default function TripInputBar({
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handleSelectSuggestion(loc)}
-                        className="w-full flex items-start gap-2.5 px-3 py-2.5 text-left hover:bg-gray-800/60 transition-colors duration-100 first:rounded-t-xl last:rounded-b-xl"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/10 transition-colors duration-150 border-b border-white/5 last:border-0"
                       >
                         <MapPin
                           size={16}
-                          className="flex-shrink-0 mt-0.5 text-gray-500"
+                          className="flex-shrink-0 text-red-500"
                         />
                         <div className="min-w-0">
-                          <p className="text-sm text-gray-200 truncate">
+                          <p className="text-sm font-bold text-gray-200 truncate">
                             {loc.name}
                           </p>
                         </div>
@@ -372,23 +376,23 @@ export default function TripInputBar({
                 setIsCollapsed(true);
               }}
               disabled={isSearchDisabled}
-              className={`mt-3 w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+              className={`mt-4 w-full flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-sm font-extrabold transition-all duration-300 ${
                 isSearchDisabled
-                  ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                  : 'bg-emerald-500 text-white hover:bg-emerald-400 active:bg-emerald-600 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-400/30'
+                  ? 'bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-400 hover:to-teal-500 active:scale-[0.98] shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'
               }`}
             >
-              <Search size={16} />
+              <Search size={18} strokeWidth={2.5} />
               Tìm chuyến đi
             </button>
             
             {/* Collapse button */}
             <button
               onClick={() => setIsCollapsed(true)}
-              className="absolute -bottom-3.5 left-1/2 transform -translate-x-1/2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 hover:text-emerald-400 rounded-full p-1 shadow-lg transition-colors z-10"
+              className="absolute -bottom-3.5 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-md border border-white/10 text-gray-400 hover:text-emerald-400 rounded-full p-1.5 shadow-xl transition-all hover:scale-110 z-10 hover:bg-white/10"
               title="Thu gọn"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
             </button>
           </div>
         )}

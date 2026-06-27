@@ -22,6 +22,9 @@ export interface CoolStop {
   description: string;
   amenities: string[];
   operatingHours?: string; // e.g. "24/7" or "06:00-22:00"
+  type?: 'Cooling Station' | 'Shaded Rest Area' | 'Air-conditioned Shelter';
+  capacity?: number;
+  status?: 'Available' | 'Crowded' | 'Full';
 }
 
 export interface HeatZone {

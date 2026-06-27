@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { ClimateReport } from '@/types';
 
 // In-memory store (chỉ dùng cho hackathon/MVP)
-let reports: ClimateReport[] = [];
+const reports: ClimateReport[] = [];
 
 export async function GET() {
   // Trả về danh sách report mới nhất trước (sort by timestamp descending)

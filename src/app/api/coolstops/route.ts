@@ -3,14 +3,14 @@ import coolstopsData from '@/data/coolstops.json';
 import { CoolStop } from '@/types';
 
 // In-memory store (chỉ dùng cho hackathon/MVP)
-let coolstops = [...coolstopsData] as CoolStop[];
+const coolstops = [...coolstopsData] as CoolStop[];
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const latStr = searchParams.get('lat');
   const lngStr = searchParams.get('lng');
 
-  let result = [...coolstops];
+  const result = [...coolstops];
 
   // Nếu có tọa độ, có thể tính khoảng cách (nếu cần filter)
   if (latStr && lngStr) {

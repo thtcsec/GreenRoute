@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Thermometer, Droplets, X } from 'lucide-react';
+import { Thermometer, Droplets, X, AlertTriangle } from 'lucide-react';
 import { HeatZone, FloodRisk } from '@/types';
 
 interface ClimateAlertBannerProps {
@@ -159,19 +159,22 @@ export default function ClimateAlertBanner({
     <div className="px-4 pt-0 animate-in slide-in-from-top duration-300 fill-mode-both">
       <div
         className={`
-          relative rounded-xl border p-3
-          transition-colors duration-300
+          relative overflow-hidden rounded-2xl border p-4
+          backdrop-blur-xl transition-all duration-300
           ${
             isHeat
-              ? 'bg-red-950/50 border-red-900/50'
-              : 'bg-blue-950/50 border-blue-900/50'
+              ? 'bg-red-950/30 border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.15)]'
+              : 'bg-blue-950/30 border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.15)]'
           }
         `}
       >
+        {/* Glowing top bar */}
+        <div className={`absolute top-0 left-0 right-0 h-0.5 ${isHeat ? 'bg-gradient-to-r from-transparent via-red-500 to-transparent' : 'bg-gradient-to-r from-transparent via-blue-500 to-transparent'}`}></div>
+
         {/* ── Main row ─────────────────────────────────────────────── */}
         <div className="flex items-start gap-3">
-          {/* Icon */}
-          <div className="mt-0.5 shrink-0">
+          {/* Icon badge */}
+          <div className={`mt-0.5 shrink-0 p-2 rounded-xl ${isHeat ? 'bg-red-500/20 border border-red-500/30' : 'bg-blue-500/20 border border-blue-500/30'}`}>
             {isHeat ? (
               <Thermometer className="h-5 w-5 text-red-400 animate-pulse" />
             ) : (
@@ -181,29 +184,31 @@ export default function ClimateAlertBanner({
 
           {/* Text content */}
           <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <AlertTriangle className={`w-3.5 h-3.5 shrink-0 ${isHeat ? 'text-red-400' : 'text-blue-400'}`} />
+              <p
+                className={`text-xs font-extrabold leading-tight uppercase tracking-wide ${
+                  isHeat ? 'text-red-300' : 'text-blue-300'
+                }`}
+              >
+                {alert.riskLevel} Risk · {isHeat ? 'Nhiệt' : 'Ngập'}: {alert.detail}
+              </p>
+            </div>
             <p
-              className={`text-sm font-bold leading-tight ${
-                isHeat ? 'text-red-200' : 'text-blue-200'
+              className={`text-sm font-bold leading-snug ${
+                isHeat ? 'text-red-100' : 'text-blue-100'
               }`}
             >
               {alert.name}
             </p>
-            <p
-              className={`text-xs mt-0.5 ${
-                isHeat ? 'text-red-300' : 'text-blue-300'
-              }`}
-            >
-              Mức độ: {alert.riskLevel} · {isHeat ? 'Chỉ số nhiệt' : 'Ngập sâu'}:{' '}
-              {alert.detail}
-            </p>
 
             {/* CTA buttons */}
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-2 mt-2.5">
               {isHeat ? (
                 <button
                   type="button"
                   onClick={onGoToCoolStop}
-                  className="inline-flex items-center gap-1 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 px-3 py-1.5 text-xs font-extrabold text-emerald-300 transition-all hover:shadow-[0_0_10px_rgba(16,185,129,0.3)] active:scale-95"
                 >
                   ❄️ Xem CoolStop gần nhất
                 </button>
@@ -211,7 +216,7 @@ export default function ClimateAlertBanner({
                 <button
                   type="button"
                   onClick={onGoToRoutes}
-                  className="inline-flex items-center gap-1 rounded-lg bg-cyan-600/80 hover:bg-cyan-600 px-2.5 py-1 text-xs font-semibold text-white transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 px-3 py-1.5 text-xs font-extrabold text-cyan-300 transition-all hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] active:scale-95"
                 >
                   🛣️ Đổi tuyến tránh ngập
                 </button>
@@ -220,27 +225,27 @@ export default function ClimateAlertBanner({
           </div>
 
           {/* Dismiss + counter */}
-          <div className="flex flex-col items-end gap-1 shrink-0">
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
             <button
               type="button"
               aria-label="Đóng cảnh báo"
               onClick={() => handleDismiss(alert.id)}
-              className={`rounded-md p-0.5 transition-colors ${
+              className={`rounded-xl p-1.5 border transition-all active:scale-90 ${
                 isHeat
-                  ? 'text-red-400 hover:bg-red-900/50'
-                  : 'text-blue-400 hover:bg-blue-900/50'
+                  ? 'text-red-400 hover:bg-red-500/20 border-red-500/20 hover:border-red-500/40'
+                  : 'text-blue-400 hover:bg-blue-500/20 border-blue-500/20 hover:border-blue-500/40'
               }`}
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
 
             {total > 1 && (
               <span
-                className={`text-[10px] font-medium ${
-                  isHeat ? 'text-red-400' : 'text-blue-400'
+                className={`text-[9px] font-extrabold uppercase tracking-wider ${
+                  isHeat ? 'text-red-500' : 'text-blue-500'
                 }`}
               >
-                {currentIndex + 1}/{total} cảnh báo
+                {currentIndex + 1}/{total}
               </span>
             )}
           </div>
@@ -248,21 +253,22 @@ export default function ClimateAlertBanner({
 
         {/* ── Carousel dots ────────────────────────────────────────── */}
         {total > 1 && (
-          <div className="flex justify-center gap-1.5 mt-2">
+          <div className="flex justify-center gap-1.5 mt-3">
             {activeAlerts.map((a, i) => (
-              <span
+              <button
                 key={a.id}
+                onClick={() => setCurrentIndex(i)}
                 className={`
-                  inline-block h-1 rounded-full transition-all duration-300
-                  ${i === currentIndex ? 'w-4' : 'w-1'}
+                  inline-block h-1.5 rounded-full transition-all duration-300
+                  ${i === currentIndex ? 'w-6' : 'w-1.5'}
                   ${
                     isHeat
                       ? i === currentIndex
-                        ? 'bg-red-400'
-                        : 'bg-red-700'
+                        ? 'bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.8)]'
+                        : 'bg-red-800/60'
                       : i === currentIndex
-                        ? 'bg-blue-400'
-                        : 'bg-blue-700'
+                        ? 'bg-blue-400 shadow-[0_0_6px_rgba(96,165,250,0.8)]'
+                        : 'bg-blue-800/60'
                   }
                 `}
               />

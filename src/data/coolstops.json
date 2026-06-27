@@ -11,7 +11,10 @@
     "accessibility": "High",
     "description": "Khu sảnh sinh hoạt mát mẻ có máy lạnh bên trong và trạm chờ xe buýt lớn có mái che rộng bên ngoài.",
     "amenities": ["Máy lọc nước miễn phí", "Wifi miễn phí", "Nhà vệ sinh sạch sẽ", "Chỗ sạc điện thoại"],
-    "operatingHours": "06:00-22:00"
+    "operatingHours": "06:00-22:00",
+    "type": "Cooling Station",
+    "capacity": 25,
+    "status": "Available"
   },
   {
     "id": "cs-2",
@@ -25,7 +28,10 @@
     "accessibility": "High",
     "description": "Nhà chờ xe buýt hiện đại trước cổng trường HCMIU, bao quanh bởi nhiều cây xanh cổ thụ bóng mát lớn.",
     "amenities": ["Ghế ngồi", "Mái che mưa lớn", "Thùng rác công cộng"],
-    "operatingHours": "24/7"
+    "operatingHours": "24/7",
+    "type": "Shaded Rest Area",
+    "capacity": 15,
+    "status": "Available"
   },
   {
     "id": "cs-3",
@@ -39,6 +45,9 @@
     "accessibility": "Medium",
     "description": "Quán cà phê liên kết với GreenRoute hỗ trợ tài xế nghỉ mát có máy lạnh và giảm giá nước uống.",
     "amenities": ["Điều hòa", "Nước uống miễn phí", "Chỗ đậu xe rộng", "Ổ cắm sạc"],
-    "operatingHours": "07:00-23:00"
+    "operatingHours": "07:00-23:00",
+    "type": "Air-conditioned Shelter",
+    "capacity": 30,
+    "status": "Crowded"
   }
 ]
