@@ -36,9 +36,12 @@ export default function PickupSafety({ pickupPoints, onNavigateToPoint }: Pickup
               <ShieldAlert className="w-4 h-4 shrink-0 text-red-400 animate-pulse" />
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-red-500">Điểm mặc định — Rủi ro cao</span>
             </div>
-            <h4 className="text-sm font-extrabold text-white mb-1.5">
+            <h4 className="text-sm font-extrabold text-white mb-1">
               {pickupPoints.defaultPoint.name}
             </h4>
+            {pickupPoints.defaultPoint.address && (
+              <p className="text-[10px] text-gray-500 mb-1.5 leading-relaxed">{pickupPoints.defaultPoint.address}</p>
+            )}
             <p className="text-xs text-red-300/80 bg-red-950/30 p-2.5 rounded-xl border border-red-500/15 leading-relaxed">
               {pickupPoints.defaultPoint.reason}
             </p>
@@ -64,9 +67,12 @@ export default function PickupSafety({ pickupPoints, onNavigateToPoint }: Pickup
               <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">Đề xuất thay thế — An toàn</span>
             </div>
-            <h4 className="text-sm font-extrabold text-white mb-1.5">
+            <h4 className="text-sm font-extrabold text-white mb-1">
               {pickupPoints.suggestedPoint.name}
             </h4>
+            {pickupPoints.suggestedPoint.address && (
+              <p className="text-[10px] text-gray-500 mb-1.5 leading-relaxed">{pickupPoints.suggestedPoint.address}</p>
+            )}
             <p className="text-xs text-emerald-300/80 bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-500/15 leading-relaxed mb-4">
               {pickupPoints.suggestedPoint.reason}
             </p>

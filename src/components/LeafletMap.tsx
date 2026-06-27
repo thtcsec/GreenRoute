@@ -29,15 +29,25 @@ const setupDefaultIcon = () => {
 setupDefaultIcon();
 
 // Component phụ để cập nhật góc nhìn bản đồ động mượt mà
-function ChangeView({ center, zoom, bounds }: { center: [number, number]; zoom: number; bounds?: L.LatLngBoundsExpression }) {
+function ChangeView({
+  center,
+  zoom,
+  bounds,
+  focusKey,
+}: {
+  center: [number, number];
+  zoom: number;
+  bounds?: L.LatLngBoundsExpression;
+  focusKey: number;
+}) {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
       map.fitBounds(bounds, { padding: [40, 40], animate: true, duration: 1 });
-    } else {
-      map.setView(center, zoom, { animate: true, duration: 1 });
+      return;
     }
-  }, [center, zoom, bounds, map]);
+    map.flyTo(center, zoom, { duration: 1.2 });
+  }, [center, zoom, bounds, focusKey, map]);
   return null;
 }
 
@@ -52,6 +62,7 @@ interface LeafletMapProps {
   userReports: ClimateReport[];
   focusLocation: [number, number] | null;
   focusBounds: L.LatLngBoundsExpression | null;
+  mapFocusKey: number;
   onSelectCoolStop: (stop: CoolStop) => void;
   onSelectRoute: (routeId: string) => void;
   gpsLocation: [number, number] | null;
@@ -70,6 +81,7 @@ function LeafletMapComponent({
   userReports,
   focusLocation,
   focusBounds,
+  mapFocusKey,
   onSelectCoolStop,
   onSelectRoute,
   gpsLocation,
@@ -109,7 +121,12 @@ function LeafletMapComponent({
         />
 
         {/* Cập nhật view động */}
-        <ChangeView center={centerLatLong} zoom={focusLocation ? 16 : 15} bounds={focusBounds || undefined} />
+        <ChangeView
+          center={centerLatLong}
+          zoom={focusLocation ? 16 : 15}
+          bounds={focusBounds || undefined}
+          focusKey={mapFocusKey}
+        />
 
         {/* 1. Marker vị trí người dùng */}
         <UserMarkerLayer driverLocation={driverLocation} gpsLocation={gpsLocation} />

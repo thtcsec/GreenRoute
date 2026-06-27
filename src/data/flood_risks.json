@@ -2,6 +2,7 @@
   {
     "id": "fr-1",
     "name": "Đường song hành ngập sâu (gần Đại học TDTT)",
+    "address": "Đường song hành Xa lộ Hà Nội, gần Trung tâm TDTT ĐHQG, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8720,
     "lng": 106.7960,
     "radius": 120,
@@ -12,6 +13,7 @@
   {
     "id": "fr-2",
     "name": "Đoạn dốc thoát nước chậm - KTX Khu B (Cổng sau)",
+    "address": "Ký túc xá Khu B, Đại học Quốc gia TP.HCM, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8820,
     "lng": 106.8090,
     "radius": 90,

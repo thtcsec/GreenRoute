@@ -6,12 +6,12 @@ import { Location } from '@/types';
 
 // Các địa điểm mẫu được hiển thị ngay lập tức khi người dùng focus vào ô tìm kiếm
 const PRESET_LOCATIONS: Location[] = [
-  { name: 'ĐH Quốc tế HCMIU - Cổng chính', lat: 10.8783, lng: 106.8063 },
-  { name: 'Ký túc xá Khu B - ĐHQG', lat: 10.882, lng: 106.809 },
-  { name: 'Nhà Văn Hóa Sinh Viên ĐHQG', lat: 10.8755, lng: 106.801 },
-  { name: 'Bệnh viện ĐHQG HCM', lat: 10.87, lng: 106.803 },
-  { name: 'Trung tâm TDTT ĐHQG', lat: 10.874, lng: 106.7975 },
-  { name: 'Làng Đại Học Thủ Đức', lat: 10.8742, lng: 106.8028 },
+  { name: 'ĐH Quốc tế HCMIU - Cổng chính', address: 'Khu phố 6, Phường Linh Trung, TP. Thủ Đức', lat: 10.8783, lng: 106.8063 },
+  { name: 'Ký túc xá Khu B - ĐHQG', address: 'Ký túc xá Khu B, Đại học Quốc gia TP.HCM, Phường Linh Trung', lat: 10.882, lng: 106.809 },
+  { name: 'Nhà Văn Hóa Sinh Viên ĐHQG', address: 'Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung', lat: 10.8755, lng: 106.801 },
+  { name: 'Bệnh viện ĐHQG HCM', address: 'Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung', lat: 10.87, lng: 106.803 },
+  { name: 'Trung tâm TDTT ĐHQG', address: 'Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung', lat: 10.874, lng: 106.7975 },
+  { name: 'Làng Đại Học Thủ Đức', address: 'Đường Hàn Thuyên, Phường Linh Trung, TP. Thủ Đức', lat: 10.8742, lng: 106.8028 },
 ];
 
 interface TripInputBarProps {
@@ -94,11 +94,15 @@ export default function TripInputBar({
       const data = await res.json();
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const results: Location[] = data.map((item: any) => ({
-        name: item.display_name.split(',').slice(0, 3).join(', ').trim(),
-        lat: parseFloat(item.lat),
-        lng: parseFloat(item.lon),
-      }));
+      const results: Location[] = data.map((item: any) => {
+        const parts = item.display_name.split(',').map((s: string) => s.trim());
+        return {
+          name: parts.slice(0, 2).join(', '),
+          address: item.display_name,
+          lat: parseFloat(item.lat),
+          lng: parseFloat(item.lon),
+        };
+      });
 
       // Kết hợp kết quả Nominatim với preset gợi ý phù hợp
       const presetMatches = PRESET_LOCATIONS.filter(loc =>
@@ -297,6 +301,9 @@ export default function TripInputBar({
                           <p className="text-sm font-bold text-gray-200 truncate group-hover:text-white">
                             {loc.name}
                           </p>
+                          {loc.address && (
+                            <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-2 leading-snug">{loc.address}</p>
+                          )}
                         </div>
                       </button>
                     ))}
@@ -360,6 +367,9 @@ export default function TripInputBar({
                           <p className="text-sm font-bold text-gray-200 truncate">
                             {loc.name}
                           </p>
+                          {loc.address && (
+                            <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-2 leading-snug">{loc.address}</p>
+                          )}
                         </div>
                       </button>
                     ))}

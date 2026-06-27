@@ -41,6 +41,9 @@ export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, acti
                 <p className={`text-sm font-extrabold truncate ${isActive ? 'text-emerald-400 drop-shadow-sm' : 'text-white'}`}>
                   {stop.name}
                 </p>
+                {stop.address && (
+                  <p className="text-[9px] text-gray-500 mt-0.5 line-clamp-2 leading-snug">{stop.address}</p>
+                )}
                 <p className="text-[10px] text-gray-400 mt-1 font-medium">{stop.distance}m</p>
                 <div className="mt-2 flex items-center">
                   <span className={`inline-flex items-center gap-1 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
@@ -75,6 +78,9 @@ export default function CoolStopCard({ coolstops, onNavigate, onSelectStop, acti
           <p className="text-xs text-emerald-400 mt-1.5 flex items-center gap-1 font-medium bg-emerald-500/10 w-fit px-2 py-0.5 rounded-md">
             <MapPin className="w-3.5 h-3.5" /> Cách bạn {recommendedStop.distance}m
           </p>
+          {recommendedStop.address && (
+            <p className="text-[10px] text-gray-500 mt-1.5 leading-relaxed max-w-[280px]">{recommendedStop.address}</p>
+          )}
         </div>
       </div>
 

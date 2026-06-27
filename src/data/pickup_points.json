@@ -1,6 +1,7 @@
 {
   "defaultPoint": {
     "name": "Cổng phụ A - Đại học Quốc Tế (Cạnh công trường)",
+    "address": "Cổng phụ A, Đại học Quốc tế HCMIU, Khu phố 6, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8785,
     "lng": 106.8040,
     "riskLevel": "High",
@@ -8,6 +9,7 @@
   },
   "suggestedPoint": {
     "name": "Nhà chờ xe buýt nội bộ HCMIU (Cách 60m)",
+    "address": "Nhà chờ xe buýt nội bộ, trước cổng chính HCMIU, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8780,
     "lng": 106.8048,
     "riskLevel": "Low",

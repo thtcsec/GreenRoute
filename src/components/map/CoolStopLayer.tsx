@@ -82,6 +82,9 @@ function CoolStopLayerComponent({ coolstops, onSelectCoolStop }: CoolStopLayerPr
                 </div>
 
                 <p className="font-bold text-gray-900 text-sm">{stop.name}</p>
+                {stop.address && (
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 leading-snug">{stop.address}</p>
+                )}
 
                 <div className="grid grid-cols-2 gap-1.5 my-2 p-1.5 bg-gray-50 dark:bg-gray-900 rounded-lg text-xs border border-gray-100 dark:border-gray-800">
                   <div>

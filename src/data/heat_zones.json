@@ -2,6 +2,7 @@
   {
     "id": "hz-1",
     "name": "Ngã tư Đại học Quốc Gia (VNU Intersection)",
+    "address": "Giao lộ Đại lộ Võ Văn Kiệt & Đường Hàn Thuyên, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8700,
     "lng": 106.8030,
     "radius": 150,
@@ -12,6 +13,7 @@
   {
     "id": "hz-2",
     "name": "Bãi đỗ xe lộ thiên - Trung tâm Thể thao VNU",
+    "address": "Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8740,
     "lng": 106.7975,
     "radius": 100,
@@ -22,6 +24,7 @@
   {
     "id": "hz-3",
     "name": "Đoạn đường nhựa song hành Xa Lộ Hà Nội",
+    "address": "Xa lộ Hà Nội, đoạn qua Khu Làng Đại học, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8660,
     "lng": 106.7990,
     "radius": 200,

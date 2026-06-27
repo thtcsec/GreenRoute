@@ -12,6 +12,7 @@ import ClimateAlertBanner from '@/components/ClimateAlertBanner';
 
 // Import icons
 import { Map, Snowflake, Route as RouteIcon, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X, Droplets, ChevronUp, ChevronDown, MapPinOff } from 'lucide-react';
+import { motion, AnimatePresence, tabContentVariants, tabContentTransition } from '@/components/motion';
 
 // Load MapContainer dynamically to prevent SSR issues
 const MapContainer = dynamic(() => import('@/components/MapContainer'), {
@@ -42,6 +43,7 @@ export default function Home() {
   const [activeCoolStop, setActiveCoolStop] = useState<CoolStop | null>(null);
   const [focusLocation, setFocusLocation] = useState<[number, number] | null>(null);
   const [focusBounds, setFocusBounds] = useState<[[number, number], [number, number]] | null>(null);
+  const [mapFocusKey, setMapFocusKey] = useState(0);
 
   // --- NEW STATES cho Feature 1, 2, 3 ---
   const [gpsLocation, setGpsLocation] = useState<[number, number] | null>(null);
@@ -73,15 +75,36 @@ export default function Home() {
     setFocusLocation(null);
   };
 
-  // --- FETCHING DATA FROM API ---
-  useEffect(() => {
-    // Feature 1: Real GPS Location
+  const centerMapOnLocation = (loc: [number, number]) => {
+    setFocusLocation(loc);
+    setFocusBounds(null);
+    setMapFocusKey((key) => key + 1);
+  };
+
+  const handleLocateMe = () => {
     if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const loc: [number, number] = [position.coords.latitude, position.coords.longitude];
           setGpsLocation(loc);
-          setFocusLocation(loc);
+          centerMapOnLocation(loc);
+        },
+        () => centerMapOnLocation(gpsLocation || driverLocation),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+      return;
+    }
+    centerMapOnLocation(gpsLocation || driverLocation);
+  };
+
+  // --- FETCHING DATA FROM API ---
+  useEffect(() => {
+    // Feature 1: Real GPS Location (chỉ lưu tọa độ, không tự pan bản đồ)
+    if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const loc: [number, number] = [position.coords.latitude, position.coords.longitude];
+          setGpsLocation(loc);
         },
         (error) => {
           console.warn("GPS Error:", error.message);
@@ -234,8 +257,7 @@ export default function Home() {
         setOsrmRoute(null);
         setOsrmInfo(null);
         setOsrmError('Không thể lấy chỉ đường thật, giữ nguyên bản đồ.');
-        setFocusLocation(dest);
-        setFocusBounds(null);
+        centerMapOnLocation(dest);
         setTimeout(() => setOsrmError(null), 3000);
       }
     }
@@ -256,8 +278,7 @@ export default function Home() {
 
   // 3. Khi chỉ đường tới điểm đón thay thế
   const handleNavigateToPickup = (lat: number, lng: number, _name: string) => {
-    setFocusLocation([lat, lng]);
-    setFocusBounds(null);
+    centerMapOnLocation([lat, lng]);
     setActiveTab('map');
     setIsPanelOpen(false);
   };
@@ -292,8 +313,7 @@ export default function Home() {
         localStorage.setItem('greenroute_reports', JSON.stringify(updated));
 
         // Tập trung bản đồ vào vị trí báo cáo mới và chuyển về Tab Bản đồ
-        setFocusLocation([newReport.lat, newReport.lng]);
-        setFocusBounds(null);
+        centerMapOnLocation([newReport.lat, newReport.lng]);
         setActiveTab('map');
         setIsPanelOpen(false);
       }
@@ -405,6 +425,7 @@ export default function Home() {
             userReports={userReports}
             focusLocation={focusLocation}
             focusBounds={focusBounds}
+            mapFocusKey={mapFocusKey}
             onSelectCoolStop={handleMapSelectCoolStop}
             onSelectRoute={handleSelectRoute}
             gpsLocation={gpsLocation}
@@ -467,8 +488,7 @@ export default function Home() {
                 onClick={() => {
                   setOsrmRoute(null);
                   setOsrmInfo(null);
-                  setFocusLocation(gpsLocation || driverLocation);
-                  setFocusBounds(null);
+                  centerMapOnLocation(gpsLocation || driverLocation);
                   if (abortControllerRef.current) abortControllerRef.current.abort();
                 }}
                 className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 p-1 rounded-full transition-colors cursor-pointer flex items-center justify-center"
@@ -488,16 +508,16 @@ export default function Home() {
           )}
 
           {/* Nút reset góc nhìn bản đồ về vị trí tài xế */}
-          <button
-            onClick={() => {
-              setFocusLocation(gpsLocation || driverLocation);
-              setFocusBounds(null);
-            }}
-            className="absolute bottom-5 right-20 z-[1000] p-3 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-emerald-400 shadow-xl hover:bg-black/80 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          <motion.button
+            type="button"
+            onClick={handleLocateMe}
+            whileTap={{ scale: 0.92 }}
+            whileHover={{ scale: 1.05 }}
+            className="absolute bottom-5 right-20 z-[1000] p-3 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-emerald-400 shadow-xl hover:bg-black/80 transition-colors cursor-pointer"
             title="Định vị tài xế"
           >
             <Compass className="w-5 h-5" />
-          </button>
+          </motion.button>
         </div>
 
         {/* Nút vuốt panel (tab Bản đồ) */}
@@ -522,7 +542,16 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              className="space-y-5"
+              variants={tabContentVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabContentTransition}
+            >
 
               {activeTab !== 'report' && weather && weather.alertLevel !== 'low' && (
                 <div className="relative z-20">
@@ -641,7 +670,7 @@ export default function Home() {
                       onStartRoute={() => {
                         setIsTripStarted(true);
                         setFocusBounds(null);
-                        setFocusLocation(gpsLocation || driverLocation);
+                        centerMapOnLocation(gpsLocation || driverLocation);
                         setActiveTab('map');
                         setIsPanelOpen(false);
                       }}
@@ -669,7 +698,8 @@ export default function Home() {
                   )}
                 </div>
               )}
-            </div>
+            </motion.div>
+            </AnimatePresence>
           )}
         </main>
 

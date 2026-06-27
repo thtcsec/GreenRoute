@@ -60,6 +60,9 @@ function HeatZoneLayerComponent({ heatZones, visible }: HeatZoneLayerProps) {
                   <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: stroke }} />
                   <p className="font-bold text-gray-900 text-sm">{zone.name}</p>
                 </div>
+                {zone.address && (
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1 leading-snug">{zone.address}</p>
+                )}
                 <div className="bg-orange-50 dark:bg-orange-950/40 p-2 rounded-lg border border-orange-200/50 dark:border-orange-800/30 my-1 space-y-1 text-xs">
                   <div className="flex justify-between">
                     <span className="text-gray-600">🌡️ Chỉ số nhiệt:</span>

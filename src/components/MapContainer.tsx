@@ -17,6 +17,7 @@ interface MapContainerProps {
   userReports: ClimateReport[];
   focusLocation: [number, number] | null;
   focusBounds: L.LatLngBoundsExpression | null;
+  mapFocusKey: number;
   onSelectCoolStop: (stop: CoolStop) => void;
   onSelectRoute: (routeId: string) => void;
   gpsLocation: [number, number] | null;

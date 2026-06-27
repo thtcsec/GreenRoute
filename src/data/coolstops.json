@@ -2,6 +2,7 @@
   {
     "id": "cs-1",
     "name": "Trạm Dừng Chân Nhà Văn Hóa Sinh Viên",
+    "address": "Khu A, Đại học Quốc gia TP.HCM, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8755,
     "lng": 106.8010,
     "distance": 480,
@@ -19,6 +20,7 @@
   {
     "id": "cs-2",
     "name": "Nhà chờ xe buýt Đại Học Quốc Tế (HCMIU)",
+    "address": "Khu phố 6, Phường Linh Trung, TP. Thủ Đức (trước cổng chính HCMIU)",
     "lat": 10.8783,
     "lng": 106.8063,
     "distance": 220,
@@ -36,6 +38,7 @@
   {
     "id": "cs-3",
     "name": "Cà phê Đối Tác Shipper - Làng Đại Học",
+    "address": "Đường Hàn Thuyên, Khu Làng Đại học, Phường Linh Trung, TP. Thủ Đức",
     "lat": 10.8742,
     "lng": 106.8028,
     "distance": 620,

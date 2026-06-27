@@ -2,6 +2,7 @@ export interface Location {
   name: string;
   lat: number;
   lng: number;
+  address?: string;
 }
 
 export interface TripInput {
@@ -12,6 +13,7 @@ export interface TripInput {
 export interface CoolStop {
   id: string;
   name: string;
+  address?: string;
   lat: number;
   lng: number;
   distance: number;
@@ -30,6 +32,7 @@ export interface CoolStop {
 export interface HeatZone {
   id: string;
   name: string;
+  address?: string;
   lat: number;
   lng: number;
   radius: number; // in meters
@@ -41,6 +44,7 @@ export interface HeatZone {
 export interface FloodRisk {
   id: string;
   name: string;
+  address?: string;
   lat: number;
   lng: number;
   radius: number; // in meters
@@ -69,6 +73,7 @@ export interface Route {
 export interface PickupPoints {
   defaultPoint: {
     name: string;
+    address?: string;
     lat: number;
     lng: number;
     riskLevel: 'High' | 'Medium' | 'Low';
@@ -76,6 +81,7 @@ export interface PickupPoints {
   };
   suggestedPoint: {
     name: string;
+    address?: string;
     lat: number;
     lng: number;
     riskLevel: 'High' | 'Medium' | 'Low';
