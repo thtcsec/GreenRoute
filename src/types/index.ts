@@ -88,3 +88,15 @@ export interface ClimateReport {
   note?: string;
   timestamp: string;
 }
+
+export interface WeatherData {
+  temperature: number;
+  feelsLike: number;
+  humidity: number;
+  uvIndex: number;
+  weatherCondition: string;
+  rainVolume: number;
+  windSpeed: number;
+  icon: string;
+  alertLevel: 'extreme' | 'high' | 'moderate' | 'low';
+}
