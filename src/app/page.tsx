@@ -118,7 +118,7 @@ export default function Home() {
 
   // --- REAL-TIME GPS TRACKING ---
   useEffect(() => {
-    let watchId: number;
+    let watchId: number | undefined;
     if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
@@ -134,11 +134,12 @@ export default function Home() {
       );
     }
     return () => {
-      if (watchId && typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+      // watchId === 0 là handle hợp lệ, phải so sánh undefined thay vì kiểm tra truthy
+      if (watchId !== undefined && typeof navigator !== 'undefined' && 'geolocation' in navigator) {
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, [isFakeGps, setGpsLocation]);
+  }, [isFakeGps]);
 
   // --- FETCHING DATA FROM API ---
   useEffect(() => {
@@ -171,17 +172,23 @@ export default function Home() {
         }
         
         // Cập nhật reports từ API kết hợp với localStorage (nếu có offline data)
-        const storedReports = localStorage.getItem('greenroute_reports');
-        if (storedReports) {
-          const localReps = JSON.parse(storedReports);
-          const merged = [...resReports];
-          localReps.forEach((lr: ClimateReport) => {
-            if (!merged.find(mr => mr.id === lr.id)) merged.push(lr);
-          });
-          setUserReports(merged);
-        } else {
-          setUserReports(resReports);
+        const apiReports: ClimateReport[] = Array.isArray(resReports) ? resReports : [];
+        let merged = apiReports;
+        try {
+          const storedReports = localStorage.getItem('greenroute_reports');
+          if (storedReports) {
+            const localReps = JSON.parse(storedReports);
+            if (Array.isArray(localReps)) {
+              merged = [...apiReports];
+              localReps.forEach((lr: ClimateReport) => {
+                if (lr && !merged.find(mr => mr.id === lr.id)) merged.push(lr);
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('Không đọc được báo cáo offline từ localStorage:', e);
         }
+        setUserReports(merged);
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu từ API:', error);
       } finally {
@@ -313,11 +320,17 @@ export default function Home() {
 
   // 5. Khi người dùng tìm kiếm tuyến đường (TripInputBar)
   const handleSearchRoutes = async (origin: { name?: string; lat: number; lng: number }, destination: { name?: string; lat: number; lng: number }) => {
+    // Huỷ request tuyến đường đang bay (nếu có) để tránh race-condition response cũ ghi đè response mới
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     setActiveTab('journey');
     try {
       const res = await fetch(
-        `/api/routes?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}`
+        `/api/routes?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}`,
+        { signal: controller.signal }
       );
       const newRoutes = await res.json();
       if (!Array.isArray(newRoutes)) {
@@ -331,9 +344,10 @@ export default function Home() {
         updateFocusBounds(allCoords);
       }
     } catch (err) {
+      if ((err as Error)?.name === 'AbortError') return; // bỏ qua khi chủ động huỷ
       console.error('Lỗi khi tìm tuyến đường:', err);
     } finally {
-      setLoading(false);
+      if (abortControllerRef.current === controller) setLoading(false);
     }
   };
 

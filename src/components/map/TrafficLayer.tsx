@@ -10,7 +10,7 @@ interface TrafficLayerProps {
 }
 
 function TrafficLayerComponent({ trafficZones, active }: TrafficLayerProps) {
-  if (!active || !trafficZones || trafficZones.length === 0) return null;
+  if (!active || !Array.isArray(trafficZones) || trafficZones.length === 0) return null;
 
   return (
     <>

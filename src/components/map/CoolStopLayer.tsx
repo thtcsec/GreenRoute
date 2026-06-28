@@ -51,7 +51,7 @@ function CoolStopLayerComponent({ coolstops, onSelectCoolStop }: CoolStopLayerPr
 
   return (
     <>
-      {coolstops.map((stop) => {
+      {(Array.isArray(coolstops) ? coolstops : []).map((stop) => {
         const icon = getIcon(stop.type);
         const walkTime = Math.max(1, Math.round(stop.distance / 70)); // Khoảng 70m/phút đi bộ
         const status = stop.status || 'Available';

@@ -84,15 +84,22 @@ export interface ClimateScoreResult {
 
 export function calculateClimateScore(
   routeCoords: [number, number][],
-  heatZones: HeatZone[],
-  floodRisks: FloodRisk[],
-  coolstops: CoolStop[],
-  trafficZones: TrafficZone[],
-  osrmDurationMin: number,
-  distanceKm: number,
+  heatZones: HeatZone[] = [],
+  floodRisks: FloodRisk[] = [],
+  coolstops: CoolStop[] = [],
+  trafficZones: TrafficZone[] = [],
+  osrmDurationMin: number = 0,
+  distanceKm: number = 0,
   weatherData?: WeatherData | null,
   reports?: ClimateReport[] | null
 ): ClimateScoreResult {
+  // Phòng thủ: ép kiểu mảng để tránh crash khi caller truyền undefined/null/non-array
+  const safeHeat = Array.isArray(heatZones) ? heatZones : [];
+  const safeFlood = Array.isArray(floodRisks) ? floodRisks : [];
+  const safeCool = Array.isArray(coolstops) ? coolstops : [];
+  const safeTraffic = Array.isArray(trafficZones) ? trafficZones : [];
+  const safeReports = Array.isArray(reports) ? reports : [];
+
   if (!routeCoords || routeCoords.length === 0) {
     return {
       score: 50,
@@ -122,7 +129,7 @@ export function calculateClimateScore(
 
     // Heat
     let pointHeat = 0;
-    for (const zone of heatZones) {
+    for (const zone of safeHeat) {
       if (haversine(point, [zone.lat, zone.lng]) < zone.radius) {
         pointHeat = Math.max(pointHeat, heatSeverity(zone));
       }
@@ -130,24 +137,24 @@ export function calculateClimateScore(
     
     // Flood
     let pointFlood = 0;
-    for (const zone of floodRisks) {
+    for (const zone of safeFlood) {
       if (haversine(point, [zone.lat, zone.lng]) < zone.radius) {
         pointFlood = Math.max(pointFlood, floodSeverity(zone));
       }
     }
     
     // Traffic
-    for (const zone of trafficZones) {
+    for (const zone of safeTraffic) {
       if (haversine(point, [zone.lat, zone.lng]) < zone.radius) {
         intersectedTrafficZones.add(zone.id);
       }
     }
 
     // Community Reports feedback loop (300m radius)
-    if (reports && reports.length > 0) {
+    if (safeReports.length > 0) {
       let reportHeatBoost = 0;
       let reportFloodBoost = 0;
-      for (const report of reports) {
+      for (const report of safeReports) {
         if (haversine(point, [report.lat, report.lng]) < 300) {
           if (report.type === 'Too hot' || report.type === 'No shade') {
             reportHeatBoost += 10;
@@ -165,7 +172,7 @@ export function calculateClimateScore(
 
     // Shade & Stop Risk
     let minStopDistance = Infinity;
-    for (const stop of coolstops) {
+    for (const stop of safeCool) {
       const dist = haversine(point, [stop.lat, stop.lng]);
       if (dist < minStopDistance) {
         minStopDistance = dist;
@@ -174,10 +181,14 @@ export function calculateClimateScore(
         shadeCount++;
       }
     }
+    // Khi không có CoolStop nào, tránh để Infinity lan vào phép tính trung bình
+    if (!Number.isFinite(minStopDistance)) {
+      minStopDistance = 1000; // coi như rất xa => stop risk cao
+    }
     
     // Add report penalty to stop distance if "Khó dừng đỗ" or "Đón trả không an toàn" is reported nearby
-    if (reports) {
-      for (const report of reports) {
+    if (safeReports.length > 0) {
+      for (const report of safeReports) {
         if (haversine(point, [report.lat, report.lng]) < 300) {
           if (report.type === 'Hard to stop' || report.type === 'Unsafe pickup/drop-off') {
             minStopDistance += 200; // Increase effective distance
@@ -224,8 +235,8 @@ export function calculateClimateScore(
   // Add traffic delay based on intersected zones
   let trafficDelayMin = 0;
   for (const zoneId of intersectedTrafficZones) {
-    const zone = trafficZones.find(z => z.id === zoneId);
-    if (zone) trafficDelayMin += zone.delayMin;
+    const zone = safeTraffic.find(z => z.id === zoneId);
+    if (zone && Number.isFinite(zone.delayMin)) trafficDelayMin += zone.delayMin;
   }
   
   // Tổng thời gian bao gồm cả kẹt xe

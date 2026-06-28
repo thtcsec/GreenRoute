@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (!body.type || !body.lat || !body.lng) {
+    if (!body.type || body.lat == null || body.lng == null || Number.isNaN(Number(body.lat)) || Number.isNaN(Number(body.lng))) {
       return NextResponse.json({ error: 'Missing required fields: type, lat, lng' }, { status: 400 });
     }
 

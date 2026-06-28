@@ -57,6 +57,14 @@ async function fetchOSRMTable(waypoints: [number, number][]): Promise<{ duration
   }
 }
 
+/** Chuẩn hoá ma trận OSRM: biến null / giá trị không hợp lệ thành Infinity để TSP không chọn nhầm cạnh "0" */
+function sanitizeMatrix(m: number[][]): number[][] {
+  if (!Array.isArray(m)) return [];
+  return m.map(row =>
+    Array.isArray(row) ? row.map(v => (v === null || !Number.isFinite(v) ? Infinity : v)) : []
+  );
+}
+
 function pathNearestNeighbor(matrix: number[][], start = 0, end: number): number[] {
   const visited = new Set([start, end]);
   const route = [start];
@@ -210,9 +218,10 @@ async function generateRouteCandidates(
     // Gọi Table API để tính ma trận khoảng cách
     const table = await fetchOSRMTable(waypoints);
     if (table) {
-      // Tìm thứ tự tối ưu bằng TSP Path
-      const initialRoute = pathNearestNeighbor(table.distances, 0, waypoints.length - 1);
-      const optimalRouteIdxs = pathTwoOpt(initialRoute, table.distances);
+      // Tìm thứ tự tối ưu bằng TSP Path (chuẩn hoá null -> Infinity trước)
+      const dist = sanitizeMatrix(table.distances);
+      const initialRoute = pathNearestNeighbor(dist, 0, waypoints.length - 1);
+      const optimalRouteIdxs = pathTwoOpt(initialRoute, dist);
       
       const optimalWaypoints = optimalRouteIdxs.map(idx => waypoints[idx]);
       
