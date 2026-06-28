@@ -105,7 +105,7 @@ export default function SafetyPickupModal({ pickupPoints, onAcceptSafe, onIgnore
               </div>
 
               <div className="flex justify-center -my-2 relative z-10">
-                <div className="bg-gray-800 rounded-full p-1 border border-gray-700">
+                <div className="bg-gray-800 rounded-full p-1 border border-gray-700 flex flex-col items-center">
                   <ArrowRight className="w-4 h-4 text-gray-400 rotate-90" />
                 </div>
               </div>
@@ -123,6 +123,14 @@ export default function SafetyPickupModal({ pickupPoints, onAcceptSafe, onIgnore
                       Ưu điểm: {pickupPoints.suggestedPoint.reason}
                     </p>
                   </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-emerald-500/20 flex items-center gap-2">
+                  <div className="bg-emerald-500/20 px-2 py-1 rounded flex items-center justify-center">
+                    <span className="text-emerald-400 text-xs">🚶‍♂️</span>
+                  </div>
+                  <p className="text-emerald-300/80 text-[10px] font-medium leading-tight">
+                    Khách hàng sẽ tự đi bộ đến điểm này. Bạn không cần phải vòng xe vào khu vực rủi ro!
+                  </p>
                 </div>
               </div>
 

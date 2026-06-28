@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { WeatherData, CoolStop, HeatZone, FloodRisk, Route, ScoredRoute, PickupPoints, ClimateReport, TrafficZone } from '@/types';
+import { WeatherData, CoolStop, HeatZone, FloodRisk, Route, PickupPoints, ClimateReport, TrafficZone } from '@/types';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import CoolStopCard from '@/components/CoolStopCard';
 import IncomingRide from '@/components/IncomingRide';
@@ -14,7 +14,7 @@ import TripInputBar from '@/components/TripInputBar';
 import ClimateAlertBanner from '@/components/ClimateAlertBanner';
 
 // Import icons
-import { Map, Snowflake, Route as RouteIcon, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X, Droplets, ChevronUp, ChevronDown, MapPinOff } from 'lucide-react';
+import { Map, Snowflake, Route as RouteIcon, AlertCircle, AlertTriangle, Flame, Compass, Navigation, X, Droplets, ChevronUp, ChevronDown, MapPinOff, Layers } from 'lucide-react';
 import { motion, AnimatePresence, tabContentVariants, tabContentTransition } from '@/components/motion';
 
 // Load MapContainer dynamically to prevent SSR issues
@@ -55,7 +55,9 @@ export default function Home() {
 
   // --- NEW STATES cho Feature 1, 2, 3 ---
   const [gpsLocation, setGpsLocation] = useState<[number, number] | null>(null);
+  const [isFakeGps, setIsFakeGps] = useState(false);
   const [activeLayer, setActiveLayer] = useState<'heat' | 'flood' | 'all' | 'none'>('all');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [osrmRoute, setOsrmRoute] = useState<[number, number][] | null>(null);
   const [osrmInfo, setOsrmInfo] = useState<{ distance: number; duration: number } | null>(null);
   const [osrmError, setOsrmError] = useState<string | null>(null);
@@ -67,6 +69,8 @@ export default function Home() {
   // Map bottom sheet + trip state (Hoàng An UX)
   const [isTripStarted, setIsTripStarted] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isPassengerPickedUp, setIsPassengerPickedUp] = useState(false);
+  const [actualPickupPoint, setActualPickupPoint] = useState<{name: string, lat: number, lng: number} | null>(null);
 
   // Trạng thái tải dữ liệu
   const [loading, setLoading] = useState(true);
@@ -99,6 +103,7 @@ export default function Home() {
     if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          if (isFakeGps) return; // Prevent real GPS from overwriting fake
           const loc: [number, number] = [position.coords.latitude, position.coords.longitude];
           setGpsLocation(loc);
           centerMapOnLocation(loc);
@@ -117,6 +122,8 @@ export default function Home() {
     if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
+          // If we are faking GPS for demo, ignore real GPS updates
+          if (isFakeGps) return;
           const loc: [number, number] = [position.coords.latitude, position.coords.longitude];
           setGpsLocation(loc);
         },
@@ -131,7 +138,7 @@ export default function Home() {
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, []);
+  }, [isFakeGps, setGpsLocation]);
 
   // --- FETCHING DATA FROM API ---
   useEffect(() => {
@@ -305,7 +312,7 @@ export default function Home() {
   };
 
   // 5. Khi người dùng tìm kiếm tuyến đường (TripInputBar)
-  const handleSearchRoutes = async (origin: Location, destination: Location) => {
+  const handleSearchRoutes = async (origin: { name?: string; lat: number; lng: number }, destination: { name?: string; lat: number; lng: number }) => {
     setLoading(true);
     setActiveTab('journey');
     try {
@@ -455,23 +462,43 @@ export default function Home() {
           </div>
 
           {/* Feature 3: Map Layer Toggle UI */}
-          <div className="absolute top-4 left-4 z-[1000] flex gap-1.5 bg-black/60 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl">
-            {(['all', 'heat', 'flood', 'none'] as const).map(mode => (
-              <button 
-                key={mode} 
-                onClick={() => setActiveLayer(mode)} 
-                className={`px-3 py-1.5 text-[11px] rounded-xl font-bold transition-all duration-300 cursor-pointer ${
-                  activeLayer === mode 
-                    ? (mode === 'heat' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-[0_0_10px_rgba(249,115,22,0.4)]' 
-                      : mode === 'flood' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-[0_0_10px_rgba(59,130,246,0.4)]' 
-                      : mode === 'all' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)]' 
-                      : 'bg-white/20 text-white') 
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {mode === 'heat' ? 'Nắng' : mode === 'flood' ? 'Ngập' : mode === 'all' ? 'Tất cả' : 'Ẩn'}
-              </button>
-            ))}
+          <div className="absolute top-4 left-4 z-[1000] flex items-center bg-black/60 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl overflow-hidden">
+            <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="p-1.5 rounded-xl text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 transition-colors flex-shrink-0"
+              title="Bộ lọc bản đồ"
+            >
+              <Layers className="w-5 h-5" />
+            </button>
+            <AnimatePresence>
+              {isFilterOpen && (
+                <motion.div
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 'auto', opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex gap-1.5 overflow-hidden whitespace-nowrap"
+                >
+                  <div className="w-px h-6 bg-white/10 mx-1 self-center flex-shrink-0" />
+                  {(['all', 'heat', 'flood', 'none'] as const).map(mode => (
+                    <button 
+                      key={mode} 
+                      onClick={() => setActiveLayer(mode)} 
+                      className={`px-3 py-1.5 text-[11px] rounded-xl font-bold transition-all duration-300 cursor-pointer flex-shrink-0 ${
+                        activeLayer === mode 
+                          ? (mode === 'heat' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-[0_0_10px_rgba(249,115,22,0.4)]' 
+                            : mode === 'flood' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-[0_0_10px_rgba(59,130,246,0.4)]' 
+                            : mode === 'all' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)]' 
+                            : 'bg-white/20 text-white') 
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      {mode === 'heat' ? 'Nắng' : mode === 'flood' ? 'Ngập' : mode === 'all' ? 'Tất cả' : 'Ẩn'}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Feature 2: OSRM Info Overlay & Cancel Button */}
@@ -741,19 +768,20 @@ export default function Home() {
           })}
         </nav>
         <AnimatePresence>
-          {showIncomingRide && (
+          {showIncomingRide && pickupPoints && (
             <IncomingRide 
+              pickupPoints={pickupPoints}
               onAccept={() => {
                 setShowIncomingRide(false);
-                // Demo: hardcode origin and destination to trigger route calculation
-                const origin = { name: 'Điểm đón (Rủi ro)', lat: 10.8725, lng: 106.8048 }; 
-                const dest = { name: 'Điểm đến', lat: 10.8785, lng: 106.8040 }; 
-                handleSearchRoutes(origin, dest);
+                // Calculate route from driver to the risky pickup point
+                const actualDriverLoc = gpsLocation || driverLocation;
+                const driverOrigin = { name: 'Vị trí của bạn', lat: actualDriverLoc[0], lng: actualDriverLoc[1] };
+                const dest = { name: pickupPoints.defaultPoint.name, lat: pickupPoints.defaultPoint.lat, lng: pickupPoints.defaultPoint.lng }; 
+                handleSearchRoutes(driverOrigin, dest);
+                setActualPickupPoint(dest);
                 
                 // Show safety modal immediately after route is drawn
-                if (pickupPoints) {
-                  setShowSafetyModal(true);
-                }
+                setShowSafetyModal(true);
               }}
               onReject={() => setShowIncomingRide(false)}
             />
@@ -764,12 +792,40 @@ export default function Home() {
               pickupPoints={pickupPoints}
               onAcceptSafe={() => {
                 setShowSafetyModal(false);
-                const safeOrigin = { name: pickupPoints.suggestedPoint.name, lat: pickupPoints.suggestedPoint.lat, lng: pickupPoints.suggestedPoint.lng };
-                const dest = { name: 'Điểm đến', lat: 10.8785, lng: 106.8040 }; 
-                handleSearchRoutes(safeOrigin, dest);
+                const actualDriverLoc = gpsLocation || driverLocation;
+                const driverOrigin = { name: 'Vị trí của bạn', lat: actualDriverLoc[0], lng: actualDriverLoc[1] };
+                const safeDest = { name: pickupPoints.suggestedPoint.name, lat: pickupPoints.suggestedPoint.lat, lng: pickupPoints.suggestedPoint.lng };
+                handleSearchRoutes(driverOrigin, safeDest);
+                setActualPickupPoint(safeDest);
               }}
-              onIgnore={() => setShowSafetyModal(false)}
+              onIgnore={() => {
+                setShowSafetyModal(false);
+              }}
             />
+          )}
+
+          {isTripStarted && !isPassengerPickedUp && actualPickupPoint && !showSafetyModal && (
+            <motion.div 
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="absolute bottom-6 left-0 right-0 px-4 z-50 flex justify-center pointer-events-none"
+            >
+              <button
+                onClick={() => {
+                  setIsPassengerPickedUp(true);
+                  setIsFakeGps(true);
+                  setGpsLocation([actualPickupPoint.lat, actualPickupPoint.lng]);
+                  centerMapOnLocation([actualPickupPoint.lat, actualPickupPoint.lng]);
+                  
+                  const finalDestination = { name: 'Điểm đến (Giao hàng)', lat: 10.8700, lng: 106.8000 };
+                  handleSearchRoutes(actualPickupPoint, finalDestination);
+                }}
+                className="w-full max-w-sm py-4 rounded-xl font-bold text-gray-900 bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.5)] pointer-events-auto active:scale-95 transition-transform text-lg flex items-center justify-center gap-2"
+              >
+                ĐÃ ĐÓN KHÁCH
+              </button>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>

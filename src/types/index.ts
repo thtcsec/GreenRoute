@@ -70,23 +70,19 @@ export interface Route {
   fuelCost?: number; // VNĐ
 }
 
+export interface PointDetail {
+  name: string;
+  address?: string;
+  lat: number;
+  lng: number;
+  riskLevel: 'Extreme' | 'High' | 'Medium' | 'Low';
+  reason: string;
+}
+
 export interface PickupPoints {
-  defaultPoint: {
-    name: string;
-    address?: string;
-    lat: number;
-    lng: number;
-    riskLevel: 'High' | 'Medium' | 'Low';
-    reason: string;
-  };
-  suggestedPoint: {
-    name: string;
-    address?: string;
-    lat: number;
-    lng: number;
-    riskLevel: 'High' | 'Medium' | 'Low';
-    reason: string;
-  };
+  defaultPoint: PointDetail;
+  suggestedPoint: PointDetail;
+  estimatedFare?: number;
 }
 
 export interface TrafficZone {

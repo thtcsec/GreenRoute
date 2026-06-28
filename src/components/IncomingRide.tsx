@@ -4,12 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Navigation, User, DollarSign, Clock, ShieldAlert } from 'lucide-react';
 
+import { PickupPoints } from '@/types';
+
 interface IncomingRideProps {
+  pickupPoints: PickupPoints;
   onAccept: () => void;
   onReject: () => void;
 }
 
-export default function IncomingRide({ onAccept, onReject }: IncomingRideProps) {
+export default function IncomingRide({ pickupPoints, onAccept, onReject }: IncomingRideProps) {
   const [timeLeft, setTimeLeft] = useState(15);
   const [isVibrating, setIsVibrating] = useState(true);
 
@@ -86,8 +89,13 @@ export default function IncomingRide({ onAccept, onReject }: IncomingRideProps) 
             </div>
             
             <div className="text-right">
-              <p className="text-2xl font-black text-emerald-400 tracking-tight">45.000đ</p>
-              <div className="flex justify-end mt-1">
+              <p className="text-2xl font-black text-emerald-400 tracking-tight">
+                {pickupPoints.estimatedFare?.toLocaleString('vi-VN')}đ
+              </p>
+              <div className="flex justify-end mt-1 gap-1">
+                <span className="inline-flex items-center gap-1 bg-gray-800 text-gray-400 border border-gray-700 px-2 py-0.5 rounded text-[9px] font-bold">
+                  DỰ KIẾN
+                </span>
                 <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold">
                   <DollarSign className="w-3 h-3" /> Tiền mặt
                 </span>
@@ -99,9 +107,9 @@ export default function IncomingRide({ onAccept, onReject }: IncomingRideProps) 
           <div className="bg-red-950/40 border border-red-500/30 rounded-xl p-3 mb-4 flex gap-3 items-start">
             <ShieldAlert className="text-red-400 w-5 h-5 shrink-0 mt-0.5 animate-pulse" />
             <div>
-              <p className="text-red-400 text-xs font-bold uppercase tracking-wider mb-0.5">Cảnh báo rủi ro</p>
-              <p className="text-red-200 text-xs leading-relaxed">
-                Khu vực điểm đón đang có <b>chỉ số UV cực đại</b> và nằm trong khu vực <b>thiếu bóng râm</b>.
+              <p className="text-red-400 text-xs font-bold uppercase tracking-wider mb-0.5">Cảnh báo rủi ro điểm đón</p>
+              <p className="text-red-200 text-[11px] leading-relaxed">
+                {pickupPoints.defaultPoint.reason}
               </p>
             </div>
           </div>
@@ -116,8 +124,8 @@ export default function IncomingRide({ onAccept, onReject }: IncomingRideProps) 
               </div>
               <div className="flex-1">
                 <p className="text-gray-400 text-[10px] font-bold uppercase mb-0.5">Điểm đón khách (Cách 1.2km)</p>
-                <p className="text-white text-sm font-semibold">Tòa nhà Bitexco Financial Tower</p>
-                <p className="text-gray-500 text-xs mt-0.5">2 Hải Triều, Bến Nghé, Quận 1</p>
+                <p className="text-white text-sm font-semibold">{pickupPoints.defaultPoint.name}</p>
+                <p className="text-gray-500 text-[11px] mt-0.5 line-clamp-1">{pickupPoints.defaultPoint.address}</p>
               </div>
             </div>
 
@@ -127,8 +135,8 @@ export default function IncomingRide({ onAccept, onReject }: IncomingRideProps) 
               </div>
               <div className="flex-1">
                 <p className="text-gray-400 text-[10px] font-bold uppercase mb-0.5">Điểm đến (5.4km)</p>
-                <p className="text-white text-sm font-semibold">Đại học Quốc Tế - ĐHQG HCM</p>
-                <p className="text-gray-500 text-xs mt-0.5">Khu phố 6, Linh Trung, Thủ Đức</p>
+                <p className="text-white text-sm font-semibold">Tòa nhà Landmark 81</p>
+                <p className="text-gray-500 text-[11px] mt-0.5">720A Điện Biên Phủ, Bình Thạnh</p>
               </div>
             </div>
           </div>

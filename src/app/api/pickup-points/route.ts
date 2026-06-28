@@ -10,14 +10,14 @@ export async function GET(request: NextRequest) {
     
     const doc = await db.collection('pickup_points').findOne({});
     if (!doc) {
-      return NextResponse.json(pickupPointsData as PickupPoints);
+      return NextResponse.json(pickupPointsData[2] as PickupPoints); // Always pick Flood Risk demo scenario
     }
     const { _id, ...rest } = doc;
 
     return NextResponse.json(rest);
   } catch (error) {
     console.error("MongoDB pickup_points error, using JSON fallback:", error);
-    return NextResponse.json(pickupPointsData as PickupPoints);
+    return NextResponse.json(pickupPointsData[2] as PickupPoints); // Always pick Flood Risk demo scenario
   }
 }
 

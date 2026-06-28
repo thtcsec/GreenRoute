@@ -1,18 +1,59 @@
-{
-  "defaultPoint": {
-    "name": "Cổng phụ A - Đại học Quốc Tế (Cạnh công trường)",
-    "address": "Cổng phụ A, Đại học Quốc tế HCMIU, Khu phố 6, Phường Linh Trung, TP. Thủ Đức",
-    "lat": 10.8785,
-    "lng": 106.8040,
-    "riskLevel": "High",
-    "reason": "Khu vực đang thi công, không có cây xanh che mát, lòng đường hẹp xe bus ra vào thường xuyên gây bụi bặm và nhiệt độ thực tế cao."
+[
+  {
+    "defaultPoint": {
+      "name": "Ngã tư đường D1 (Khu Vực Hấp Thụ Nhiệt)",
+      "address": "Gần KTX Khu A ĐHQG",
+      "lat": 10.875474,
+      "lng": 106.785581,
+      "riskLevel": "Extreme",
+      "reason": "Điểm này nằm trọn trong vùng kẹt xe nặng và đảo nhiệt đô thị (42°C). Xe máy dừng lâu sẽ gây kiệt sức và dễ say nắng."
+    },
+    "suggestedPoint": {
+      "name": "Bãi đỗ xe nội khu sinh viên (Cách 80m)",
+      "address": "Nhà điều hành ĐHQG",
+      "lat": 10.875000,
+      "lng": 106.786500,
+      "riskLevel": "Low",
+      "reason": "Có mái che lớn và hàng cây xanh bóng râm mát. Khách hàng đã đồng ý đi bộ tới đây để bạn đón."
+    },
+    "estimatedFare": 38000
   },
-  "suggestedPoint": {
-    "name": "Nhà chờ xe buýt nội bộ HCMIU (Cách 60m)",
-    "address": "Nhà chờ xe buýt nội bộ, trước cổng chính HCMIU, Phường Linh Trung, TP. Thủ Đức",
-    "lat": 10.8780,
-    "lng": 106.8048,
-    "riskLevel": "Low",
-    "reason": "Có mái che lớn và hàng cây xanh bóng râm mát, vỉa hè rộng rãi an toàn hơn cho khách đợi và tài xế dừng đỗ gom khách."
+  {
+    "defaultPoint": {
+      "name": "Trạm xe bus Suối Tiên (Mặt đường nhựa)",
+      "address": "Xa Lộ Hà Nội",
+      "lat": 10.871393,
+      "lng": 106.790284,
+      "riskLevel": "High",
+      "reason": "Vùng kẹt xe nặng cộng hưởng với hiệu ứng nhiệt (40°C), mặt đường bê tông phả hơi nóng, không có bóng râm."
+    },
+    "suggestedPoint": {
+      "name": "Trạm dừng nghỉ râm mát ven đường (Cách 120m)",
+      "address": "Đường nội bộ rợp bóng cây",
+      "lat": 10.871000,
+      "lng": 106.791500,
+      "riskLevel": "Low",
+      "reason": "Khu vực rợp bóng cây, nhiệt độ thấp hơn 3 độ C. Khách sẽ đi bộ ra điểm này."
+    },
+    "estimatedFare": 42000
+  },
+  {
+    "defaultPoint": {
+      "name": "Hẻm 12 Đường Lê Văn Việt (Ngập Sâu)",
+      "address": "Khu vực trũng",
+      "lat": 10.868905,
+      "lng": 106.788592,
+      "riskLevel": "Extreme",
+      "reason": "Khu vực đang bị ngập sâu nguy hiểm cấp độ Extreme sau mưa, rủi ro chết máy xe cực kỳ cao."
+    },
+    "suggestedPoint": {
+      "name": "Sảnh chung cư cao ráo (Cách 60m)",
+      "address": "Khu căn hộ lân cận",
+      "lat": 10.869500,
+      "lng": 106.787500,
+      "riskLevel": "Low",
+      "reason": "Nền đất cao, thoát nước tốt. Khách hàng sẵn sàng đi bộ ra đây để đảm bảo an toàn cho xe của bạn."
+    },
+    "estimatedFare": 55000
   }
-}
+]
