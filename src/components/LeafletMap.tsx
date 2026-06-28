@@ -52,6 +52,26 @@ function ChangeView({
   return null;
 }
 
+/** Leaflet cần invalidateSize khi container flex thay đổi (desktop vs mobile) */
+function MapResizeHandler() {
+  const map = useMap();
+  useEffect(() => {
+    const invalidate = () => map.invalidateSize();
+    const t = window.setTimeout(invalidate, 100);
+    window.addEventListener('resize', invalidate);
+    const ro = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(invalidate)
+      : null;
+    if (ro) ro.observe(map.getContainer());
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('resize', invalidate);
+      ro?.disconnect();
+    };
+  }, [map]);
+  return null;
+}
+
 interface LeafletMapProps {
   driverLocation: [number, number];
   coolstops: CoolStop[];
@@ -130,6 +150,7 @@ function LeafletMapComponent({
           bounds={focusBounds || undefined}
           focusKey={mapFocusKey}
         />
+        <MapResizeHandler />
 
         {/* 1. Marker vị trí người dùng */}
         <UserMarkerLayer driverLocation={driverLocation} gpsLocation={gpsLocation} />

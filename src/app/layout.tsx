@@ -17,6 +17,13 @@ export const metadata: Metadata = {
   description: "Bản mẫu ứng dụng di động bảo vệ tài xế và shipper trước rủi ro nắng nóng và ngập lụt đô thị.",
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover' as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

@@ -145,18 +145,33 @@ export default function Home() {
   // --- FETCHING DATA FROM API ---
   useEffect(() => {
 
+    const fetchApi = async <T,>(path: string, fallback: T, timeoutMs = 8000): Promise<T> => {
+      try {
+        const res = await fetch(path, { signal: AbortSignal.timeout(timeoutMs) });
+        if (!res.ok) {
+          console.warn(`API ${path} HTTP ${res.status}`);
+          return fallback;
+        }
+        const data = await res.json();
+        return (data ?? fallback) as T;
+      } catch (error) {
+        console.warn(`API ${path} failed, using fallback:`, error);
+        return fallback;
+      }
+    };
+
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Gọi song song các API Route Handlers
+        // Gọi song song — mỗi API có timeout riêng, không block cả trang nếu 1 endpoint chậm
         const [resCoolStops, resHeatZones, resFloodRisks, resPickup, resWeather, resReports, resTraffic] = await Promise.all([
-          fetch('/api/coolstops').then(r => r.json()),
-          fetch('/api/heat-zones').then(r => r.json()),
-          fetch('/api/flood-risks').then(r => r.json()),
-          fetch('/api/pickup-points').then(r => r.json()),
-          fetch('/api/weather').then(r => r.json()),
-          fetch('/api/reports').then(r => r.json()),
-          fetch('/api/traffic-zones').then(r => r.json())
+          fetchApi<CoolStop[]>('/api/coolstops', []),
+          fetchApi<HeatZone[]>('/api/heat-zones', []),
+          fetchApi<FloodRisk[]>('/api/flood-risks', []),
+          fetchApi<PickupPoints | null>('/api/pickup-points', null),
+          fetchApi<WeatherData | null>('/api/weather', null),
+          fetchApi<ClimateReport[]>('/api/reports', []),
+          fetchApi<TrafficZone[]>('/api/traffic-zones', []),
         ]);
 
         setCoolstops(resCoolStops);
@@ -377,7 +392,7 @@ export default function Home() {
     <div className="fixed inset-0 flex items-center justify-center bg-black font-sans text-gray-200 sm:py-6 overflow-hidden">
       
       {/* Container Mobile Shape */}
-      <div className="w-full max-w-[480px] h-full sm:h-[90vh] sm:max-h-[850px] flex flex-col bg-gradient-to-b from-gray-900 to-black sm:border border-white/10 sm:rounded-[2.5rem] sm:shadow-[0_0_80px_rgba(16,185,129,0.15)] relative overflow-hidden">
+      <div className="w-full max-w-[480px] h-full sm:h-[90vh] sm:max-h-[850px] flex flex-col min-h-0 bg-gradient-to-b from-gray-900 to-black sm:border border-white/10 sm:rounded-[2.5rem] sm:shadow-[0_0_80px_rgba(16,185,129,0.15)] relative overflow-hidden">
         
         {/* Header */}
         <header className="shrink-0 px-5 py-3.5 bg-black/40 backdrop-blur-xl border-b border-white/5 flex items-center justify-between z-30">
@@ -427,13 +442,13 @@ export default function Home() {
           />
         </div>
 
-        {/* Bản đồ */}
-        <div className={`w-full relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 ease-in-out ${
+        {/* Bản đồ — flex-1 thay vì h-[100%] để desktop không overflow/0-height Leaflet */}
+        <div className={`w-full relative z-10 border-b border-white/10 bg-gray-900 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 ease-in-out min-h-0 ${
           isPanelOpen && activeTab !== 'map'
-            ? 'h-[20%]'
-            : activeTab === 'map' 
-              ? isPanelOpen ? 'h-[50%]' : 'h-[100%]' 
-              : 'h-[60%]'
+            ? 'flex-none h-[22vh] min-h-[120px] max-h-[200px]'
+            : activeTab === 'map'
+              ? isPanelOpen ? 'flex-1 min-h-[160px]' : 'flex-1 min-h-[200px]'
+              : 'flex-none h-[38vh] min-h-[180px] max-h-[340px]'
         }`}>
           <ErrorBoundary>
             <MapContainer
@@ -559,14 +574,14 @@ export default function Home() {
         </button>
 
         {/* Nội dung Tab */}
-        <div className={`w-full overflow-y-auto z-20 custom-scrollbar transition-all duration-300 ease-in-out ${
+        <div className={`w-full overflow-y-auto z-20 custom-scrollbar transition-all duration-300 ease-in-out min-h-0 ${
           activeTab === 'map'
             ? isPanelOpen
-              ? 'h-[50%] px-4 py-5 pb-4 opacity-100'
-              : 'h-0 p-0 opacity-0'
+              ? 'flex-1 min-h-0 px-4 py-5 pb-4 opacity-100'
+              : 'hidden h-0 p-0 opacity-0 overflow-hidden'
             : isPanelOpen
-              ? 'h-[80%] px-4 py-5 pb-4 opacity-100'
-              : 'h-[40%] px-4 py-5 pb-4 opacity-100'
+              ? 'flex-1 min-h-0 px-4 py-5 pb-4 opacity-100'
+              : 'flex-none h-[35vh] min-h-[160px] px-4 py-5 pb-4 opacity-100'
         }`}>
           {loading ? (
             <div className="h-full flex items-center justify-center py-10">

@@ -6,7 +6,11 @@ if (!process.env.MONGODB_URI) {
   console.warn('Warning: MONGODB_URI is not defined in environment. Defaulting to local connection.');
 }
 
-const options = {};
+const options = {
+  serverSelectionTimeoutMS: 4000,
+  connectTimeoutMS: 4000,
+  socketTimeoutMS: 10000,
+};
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
