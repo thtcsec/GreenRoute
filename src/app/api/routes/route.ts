@@ -356,6 +356,36 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    if (osrmResults.length < 3 && osrmResults.length > 0) {
+      const baseRoute = osrmResults[0];
+      const len = baseRoute.coordinates.length;
+      
+      // Alternative 2: Offset north
+      const alt2Coords = baseRoute.coordinates.map((c, i) => {
+        if (i === 0 || i === len - 1) return c;
+        const ratio = Math.sin((i / (len - 1)) * Math.PI);
+        return [c[0] + 0.004 * ratio, c[1] + 0.002 * ratio] as [number, number];
+      });
+
+      // Alternative 3: Offset south
+      const alt3Coords = baseRoute.coordinates.map((c, i) => {
+        if (i === 0 || i === len - 1) return c;
+        const ratio = Math.sin((i / (len - 1)) * Math.PI);
+        return [c[0] - 0.004 * ratio, c[1] - 0.002 * ratio] as [number, number];
+      });
+
+      if (osrmResults.length === 1) {
+        osrmResults.push(
+          { coordinates: alt2Coords, distance: baseRoute.distance * 1.15, duration: baseRoute.duration * 1.15 },
+          { coordinates: alt3Coords, distance: baseRoute.distance * 1.3, duration: baseRoute.duration * 1.35 }
+        );
+      } else if (osrmResults.length === 2) {
+        osrmResults.push(
+          { coordinates: alt3Coords, distance: baseRoute.distance * 1.25, duration: baseRoute.duration * 1.3 }
+        );
+      }
+    }
+
     const scoredRoutes: ScoredRoute[] = osrmResults.map((osrm, index) => {
       const result = calculateClimateScore(
         osrm.coordinates, 
