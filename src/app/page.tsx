@@ -455,24 +455,6 @@ export default function Home() {
             >
               <Compass className="w-5 h-5" />
             </motion.button>
-
-            {/* Nút FAB Báo cáo Khẩn cấp */}
-            <button
-              onClick={() => {
-                setActiveTab('report');
-                setIsPanelOpen(true);
-              }}
-              className="p-3.5 rounded-full bg-gradient-to-br from-red-500 to-rose-700 border border-red-400/50 text-white shadow-[0_0_25px_rgba(225,29,72,0.6)] animate-bounce hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center relative"
-              title="Báo cáo nhanh"
-            >
-              <AlertTriangle className="w-5 h-5 drop-shadow-md" />
-              {userReports.length > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-500 border-2 border-rose-700"></span>
-                </span>
-              )}
-            </button>
           </div>
 
           {/* Feature 3: Map Layer Toggle UI */}
