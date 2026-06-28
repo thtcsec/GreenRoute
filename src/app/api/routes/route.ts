@@ -416,6 +416,7 @@ export async function GET(request: NextRequest) {
     const routeConfigs: { idx: number; id: string; name: string; color: string; isRecommended: boolean; status: string; }[] = [];
 
     const fastest = byDuration[0];
+    assigned.add(fastest.index);
     
     // Tuyến Cân Bằng: Tìm tuyến có Điểm Khí Hậu TỐT HƠN tuyến nhanh nhất,
     // và thời gian tăng thêm ÍT NHẤT (hoặc nằm trong ngưỡng chấp nhận được).
@@ -427,14 +428,15 @@ export async function GET(request: NextRequest) {
         return efficiencyB - efficiencyA;
       });
       
-    // Nếu không có tuyến nào tốt hơn, Tuyến Cân Bằng sẽ chính là Tuyến Nhanh Nhất
-    const balancedEntry = validBalanced.length > 0 ? validBalanced[0] : fastest;
+    // Nếu không có tuyến nào tốt hơn trong giới hạn thời gian, chọn tuyến khác bất kỳ (không phải fastest) để đảm bảo trực quan
+    const balancedEntry = validBalanced.length > 0 
+      ? validBalanced[0] 
+      : (scoredRoutes.find(r => r.index !== fastest.index) ?? fastest);
+    assigned.add(balancedEntry.index);
     
     // Tuyến Mát Nhất: Tuyến có điểm khí hậu cao nhất
-    let coolestEntry = byScore[0];
-    // Nếu tuyến mát nhất trùng với nhanh nhất/cân bằng nhưng có tuyến khác mát bằng, ta có thể chọn tuyến khác để đa dạng hóa
-    const alternativeCoolest = byScore.find(e => e.index !== fastest.index && e.index !== balancedEntry.index && e.score === coolestEntry.score);
-    if (alternativeCoolest) coolestEntry = alternativeCoolest;
+    // Ưu tiên chọn tuyến chưa được gán cho 2 lựa chọn trên để đa dạng trực quan trên bản đồ
+    let coolestEntry = byScore.find(r => !assigned.has(r.index)) ?? byScore[0];
 
     const recommendBalanced = shouldRecommendBalanced(
       { time: fastest.duration, climateScore: fastest.score }, 
