@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { WeatherData, CoolStop, HeatZone, FloodRisk, Route, PickupPoints, ClimateReport, TrafficZone } from '@/types';
+import { WeatherData, CoolStop, HeatZone, FloodRisk, Route, PickupPoints, ClimateReport, TrafficZone, Location } from '@/types';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import CoolStopCard from '@/components/CoolStopCard';
 import IncomingRide from '@/components/IncomingRide';
@@ -71,6 +71,7 @@ export default function Home() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isPassengerPickedUp, setIsPassengerPickedUp] = useState(false);
   const [actualPickupPoint, setActualPickupPoint] = useState<{name: string, lat: number, lng: number} | null>(null);
+  const [activeTrip, setActiveTrip] = useState<{ origin: Location; destination: Location } | null>(null);
 
   // Trạng thái tải dữ liệu
   const [loading, setLoading] = useState(true);
@@ -320,6 +321,19 @@ export default function Home() {
 
   // 5. Khi người dùng tìm kiếm tuyến đường (TripInputBar)
   const handleSearchRoutes = async (origin: { name?: string; lat: number; lng: number }, destination: { name?: string; lat: number; lng: number }) => {
+    const normalizeOriginName = (name?: string) => {
+      if (!name || name === 'Vị trí của bạn' || name === 'Vị trí hiện tại') return 'Vị trí hiện tại';
+      return name;
+    };
+    const normalizeDestName = (name?: string) => {
+      if (name === 'Vị trí của bạn' || name === 'Vị trí hiện tại') return 'Vị trí hiện tại';
+      return name || 'Điểm đến';
+    };
+
+    setActiveTrip({
+      origin: { name: normalizeOriginName(origin.name), lat: origin.lat, lng: origin.lng },
+      destination: { name: normalizeDestName(destination.name), lat: destination.lat, lng: destination.lng },
+    });
     // Huỷ request tuyến đường đang bay (nếu có) để tránh race-condition response cũ ghi đè response mới
     abortControllerRef.current?.abort();
     const controller = new AbortController();
@@ -409,6 +423,7 @@ export default function Home() {
           <TripInputBar 
             driverLocation={gpsLocation || driverLocation}
             onSearchRoutes={handleSearchRoutes}
+            syncTrip={activeTrip}
           />
         </div>
 
@@ -840,6 +855,7 @@ export default function Home() {
                   setRoutes([]);
                   setSelectedRouteId(null);
                   setActualPickupPoint(null);
+                  setActiveTrip(null);
                   setIsFakeGps(false);
                   setActiveTab('map');
                   setIsPanelOpen(true);

@@ -16,17 +16,33 @@ const PRESET_LOCATIONS: Location[] = [
 interface TripInputBarProps {
   driverLocation: [number, number];
   onSearchRoutes: (origin: Location, destination: Location) => void;
+  /** Đồng bộ hiển thị khi tìm tuyến từ demo / CoolStop / pickup modal */
+  syncTrip?: { origin: Location; destination: Location } | null;
+}
+
+function normalizeLocationName(loc: Location): Location {
+  if (loc.name === 'Vị trí của bạn' || loc.name === 'Vị trí hiện tại') {
+    return { ...loc, name: 'Vị trí hiện tại' };
+  }
+  return loc;
+}
+
+function isSameLocation(a: Location, b: Location): boolean {
+  return Math.abs(a.lat - b.lat) < 0.0001 && Math.abs(a.lng - b.lng) < 0.0001;
 }
 
 export default function TripInputBar({
   driverLocation,
   onSearchRoutes,
+  syncTrip,
 }: TripInputBarProps) {
-  const defaultOrigin: Location = {
+  const makeCurrentLocation = (): Location => ({
     name: 'Vị trí hiện tại',
     lat: driverLocation[0],
     lng: driverLocation[1],
-  };
+  });
+
+  const defaultOrigin = makeCurrentLocation();
 
   const [origin, setOrigin] = useState<Location | null>(defaultOrigin);
   const [destination, setDestination] = useState<Location | null>(null);
@@ -54,16 +70,34 @@ export default function TripInputBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Update origin when driverLocation changes
+  // Update origin when driverLocation changes (chỉ khi điểm đón là GPS hiện tại)
   useEffect(() => {
     if (origin?.name === 'Vị trí hiện tại') {
-      setOrigin({
-        name: 'Vị trí hiện tại',
-        lat: driverLocation[0],
-        lng: driverLocation[1],
-      });
+      setOrigin(makeCurrentLocation());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [driverLocation, origin?.name]);
+
+  // Đồng bộ từ luồng demo bên ngoài (Gọi xe, CoolStop, pickup an toàn...)
+  useEffect(() => {
+    if (!syncTrip) {
+      const loc = makeCurrentLocation();
+      setOrigin(loc);
+      setOriginText(loc.name);
+      setDestination(null);
+      setDestText('');
+      setIsCollapsed(false);
+      return;
+    }
+    const o = normalizeLocationName(syncTrip.origin);
+    const d = normalizeLocationName(syncTrip.destination);
+    setOrigin(o);
+    setOriginText(o.name);
+    setDestination(d);
+    setDestText(d.name);
+    setIsCollapsed(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncTrip]);
 
   // ─── Nominatim Geocoding (OpenStreetMap, miễn phí, không cần key) ─────────
   // API: https://nominatim.openstreetmap.org/search
@@ -192,36 +226,46 @@ export default function TripInputBar({
   };
 
   const handleSwap = () => {
-    const prevOrigin = origin;
-    const prevOriginText = originText;
-    const prevDest = destination;
-    const prevDestText = destText;
+    if (!origin || !destination) return;
 
-    setOrigin(prevDest);
-    setOriginText(prevDestText);
-    setDestination(prevOrigin);
-    setDestText(prevOriginText);
+    let newOrigin = normalizeLocationName(destination);
+    let newOriginText = destText || newOrigin.name;
+    let newDest = normalizeLocationName(origin);
+    let newDestText = originText || newDest.name;
+
+    if (newOrigin.name === 'Vị trí hiện tại') {
+      newOrigin = makeCurrentLocation();
+      newOriginText = 'Vị trí hiện tại';
+    }
+    if (newDest.name === 'Vị trí hiện tại') {
+      newDest = makeCurrentLocation();
+      newDestText = 'Vị trí hiện tại';
+    }
+
+    if (isSameLocation(newOrigin, newDest)) return;
+
+    setOrigin(newOrigin);
+    setOriginText(newOriginText);
+    setDestination(newDest);
+    setDestText(newDestText);
     setActiveField(null);
   };
 
   const handleResetOrigin = () => {
-    const loc: Location = {
-      name: 'Vị trí hiện tại',
-      lat: driverLocation[0],
-      lng: driverLocation[1],
-    };
+    const loc = makeCurrentLocation();
     setOrigin(loc);
     setOriginText(loc.name);
     setActiveField(null);
   };
 
   const handleSearch = () => {
-    if (origin && destination) {
-      onSearchRoutes(origin, destination);
-    }
+    if (!origin || !destination) return;
+    if (isSameLocation(origin, destination)) return;
+    onSearchRoutes(origin, destination);
   };
 
-  const isSearchDisabled = !destination;
+  const isSearchDisabled = !origin || !destination || isSameLocation(origin, destination);
+  const isSwapDisabled = !origin || !destination;
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -238,10 +282,10 @@ export default function TripInputBar({
           >
             <div className="flex items-center gap-3 text-sm">
               <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-              <span className="text-white font-extrabold truncate max-w-[100px] drop-shadow-md">{originText || 'Vị trí hiện tại'}</span>
+              <span className="text-white font-extrabold truncate max-w-[100px] drop-shadow-md">{origin?.name || originText || 'Điểm đón'}</span>
               <span className="text-gray-500 font-bold">→</span>
               <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]" />
-              <span className="text-gray-400 font-medium truncate max-w-[120px]">{destText || 'Bạn muốn đi đâu?'}</span>
+              <span className="text-gray-400 font-medium truncate max-w-[120px]">{destination?.name || destText || 'Bạn muốn đi đâu?'}</span>
             </div>
             <button className="text-gray-400 hover:text-emerald-400 bg-white/5 p-1.5 rounded-full transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -316,7 +360,12 @@ export default function TripInputBar({
                 <button
                   type="button"
                   onClick={handleSwap}
-                  className="flex items-center justify-center w-8 h-8 rounded-full border border-white/10 bg-black/60 backdrop-blur-md text-gray-400 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-black/80 hover:scale-110 active:scale-90 transition-all duration-300 shadow-xl"
+                  disabled={isSwapDisabled}
+                  className={`flex items-center justify-center w-8 h-8 rounded-full border border-white/10 bg-black/60 backdrop-blur-md transition-all duration-300 shadow-xl ${
+                    isSwapDisabled
+                      ? 'text-gray-600 cursor-not-allowed opacity-50'
+                      : 'text-gray-400 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-black/80 hover:scale-110 active:scale-90'
+                  }`}
                   title="Hoán đổi điểm đón và điểm đến"
                 >
                   <ArrowUpDown size={14} strokeWidth={2.5} />
