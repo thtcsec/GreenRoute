@@ -827,6 +827,33 @@ export default function Home() {
               </button>
             </motion.div>
           )}
+
+          {isTripStarted && isPassengerPickedUp && (
+            <motion.div 
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="absolute bottom-6 left-0 right-0 px-4 z-50 flex justify-center pointer-events-none"
+            >
+              <button
+                onClick={() => {
+                  setIsTripStarted(false);
+                  setIsPassengerPickedUp(false);
+                  setOsrmRoute(null);
+                  setOsrmInfo(null);
+                  setRoutes([]);
+                  setSelectedRouteId(null);
+                  setActualPickupPoint(null);
+                  setIsFakeGps(false);
+                  setActiveTab('map');
+                  setIsPanelOpen(true);
+                }}
+                className="w-full max-w-sm py-4 rounded-xl font-bold text-gray-900 bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_30px_rgba(16,185,129,0.5)] pointer-events-auto active:scale-95 transition-transform text-lg flex items-center justify-center gap-2"
+              >
+                HOÀN THÀNH CHUYẾN ĐI
+              </button>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </div>
