@@ -256,7 +256,7 @@ export default function Home() {
     const origin = gpsLocation || driverLocation;
     await handleSearchRoutes(
       { name: 'Vị trí hiện tại', lat: origin[0], lng: origin[1] },
-      { name: name || 'Điểm đón an toàn', lat, lng }
+      { name: _name || 'Điểm đón an toàn', lat, lng }
     );
   };
 

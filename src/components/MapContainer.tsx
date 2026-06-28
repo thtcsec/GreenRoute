@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints } from '@/types';
+import { CoolStop, HeatZone, FloodRisk, Route, ClimateReport, PickupPoints, TrafficZone } from '@/types';
 import L from 'leaflet';
 
 import LeafletMap from './LeafletMap';
@@ -11,6 +11,7 @@ interface MapContainerProps {
   coolstops: CoolStop[];
   heatZones: HeatZone[];
   floodRisks: FloodRisk[];
+  trafficZones: TrafficZone[];
   routes: Route[];
   selectedRouteId: string | null;
   pickupPoints: PickupPoints | null;

@@ -149,9 +149,9 @@ export function calculateClimateScore(
       let reportFloodBoost = 0;
       for (const report of reports) {
         if (haversine(point, [report.lat, report.lng]) < 300) {
-          if (report.type === 'Trời quá nóng' || report.type === 'Thiếu bóng râm') {
+          if (report.type === 'Too hot' || report.type === 'No shade') {
             reportHeatBoost += 10;
-          } else if (report.type === 'Đường ngập nước') {
+          } else if (report.type === 'Flooded') {
             reportFloodBoost += 10;
           }
         }
@@ -179,7 +179,7 @@ export function calculateClimateScore(
     if (reports) {
       for (const report of reports) {
         if (haversine(point, [report.lat, report.lng]) < 300) {
-          if (report.type === 'Khó dừng đỗ' || report.type === 'Đón trả không an toàn') {
+          if (report.type === 'Hard to stop' || report.type === 'Unsafe pickup/drop-off') {
             minStopDistance += 200; // Increase effective distance
           }
         }
