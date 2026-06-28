@@ -1,120 +1,84 @@
-# GreenRoute - From ideas to action. From action to impact
+# GreenRoute - Eco-Routing & Climate-Safety Assistant
 
-**Dự án Hackathon MVP bởi Team I - iMPACT**
-
-## Thông tin nhóm
-- **Tên nhóm**: Team I - iMPACT
-- **Khẩu hiệu**: *From ideas to action. From action to impact*
-- **Danh sách thành viên**:
-  1. **Nguyễn Hữu Dũng** (ID: 29) - Trường Đại học Công nghệ Thông tin - ĐHQG-HCM (UIT)
-  2. **Trịnh Hoàng Tú** (ID: 2) - Trường Đại học Ngoại ngữ - Tin học TP.HCM (HUFLIT)
-  3. **Nguyễn Phước Nhật Duy** (ID: 101) - Trường Đại học Bách khoa - ĐHQG-HCM (HCMUT)
-  4. **Nguyễn Hoàng An** (ID: 84) - Trường Đại học FPT (FPT)
-  5. **Tiêu Thị Kim Cương** (ID: 69) - Trường Đại học Kinh tế TP.HCM (UEH)
+**Hackathon MVP Project by Team I - iMPACT**
+**Slogan**: *From ideas to action. From action to impact*
 
 ---
 
-## Giới thiệu về GreenRoute
-**GreenRoute** là một bản mẫu ứng dụng di động (mobile web prototype) dành cho tài xế và người giao hàng (shippers). Ứng dụng giúp họ đưa ra các quyết định an toàn hơn và nhận thức về khí hậu trong điều kiện nắng nóng gay gắt hoặc mưa bão tại khu vực đô thị (khu vực Thủ Đức / ĐHQG-HCM làm trung tâm):
-- Tìm điểm dừng mát mẻ (**CoolStop**) để nghỉ ngơi tạm thời hoặc đợi đơn hàng.
-- Tránh các khu vực rủi ro nhiệt độ cực đoan và các điểm ngập nước nghiêm trọng.
-- So sánh các tuyến đường khí hậu (**Climate Routes**): Tuyến đường Nhanh nhất (Fastest), Tuyến đường Cân bằng (Balanced), Tuyến đường Mát nhất (Coolest).
-- Gợi ý điểm đón/trả khách an toàn hơn thay thế cho điểm mặc định bị nắng/ngập.
-- Báo cáo thời tiết khí hậu thời gian thực lưu vào thiết bị (`localStorage`) và hiển thị ngay trên bản đồ.
+## 🛑 Problem Statement
+
+According to UNDP research, 94% of outdoor workers (especially gig drivers and shippers) have experienced health issues due to extreme weather, such as severe heatwaves. Over 66% have incurred additional expenses for vehicle repairs or medical care due to exposure to heavy rain and urban flooding.
+
+However, almost all current navigation and mapping applications solve only one core problem: **"What is the fastest route?"** while completely ignoring a more critical question for gig workers: **"What is the safest route to work?"**. Drivers are frequently pushed into heat cores, deep flood zones, or forced to wait for orders in areas lacking shade, directly impacting their health and livelihood.
 
 ---
 
-## Why GreenRoute is different
+## 💡 Solution Overview
 
-GreenRoute is not another map or a generic green-route planner.
+**GreenRoute** is not built to replace Google Maps. We are building a **Climate-Safety Layer** integrated on top of existing map platforms, empowering drivers and shippers to make safer working decisions based on real-time climate data.
 
-Most navigation tools optimize for speed. GreenRoute optimizes climate-safe working decisions for drivers and shippers during high-risk moments: waiting, stopping, pickup/drop-off, and routing under heat or rain.
+The philosophy of GreenRoute is **"Suggest, don't force"**. The application provides a comprehensive view of environmental risks (Heat, Flood, Lack of Shade, Traffic Congestion), and then suggests optimal alternative pickup/drop-off points and routes. Drivers are given **full autonomy** to balance between completing trips quickly and protecting their personal health.
 
-Our key differentiation:
-- **Driver-first**: designed for drivers and shippers, not casual commuters.
-- **Stop-first**: recommends safer waiting and pickup/drop-off points, not only routes.
-- **Rain-aware**: combines rain signals, local flood-risk points, and driver reports.
-- **Report-driven**: drivers become real-time climate sensors for the city.
-- **Integration-ready**: can become an API/SDK layer for mobility platforms and city dashboards.
+In the long term, GreenRoute is positioned as a **B2B SaaS**, providing Routing APIs and a Climate Analytics Dashboard for ride-hailing super apps, logistics enterprises, and Smart City projects.
 
 ---
 
-## Data & API Strategy
+## 🚀 Features
 
-**Live data:**
-- OpenStreetMap + Leaflet for base map and markers.
-- Weather forecast API for heat and rain signal.
-- Driver reports for real-time hotspot updates.
+1. **Climate-Aware Map:**
+   - An intuitive map layer that visualizes Heat Zones (orange/red) and Flood Risks (blue) in real-time.
 
-**Pilot layer:**
-- Local urban flood-risk points for water pooling, hard-to-stop locations, and unsafe pickup/drop-off areas.
+2. **Safety Pickup Suggestion & Alerts:**
+   - Automatically scans the passenger's location upon a ride request. If the passenger is in a high-risk area (e.g., severe flooding), the AI triggers an emergency alert and suggests a new, safer pickup point nearby (e.g., a high-ground apartment lobby 60m away).
 
-**Why hybrid:**
-Regional flood forecasts do not fully capture street-level urban waterlogging. GreenRoute combines forecast context with local driver intelligence to produce practical recommendations.
+3. **CoolStop Recommendation:**
+   - Scans and recommends cool, shaded stops or covered areas along the way for drivers to rest safely while waiting for their next ride.
 
----
+4. **Smart Route Comparison (Routing Engine):**
+   - Calculates and directly compares multiple routes:
+     - **Fastest Route:** Purely optimized for speed.
+     - **Balanced Route:** Recommended by the AI as "Optimal"—accepting a 1-3 minute delay but avoiding most heat cores and flood spots.
+   - Consistently calculates estimated earnings and fuel costs based on the chosen route.
 
-## Judging Criteria Fit
-
-### Problem Definition & Relevance
-Drivers and shippers are exposed to heat, rain, flooding, poor shade, and unsafe stops during daily work. Current maps optimize speed, but not climate-safe working decisions.
-
-### Solution Quality & Innovation
-GreenRoute adds a climate-safety decision layer for waiting, stopping, pickup/drop-off, and routing under heat or rain.
-
-### Feasibility & Implementation
-The MVP uses a mobile web app, OpenStreetMap, pilot data, precomputed routes, and driver reports to prove the core flow within the hackathon timeframe.
-
-### Demo & Pitch
-The demo follows a driver journey: heat alert → CoolStop → balanced route → safer pickup/drop-off → report hotspot.
-
-### Adoption & Scalability
-GreenRoute can start with drivers and shippers, then scale to mobility platforms, campuses, urban districts, and cities.
+5. **Community Report:**
+   - Allows drivers to quickly report hotspots, flooded roads, fallen trees, or traffic jams to provide instant warnings for the entire driver community.
 
 ---
 
-## Công nghệ sử dụng
+## 👥 Team Information (Team I - iMPACT)
+1. **Nguyen Huu Dung** (ID: 29) - UIT
+2. **Trinh Hoang Tu** (ID: 2) - HUFLIT
+3. **Nguyen Phuoc Nhat Duy** (ID: 101) - HCMUT
+4. **Nguyen Hoang An** (ID: 84) - FPT
+5. **Tieu Thi Kim Cuong** (ID: 69) - UEH
+
+---
+
+## 🛠 Technologies Used
 - **Framework**: Next.js 14+ (App Router)
-- **Ngôn ngữ**: TypeScript
-- **Styling**: Tailwind CSS
-- **Bản đồ**: Leaflet kết hợp OpenStreetMap thông qua React-Leaflet
-- **Icons**: Lucide React
-- **Cơ sở dữ liệu**: MongoDB Atlas (Lưu trữ và đồng bộ hóa báo cáo thời tiết thời gian thực của các tài xế)
-- **Đường truyền phát triển**: Cloudflare Tunnel (Wrangler Tunnel) hỗ trợ chạy thử trực tiếp trên điện thoại di động
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS, Framer Motion
+- **Map**: Leaflet & OpenStreetMap (via React-Leaflet)
+- **Database**: MongoDB Atlas (Real-time tracking)
+- **Routing Engine**: OSRM (Open Source Routing Machine) combined with an internal spatial sampling algorithm to calculate the Climate Score.
 
 ---
 
-## Hướng dẫn cài đặt và chạy thử nghiệm
+## 📦 Installation and Demo Guide
 
-### 1. Cài đặt các thư viện cần thiết
-Nếu chạy lần đầu tiên, hãy cài đặt các thư viện phụ thuộc:
-```bash
-npm install
-```
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-### 2. Chạy ứng dụng trong môi trường phát triển
-```bash
-npm run dev
-```
-Mở trình duyệt truy cập: [http://localhost:3000](http://localhost:3000)
+2. **Run Development Server (Localhost):**
+   ```bash
+   npm run dev
+   ```
+   Open your browser and navigate to: [http://localhost:3000](http://localhost:3000)
 
-### 3. Build ứng dụng cho Production (Deploy lên Vercel)
-```bash
-npm run build
-```
-Dự án được cấu hình sẵn sàng để deploy lên Vercel một cách nhanh chóng.
-
-### 4. Chia sẻ ứng dụng & Demo trên điện thoại (Cloudflare Tunnel)
-Để tạo một đường truyền công khai (Public URL) miễn phí giúp ban giám khảo hoặc các thành viên quét mã QR truy cập trực tiếp ứng dụng đang chạy ở `localhost:3000` trên điện thoại di động:
-
-Sử dụng lệnh **Quick Tunnel** tích hợp sẵn trong Wrangler (không cần đăng nhập Cloudflare):
-```bash
-npx wrangler tunnel quick-start http://localhost:3000
-```
-
-Sau khi chạy lệnh trên, Wrangler sẽ tải xuống công cụ `cloudflared` và in ra một đường dẫn ngẫu nhiên có đuôi dạng:
-`https://xxx-xxx-xxx.trycloudflare.com`
-
-**Cách dùng:**
-1. Hãy quét mã QR hoặc truy cập đường link `.trycloudflare.com` này trên điện thoại di động để demo trực tiếp.
-2. Mọi thao tác trên điện thoại sẽ gọi trực tiếp đến API trên máy tính của bạn và cập nhật bản đồ theo thời gian thực.
+3. **Share Mobile Demo (via Cloudflare Tunnel):**
+   ```bash
+   npx wrangler tunnel quick-start http://localhost:3000
+   ```
+   Scan the provided QR code or access the `.trycloudflare.com` link to demo the application directly on your mobile phone.
