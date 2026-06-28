@@ -2,6 +2,11 @@ import { NextResponse, NextRequest } from 'next/server';
 import { Route, HeatZone, FloodRisk, CoolStop, WeatherData, ClimateReport } from '@/types';
 import { calculateClimateScore, haversine, shouldRecommendBalanced, TIME_THRESHOLD_MINS } from '@/lib/climate';
 import clientPromise from '@/lib/mongodb';
+import coolstopsData from '@/data/coolstops.json';
+import heatZonesData from '@/data/heat_zones.json';
+import floodRisksData from '@/data/flood_risks.json';
+import trafficZonesData from '@/data/traffic_zones.json';
+import routesData from '@/data/routes.json';
 
 type OsrmRoute = {
   coordinates: [number, number][];
@@ -267,12 +272,19 @@ export async function GET(request: NextRequest) {
   const destLat = searchParams.get('destLat');
   const destLng = searchParams.get('destLng');
 
+  let dbRoutes: any[] = [];
+  let dbHeat: any[] = [];
+  let dbFlood: any[] = [];
+  let dbCool: any[] = [];
+  let dbReports: any[] = [];
+  let dbTraffic: any[] = [];
+
   try {
     const client = await clientPromise;
     const db = client.db('grab_undp');
     
     // Fetch data from MongoDB
-    const [dbRoutes, dbHeat, dbFlood, dbCool, dbReports, dbTraffic] = await Promise.all([
+    [dbRoutes, dbHeat, dbFlood, dbCool, dbReports, dbTraffic] = await Promise.all([
       db.collection('routes').find({}).toArray(),
       db.collection('heat_zones').find({}).toArray(),
       db.collection('flood_risks').find({}).toArray(),
@@ -280,7 +292,17 @@ export async function GET(request: NextRequest) {
       db.collection('reports').find({}).sort({ timestamp: -1 }).limit(50).toArray(), // Recent reports
       db.collection('traffic_zones').find({}).toArray()
     ]);
+  } catch (dbErr) {
+    console.warn("MongoDB connection failed in routes API, using local JSON fallbacks:", dbErr);
+    dbRoutes = routesData;
+    dbHeat = heatZonesData as HeatZone[];
+    dbFlood = floodRisksData as FloodRisk[];
+    dbCool = coolstopsData as CoolStop[];
+    dbReports = [];
+    dbTraffic = trafficZonesData;
+  }
 
+  try {
     // Fetch Weather Data
     let weatherData: WeatherData | null = null;
     try {
